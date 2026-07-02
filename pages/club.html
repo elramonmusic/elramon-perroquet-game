@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Ramon Music Club — Rejoins la communauté tropicale</title>
+  <meta name="description" content="Bienvenue dans le El Ramon Music Club ! Accède à des guides Suno, prompts IA, tablatures, mini-jeu tropical et bien plus. Rejoins gratuitement la communauté." />
+  <meta property="og:title" content="El Ramon Music Club — Rejoins la communauté tropicale" />
+  <meta property="og:description" content="L'espace tropical où la musique, le soleil et la créativité se rencontrent." />
+  <meta property="og:image" content="../assets/images/parrot-mascot.png" />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+        El Ramon
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link">Accueil</a></li>
+        <li><a href="club.html" class="nav-link" style="color:var(--yellow-sun)">Le Club</a></li>
+        <li><a href="../index.html#videos" class="nav-link">Vidéos</a></li>
+        <li><a href="partenaires.html" class="nav-link">Partenaires</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
+        <li data-guest-show><a href="inscription.html" class="nav-cta">Rejoindre</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile">
+      <a href="../index.html" class="nav-link">Accueil</a>
+      <a href="club.html" class="nav-link text-yellow">Le Club</a>
+      <a href="../index.html#videos" class="nav-link">Videos</a>
+      <a href="partenaires.html" class="nav-link">Partenaires</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <a href="espace-membre.html" class="nav-link" data-auth-show style="display:none">Mon Espace</a>
+      <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre gratuitement</a>
+    </nav>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" style="min-height:90vh;">
+    <div class="hero-bg" style="background-image:url('../assets/images/hero-bg.png');"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-particles"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="hero-badge">Communaute gratuite</span>
+        <h1 class="hero-title font-tropical text-gradient-warm">El Ramon Music Club</h1>
+        <p class="hero-subtitle">
+          Bienvenue dans l'espace tropical ou la musique, le soleil et la creativite se rencontrent. Acces a des ressources exclusives, rejoins une communaute passionnee et vis la musique autrement.
+        </p>
+        <div class="hero-cta">
+          <a href="inscription.html" class="btn btn-primary btn-lg">Rejoindre gratuitement</a>
+          <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">Voir la chaine</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">100%</div>
+            <div class="hero-stat-label">Gratuit</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">6+</div>
+            <div class="hero-stat-label">Avantages</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value text-yellow">Tropical</div>
+            <div class="hero-stat-label">Vibes</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-glow"></div>
+        <img src="../assets/images/parrot-mascot.png" alt="Mascotte perroquet El Ramon" class="hero-parrot" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QU'EST-CE QUE LE CLUB ? ===== -->
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Notre mission</span>
+        <h2 class="section-title">Qu'est-ce que le <span class="text-gradient">El Ramon Music Club</span> ?</h2>
+        <p class="section-subtitle">Un espace communautaire 100% gratuit cree pour les fans de musique tropicale, les createurs curieux et tous ceux qui veulent explorer la musique autrement.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card card-glass text-center reveal reveal-delay-1">
+          <div style="font-size:3rem;margin-bottom:1rem;">&#127926;</div>
+          <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:.75rem;">Musique tropicale</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Des chansons originales creees avec passion, melant salsa, zouk, cumbia et reggae dans un univers solaire unique.</p>
+        </div>
+        <div class="card card-glass text-center reveal reveal-delay-2">
+          <div style="font-size:3rem;margin-bottom:1rem;">&#129302;</div>
+          <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:.75rem;">IA &amp; Creation</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Decouvre comment l'intelligence artificielle transforme la creation musicale. Guides, prompts et tutoriels exclusifs.</p>
+        </div>
+        <div class="card card-glass text-center reveal reveal-delay-3">
+          <div style="font-size:3rem;margin-bottom:1rem;">&#127796;</div>
+          <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:.75rem;">Communaute vivante</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Rejoins des milliers de passionnes, partage tes creations et avance ensemble dans l'univers de la musique tropicale.</p>
+        </div>
+      </div>
+      <div class="card card-dark reveal" style="max-width:800px;margin:3rem auto 0;padding:2.5rem;">
+        <div class="flex items-center gap-md" style="margin-bottom:1.5rem;">
+          <img src="../assets/images/parrot-mascot.png" alt="Mascotte" style="width:70px;height:70px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(255,215,0,0.3));" />
+          <div>
+            <h3 class="font-tropical text-yellow" style="font-size:1.3rem;">Le mot du createur</h3>
+            <p style="color:rgba(255,255,255,.5);font-size:.85rem;">El Ramon Music</p>
+          </div>
+        </div>
+        <blockquote style="font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.8);font-style:italic;border-left:3px solid var(--yellow-sun);padding-left:1.5rem;">
+          "J'ai cree ce club pour partager ma passion de la musique tropicale et de l'IA avec vous. Ensemble, on explore de nouveaux horizons sonores — et on s'amuse ! Bienvenue dans la famille."
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AVANTAGES MEMBRES ===== -->
+  <section class="section section-darker" id="avantages">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Avantages exclusifs</span>
+        <h2 class="section-title">Ce que tu gagnes <span class="text-gradient-tropical">en rejoignant le Club</span></h2>
+        <p class="section-subtitle">Six avantages concrets, accessibles des ton inscription. Gratuit, sans engagement.</p>
+      </div>
+      <div class="bonus-grid">
+        <div class="bonus-card reveal reveal-delay-1">
+          <span class="bonus-icon">&#127918;</span>
+          <h3 class="bonus-title">Mini-Jeu Tropical</h3>
+          <p class="bonus-desc">Un jeu musical exclusif pour tester tes oreilles et t'amuser avec les sonoritees d'El Ramon Music. Scores et classements a venir !</p>
+          <span class="bonus-badge">Acces membre</span>
+        </div>
+        <div class="bonus-card reveal reveal-delay-2">
+          <span class="bonus-icon">&#128218;</span>
+          <h3 class="bonus-title">Guides Suno AI</h3>
+          <p class="bonus-desc">Des guides pas-a-pas pour creer ta propre musique avec Suno. Styles, prompts optimises, astuces de production tropicale.</p>
+          <span class="bonus-badge">Guides PDF</span>
+        </div>
+        <div class="bonus-card reveal reveal-delay-3">
+          <span class="bonus-icon">&#129302;</span>
+          <h3 class="bonus-title">Prompts IA Musique</h3>
+          <p class="bonus-desc">Une bibliotheque de prompts testes et approuves pour generer des chansons tropicales avec l'IA. Prets a copier-coller !</p>
+          <span class="bonus-badge">Collection complete</span>
+        </div>
+        <div class="bonus-card reveal reveal-delay-1">
+          <span class="bonus-icon">&#127928;</span>
+          <h3 class="bonus-title">Tablatures Guitare</h3>
+          <p class="bonus-desc">Apprends a jouer les morceaux El Ramon Music a la guitare. Tablatures adaptees a tous les niveaux, du debutant au confirme.</p>
+          <span class="bonus-badge">Tous niveaux</span>
+        </div>
+        <div class="bonus-card reveal reveal-delay-2">
+          <span class="bonus-icon">&#127902;</span>
+          <h3 class="bonus-title">Bonus Clips Exclusifs</h3>
+          <p class="bonus-desc">Accede en avant-premiere aux nouvelles sorties, behind-the-scenes et contenus exclusifs non publies sur YouTube.</p>
+          <span class="bonus-badge">Avant-premiere</span>
+        </div>
+        <div class="bonus-card reveal reveal-delay-3">
+          <span class="bonus-icon">&#129309;</span>
+          <h3 class="bonus-title">Offres Partenaires</h3>
+          <p class="bonus-desc">Des outils creatifs recommandes par El Ramon : Suno, Flow Music, Kling AI et d'autres. Des offres privilegiees reservees aux membres.</p>
+          <span class="bonus-badge">Offres exclusives</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMENT REJOINDRE ===== -->
+  <section class="section section-warm" id="rejoindre">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Simple et rapide</span>
+        <h2 class="section-title">Rejoindre en <span class="text-gradient-warm">3 etapes simples</span></h2>
+        <p class="section-subtitle">Moins d'une minute. Aucune carte bancaire. Que du bonheur tropical.</p>
+      </div>
+      <div class="grid-3 reveal" style="max-width:900px;margin:0 auto;">
+        <div class="card text-center">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--grad-warm);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--night-blue);margin:0 auto 1.25rem;box-shadow:var(--shadow-glow-yellow);">1</div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.75rem;color:var(--yellow-sun);">Cree ton compte</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Entre ton email et choisis un pseudo. C'est tout ! Pas de mot de passe complexe, pas de CB.</p>
+        </div>
+        <div class="card text-center">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--grad-tropical);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--night-blue);margin:0 auto 1.25rem;box-shadow:var(--shadow-glow-turquoise);">2</div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.75rem;color:var(--turquoise);">Accede a ton espace</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Connecte-toi instantanement et decouvre ton tableau de bord : jeux, guides, prompts et bien plus.</p>
+        </div>
+        <div class="card text-center">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--grad-sunset);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--night-blue);margin:0 auto 1.25rem;box-shadow:var(--shadow-glow-orange);">3</div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.75rem;color:var(--orange-tropical);">Profite et partage</h3>
+          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.7;">Explore les ressources, joue au mini-jeu et partage tes creations avec la communaute tropicale !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA FINAL ===== -->
+  <section class="section section-mid" style="position:relative;overflow:hidden;">
+    <div class="tropical-decoration" style="right:5%;top:10%;font-size:6rem;">&#127796;</div>
+    <div class="tropical-decoration" style="left:3%;bottom:10%;font-size:5rem;animation-delay:2s;">&#127802;</div>
+    <div class="tropical-decoration" style="right:15%;bottom:20%;font-size:4rem;animation-delay:4s;">&#11088;</div>
+    <div class="container text-center reveal">
+      <span class="section-label">Pret(e) ?</span>
+      <h2 class="section-title" style="margin-bottom:1rem;">Rejoins le Club <span class="text-gradient-warm">gratuitement des aujourd'hui</span></h2>
+      <p class="section-subtitle" style="margin-bottom:2.5rem;">Aucune carte bancaire. Aucun engagement. Juste de la musique tropicale, de la bonne humeur et des ressources exclusives.</p>
+      <div class="flex justify-center gap-md" style="flex-wrap:wrap;">
+        <a href="inscription.html" class="btn btn-primary btn-lg">Rejoindre gratuitement</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">D'abord voir la chaine</a>
+      </div>
+      <div class="tags-wrap justify-center" style="margin-top:2rem;">
+        <span class="tag tag-green">100% Gratuit</span>
+        <span class="tag tag-yellow">Acces immediat</span>
+        <span class="tag tag-turquoise">Donnees securisees</span>
+        <span class="tag tag-coral">Communaute tropicale</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+            El Ramon Music
+          </div>
+          <p class="footer-tagline">Les chansons tropicales qui donnent le sourire.</p>
+          <div class="footer-social">
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube">&#9654;</a>
+            <a href="mailto:elramonmusic@gmail.com" class="footer-social-btn" title="Email">&#9993;</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-col-title">Club</p>
+          <ul class="footer-links">
+            <li><a href="club.html" class="footer-link">Le Club</a></li>
+            <li><a href="inscription.html" class="footer-link">Inscription</a></li>
+            <li><a href="login.html" class="footer-link">Connexion</a></li>
+            <li><a href="espace-membre.html" class="footer-link">Espace Membre</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Contenu</p>
+          <ul class="footer-links">
+            <li><a href="guides-suno.html" class="footer-link">Guides Suno</a></li>
+            <li><a href="prompts.html" class="footer-link">Prompts IA</a></li>
+            <li><a href="tablatures.html" class="footer-link">Tablatures</a></li>
+            <li><a href="jeu.html" class="footer-link">Mini-Jeu</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Info</p>
+          <ul class="footer-links">
+            <li><a href="partenaires.html" class="footer-link">Partenaires</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+            <li><a href="confidentialite.html" class="footer-link">Confidentialite</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2025 El Ramon Music Club. Fait avec soleil et passion.</span>
+        <div class="footer-bottom-links">
+          <a href="confidentialite.html" class="footer-bottom-link">Confidentialite</a>
+          <a href="contact.html" class="footer-bottom-link">Contact</a>
+        </div>
+      </div>
+      <p class="footer-affiliate-note">Certains liens sont des liens affilies. Cela nous aide a maintenir le Club gratuit.</p>
+    </div>
+  </footer>
+
+  <div class="cookie-banner">
+    <p class="cookie-text">On utilise des cookies pour ameliorer ton experience. <a href="confidentialite.html">En savoir plus</a></p>
+    <div class="cookie-actions">
+      <button class="btn btn-primary btn-sm" data-cookie-accept>Accepter</button>
+      <button class="btn btn-secondary btn-sm" data-cookie-decline>Refuser</button>
+    </div>
+  </div>
+
+  <script src="../app.js"></script>
+</body>
+</html>

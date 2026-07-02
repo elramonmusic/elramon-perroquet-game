@@ -1,0 +1,54 @@
+# ============================================================
+# Cloudflare Pages — _headers
+# Configuration des en-têtes HTTP de sécurité et de cache
+# El Ramon Music Club
+# ============================================================
+
+# --- Headers globaux (toutes les pages) ---
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+# --- Pages HTML : pas de cache (contenu peut évoluer) ---
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# --- Assets statiques : cache long (1 an) ---
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# --- CSS et JS : cache modéré (1 jour, revalidation) ---
+/styles.css
+  Cache-Control: public, max-age=86400
+/app.js
+  Cache-Control: public, max-age=86400
+
+# --- Pages membres : empêcher l'indexation et le cache ---
+/pages/espace-membre.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/pages/jeu.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/pages/guides-suno.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/pages/prompts.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/pages/tablatures.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/pages/merci.html
+  X-Robots-Tag: noindex, nofollow
+/pages/login.html
+  X-Robots-Tag: noindex, nofollow
+
+# --- Pages légales : indexables mais cache court ---
+/pages/mentions-legales.html
+  Cache-Control: public, max-age=0, must-revalidate
+/pages/confidentialite.html
+  Cache-Control: public, max-age=0, must-revalidate

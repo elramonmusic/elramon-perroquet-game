@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription — El Ramon Music Club</title>
+  <meta name="description" content="Rejoins gratuitement le El Ramon Music Club. Acces instantane aux guides Suno, prompts IA, tablatures, mini-jeu et contenu exclusif." />
+  <meta property="og:title" content="Inscription — El Ramon Music Club" />
+  <meta property="og:description" content="Rejoins la communaute tropicale d'El Ramon Music. 100% gratuit, acces immediat." />
+  <meta property="og:image" content="../assets/images/parrot-mascot.png" />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .inscription-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .inscription-layout {
+        grid-template-columns: 1fr;
+      }
+      .inscription-sidebar {
+        order: -1;
+      }
+    }
+    .form-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(20px);
+    }
+    .sidebar-benefit {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-benefit:last-child { border-bottom: none; }
+    .sidebar-benefit-icon {
+      font-size: 1.5rem;
+      min-width: 2rem;
+      text-align: center;
+    }
+    .sidebar-benefit-text h4 {
+      font-size: .95rem;
+      font-weight: 700;
+      margin-bottom: .2rem;
+      color: var(--white-light);
+    }
+    .sidebar-benefit-text p {
+      font-size: .8rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+        El Ramon
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link">Accueil</a></li>
+        <li><a href="club.html" class="nav-link">Le Club</a></li>
+        <li><a href="../index.html#videos" class="nav-link">Videos</a></li>
+        <li><a href="partenaires.html" class="nav-link">Partenaires</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
+        <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile">
+      <a href="../index.html" class="nav-link">Accueil</a>
+      <a href="club.html" class="nav-link">Le Club</a>
+      <a href="../index.html#videos" class="nav-link">Videos</a>
+      <a href="partenaires.html" class="nav-link">Partenaires</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <a href="espace-membre.html" class="nav-link" data-auth-show style="display:none">Mon Espace</a>
+      <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
+    </nav>
+  </header>
+
+  <!-- ===== PAGE HERO ===== -->
+  <section class="page-hero" style="padding-bottom:3rem;">
+    <div class="tropical-decoration" style="left:5%;top:30%;">&#127796;</div>
+    <div class="tropical-decoration" style="right:8%;top:20%;animation-delay:3s;">&#127802;</div>
+    <div class="tropical-decoration" style="right:20%;bottom:10%;animation-delay:1.5s;font-size:3rem;">&#11088;</div>
+    <span class="hero-badge" style="margin-bottom:1.5rem;">Gratuit et sans engagement</span>
+    <h1 class="page-hero-title">
+      Rejoins le <span class="text-gradient-warm font-tropical">El Ramon Music Club</span>
+    </h1>
+    <p class="page-hero-subtitle">
+      Cree ton compte en moins d'une minute et accede instantanement a tous les avantages membres. La musique tropicale t'attend !
+    </p>
+  </section>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <section class="section-sm section-darker">
+    <div class="container">
+      <div class="inscription-layout">
+
+        <!-- FORM COLUMN -->
+        <div>
+          <div class="form-card">
+            <div class="flex items-center gap-md" style="margin-bottom:2rem;">
+              <img src="../assets/images/parrot-mascot.png" alt="Perroquet" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(255,215,0,.3));" />
+              <div>
+                <h2 style="font-size:1.4rem;font-weight:800;color:var(--white-light);">Creer mon compte</h2>
+                <p style="color:rgba(255,255,255,.5);font-size:.85rem;">Acces immediat apres inscription</p>
+              </div>
+            </div>
+
+            <!-- SUCCESS MESSAGE -->
+            <div class="form-success" id="form-success-msg" style="margin-bottom:1.5rem;">
+              <p style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Bienvenue dans le Club !</p>
+              <p>Ton compte a ete cree. Redirection en cours...</p>
+            </div>
+
+            <form id="inscription-form" novalidate>
+
+              <!-- EMAIL -->
+              <div class="form-group">
+                <label class="form-label" for="email">
+                  Adresse email <span class="required">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-input"
+                  placeholder="tonemail@exemple.com"
+                  required
+                  autocomplete="email"
+                />
+                <p class="form-error" id="email-error"></p>
+              </div>
+
+              <!-- PSEUDO -->
+              <div class="form-group">
+                <label class="form-label" for="pseudo">
+                  Pseudo YouTube ou reseau social <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="pseudo"
+                  name="pseudo"
+                  class="form-input"
+                  placeholder="TonPseudo"
+                  required
+                  autocomplete="username"
+                />
+                <p class="form-error" id="pseudo-error"></p>
+              </div>
+
+              <!-- PRENOM -->
+              <div class="form-group">
+                <label class="form-label" for="prenom">
+                  Prenom <span style="color:rgba(255,255,255,.4);font-weight:400;">(facultatif)</span>
+                </label>
+                <input
+                  type="text"
+                  id="prenom"
+                  name="prenom"
+                  class="form-input"
+                  placeholder="Ton prenom"
+                  autocomplete="given-name"
+                />
+              </div>
+
+              <!-- NEWSLETTER -->
+              <div class="form-checkbox-group">
+                <input type="checkbox" id="newsletter" name="newsletter" class="form-checkbox" />
+                <label class="form-checkbox-label" for="newsletter">
+                  Je souhaite recevoir les bonus El Ramon Music (guides, prompts, nouveautes)
+                </label>
+              </div>
+
+              <!-- ABONNE -->
+              <div class="form-checkbox-group">
+                <input type="checkbox" id="abonne" name="abonne" class="form-checkbox" />
+                <label class="form-checkbox-label" for="abonne">
+                  Je suis abonne ou je souhaite suivre la
+                  <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" style="color:var(--coral-red);text-decoration:underline;">chaine El Ramon Music</a>
+                  sur YouTube
+                </label>
+              </div>
+
+              <!-- RGPD -->
+              <div class="form-checkbox-group" style="margin-top:.5rem;padding:.75rem;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:12px;">
+                <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required />
+                <label class="form-checkbox-label" for="rgpd">
+                  <strong style="color:var(--white-light);">J'accepte la politique de confidentialite et le traitement de mes donnees</strong>
+                  — conformement au RGPD. <a href="confidentialite.html" style="color:var(--turquoise);text-decoration:underline;">Lire la politique</a>
+                </label>
+              </div>
+              <p class="form-error" id="rgpd-error" style="margin-top:.25rem;"></p>
+
+              <!-- SUBMIT -->
+              <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.75rem;font-size:1.05rem;">
+                Rejoindre le Club gratuitement
+              </button>
+
+              <p style="text-align:center;color:rgba(255,255,255,.4);font-size:.78rem;margin-top:1rem;">
+                Aucune carte bancaire. Aucun engagement. Desabonnement en un clic.
+              </p>
+
+            </form>
+          </div>
+
+          <!-- YouTube link -->
+          <div class="alert alert-info" style="margin-top:1.5rem;">
+            <span style="font-size:1.3rem;">&#9654;</span>
+            <div>
+              <strong>Abonne-toi d'abord a la chaine !</strong><br/>
+              <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" style="color:var(--turquoise);text-decoration:underline;">youtube.com/@El-Ramon-Music</a>
+              — Des nouvelles chansons tropicales chaque semaine.
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="inscription-sidebar">
+          <div class="card card-dark" style="padding:2rem;">
+            <div class="flex items-center gap-sm" style="margin-bottom:1.5rem;">
+              <span style="font-size:1.5rem;">&#127881;</span>
+              <h3 style="font-size:1.1rem;font-weight:800;color:var(--yellow-sun);">Tes avantages membres</h3>
+            </div>
+
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#127918;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Mini-Jeu Tropical</h4>
+                <p>Un jeu exclusif pour tester tes oreilles musicales</p>
+              </div>
+            </div>
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#128218;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Guides Suno AI</h4>
+                <p>Cree ta propre musique avec l'IA, pas a pas</p>
+              </div>
+            </div>
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#129302;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Prompts IA Musique</h4>
+                <p>Bibliotheque de prompts testes et prrets a l'emploi</p>
+              </div>
+            </div>
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#127928;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Tablatures Guitare</h4>
+                <p>Apprends les morceaux El Ramon Music tous niveaux</p>
+              </div>
+            </div>
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#127902;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Clips Exclusifs</h4>
+                <p>Avant-premieres et contenus inedits</p>
+              </div>
+            </div>
+            <div class="sidebar-benefit">
+              <span class="sidebar-benefit-icon">&#129309;</span>
+              <div class="sidebar-benefit-text">
+                <h4>Offres Partenaires</h4>
+                <p>Suno, Flow Music, Kling AI et plus encore</p>
+              </div>
+            </div>
+
+            <div class="divider-tropical" style="margin:1.5rem 0;"></div>
+
+            <div class="text-center">
+              <span class="badge badge-free" style="font-size:.85rem;padding:.4rem 1rem;">100% GRATUIT</span>
+              <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:.75rem;">Aucune carte requise.<br/>Acces immediat a la creation du compte.</p>
+            </div>
+          </div>
+
+          <!-- Already member -->
+          <div style="text-align:center;margin-top:1.5rem;padding:1.25rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;">
+            <p style="color:rgba(255,255,255,.55);font-size:.875rem;margin-bottom:.75rem;">Deja membre du Club ?</p>
+            <a href="login.html" class="btn btn-secondary btn-sm">Se connecter</a>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+            El Ramon Music
+          </div>
+          <p class="footer-tagline">Les chansons tropicales qui donnent le sourire.</p>
+          <div class="footer-social">
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube">&#9654;</a>
+            <a href="mailto:elramonmusic@gmail.com" class="footer-social-btn" title="Email">&#9993;</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-col-title">Club</p>
+          <ul class="footer-links">
+            <li><a href="club.html" class="footer-link">Le Club</a></li>
+            <li><a href="inscription.html" class="footer-link">Inscription</a></li>
+            <li><a href="login.html" class="footer-link">Connexion</a></li>
+            <li><a href="espace-membre.html" class="footer-link">Espace Membre</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Contenu</p>
+          <ul class="footer-links">
+            <li><a href="guides-suno.html" class="footer-link">Guides Suno</a></li>
+            <li><a href="prompts.html" class="footer-link">Prompts IA</a></li>
+            <li><a href="tablatures.html" class="footer-link">Tablatures</a></li>
+            <li><a href="jeu.html" class="footer-link">Mini-Jeu</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Info</p>
+          <ul class="footer-links">
+            <li><a href="partenaires.html" class="footer-link">Partenaires</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+            <li><a href="confidentialite.html" class="footer-link">Confidentialite</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2025 El Ramon Music Club. Fait avec soleil et passion.</span>
+        <div class="footer-bottom-links">
+          <a href="confidentialite.html" class="footer-bottom-link">Confidentialite</a>
+          <a href="contact.html" class="footer-bottom-link">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner">
+    <p class="cookie-text">On utilise des cookies pour ameliorer ton experience. <a href="confidentialite.html">En savoir plus</a></p>
+    <div class="cookie-actions">
+      <button class="btn btn-primary btn-sm" data-cookie-accept>Accepter</button>
+      <button class="btn btn-secondary btn-sm" data-cookie-decline>Refuser</button>
+    </div>
+  </div>
+
+  <script src="../app.js"></script>
+</body>
+</html>

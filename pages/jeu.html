@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini-Jeu Tropical — El Ramon Music Club</title>
+  <meta name="description" content="Le mini-jeu du perroquet tropical ! Un jeu de plateforme 2D rétro façon Mario, exclusif aux membres El Ramon Music Club." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Mini-Jeu Tropical — El Ramon Music Club" />
+  <meta property="og:description" content="Joue au mini-jeu du perroquet tropical ! Exclusif membres." />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .jeu-hero {
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-3xl);
+      background: linear-gradient(135deg, var(--night-blue) 0%, var(--deep-purple) 40%, rgba(46,204,113,0.15) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .jeu-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,215,0,0.15) 0%, transparent 55%),
+                  radial-gradient(ellipse at 70% 30%, rgba(46,204,113,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .jeu-hero-emoji {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: var(--space-md);
+      animation: float-parrot 3s ease-in-out infinite;
+    }
+    .jeu-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      margin-bottom: var(--space-sm);
+    }
+    .jeu-hero p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.75);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .game-area {
+      background: rgba(15,52,96,0.4);
+      border: 2px solid rgba(255,215,0,0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      text-align: center;
+      margin: var(--space-xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-area::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--grad-warm);
+    }
+    .game-placeholder {
+      background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(46,204,113,0.06) 100%);
+      border: 2px dashed rgba(255,215,0,0.25);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3xl) var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+    .game-placeholder-icon { font-size: 5rem; margin-bottom: var(--space-lg); display:block; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+    .feature-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+    .feature-icon { font-size: 2rem; margin-bottom: 0.5rem; display:block; }
+    .feature-name { font-size: 0.9rem; font-weight: 700; color: var(--white-light); }
+    .feature-desc { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; }
+    .game-stats {
+      display: flex;
+      gap: var(--space-lg);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--space-xl);
+    }
+    .game-stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      text-align: center;
+      min-width: 120px;
+    }
+    .game-stat-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--yellow-sun);
+    }
+    .game-stat-label {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH GATE -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.ElRamon) {
+        window.ElRamon.Auth.requireAuth('./inscription.html');
+      } else {
+        try {
+          const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
+          if (!m) window.location.href = './inscription.html';
+        } catch(e) { window.location.href = './inscription.html'; }
+      }
+    });
+  </script>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="./tablatures.html" class="nav-link">🎸 Tablatures</a></li>
+        <li><a href="./jeu.html" class="nav-link" style="color:var(--yellow-sun);">🎮 Mini-Jeu</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./tablatures.html" class="nav-link">🎸 Tablatures</a>
+      <a href="./jeu.html" class="nav-link text-yellow">🎮 Mini-Jeu</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
+    </nav>
+  </header>
+
+  <section class="jeu-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="jeu-hero-emoji">🦜🎮</span>
+      <div class="hero-badge" style="margin: 0 auto var(--space-md);">
+        <span>🌴</span> Contenu Membre Exclusif
+      </div>
+      <h1 class="text-gradient-warm">Mini-Jeu Tropical</h1>
+      <p>Aide le perroquet à atteindre le perchoir final ! Un jeu de plateforme 2D rétro avec une ambiance 100% tropicale.</p>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+
+      <div class="game-area">
+        <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:var(--space-sm); color:var(--white-light);">Le Jeu du Perroquet Tropical</h2>
+        <p style="color:rgba(255,255,255,0.7); max-width:600px; margin:0 auto var(--space-xl); line-height:1.7;">
+          Un mini-jeu rétro façon plateforme, inspiré des jeux à l'ancienne. Guide le perroquet à travers des niveaux remplis de fruits, potions, ennemis et passages secrets !
+        </p>
+
+        <div class="game-placeholder">
+          <span class="game-placeholder-icon">🦜</span>
+          <h3 style="font-size:1.4rem; font-weight:800; color:var(--yellow-sun); margin-bottom:var(--space-sm);">Le jeu arrive bientôt !</h3>
+          <p style="color:rgba(255,255,255,0.6); max-width:500px; margin:0 auto; line-height:1.7;">
+            Le mini-jeu du perroquet tropical est en cours de développement. Les premiers niveaux seront disponibles très prochainement pour tous les membres du Club.
+          </p>
+          <div style="margin-top:var(--space-xl);">
+            <a href="./espace-membre.html" class="btn btn-primary btn-lg">Retour au Dashboard</a>
+          </div>
+        </div>
+
+        <div class="game-stats">
+          <div class="game-stat">
+            <div class="game-stat-value">3</div>
+            <div class="game-stat-label">Vies par niveau</div>
+          </div>
+          <div class="game-stat">
+            <div class="game-stat-value">5+</div>
+            <div class="game-stat-label">Objets à collecter</div>
+          </div>
+          <div class="game-stat">
+            <div class="game-stat-value">∞</div>
+            <div class="game-stat-label">Niveaux prévus</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section-sm section-alt">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">🎮 Fonctionnalités</span>
+        <h2 class="section-title">Ce qui t'attend dans le <span class="text-gradient-warm">jeu</span></h2>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon">🦜</span>
+          <div class="feature-name">Perroquet Tropical</div>
+          <div class="feature-desc">Ton personnage : un perroquet joyeux et coloré</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🍎</span>
+          <div class="feature-name">Fruits</div>
+          <div class="feature-desc">Collecte des fruits pour gagner des plumes</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🧪</span>
+          <div class="feature-name">Potions</div>
+          <div class="feature-desc">Change la couleur ou donne l'invincibilité</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🪶</span>
+          <div class="feature-name">Plumes</div>
+          <div class="feature-desc">Système de vies : 3 plumes par niveau</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">👾</span>
+          <div class="feature-name">Ennemis</div>
+          <div class="feature-desc">Esquive les ennemis tropicaux</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🚪</span>
+          <div class="feature-name">Passages secrets</div>
+          <div class="feature-desc">Découvre des zones cachées</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">👑</span>
+          <div class="feature-name">Boss final</div>
+          <div class="feature-desc">Affronte le boss de chaque niveau</div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🏆</span>
+          <div class="feature-name">Classement</div>
+          <div class="feature-desc">Bientôt : classement entre membres</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container text-center" style="max-width:600px;">
+      <h2 style="font-size:1.4rem; margin-bottom:var(--space-md);">En attendant le jeu…</h2>
+      <p style="color:rgba(255,255,255,0.7); margin-bottom:var(--space-xl); line-height:1.7;">
+        Découvre les guides Suno IA, la bibliothèque de prompts et les tablatures pendant que le perroquet tropical se prépare pour l'aventure !
+      </p>
+      <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+        <a href="./guides-suno.html" class="btn btn-primary">📖 Guides Suno</a>
+        <a href="./prompts.html" class="btn btn-secondary">🤖 Prompts IA</a>
+        <a href="./tablatures.html" class="btn btn-turquoise">🎸 Tablatures</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
+    <div class="container">
+      <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
+      <div style="display:flex; justify-content:center; gap:var(--space-lg); flex-wrap:wrap; font-size:0.88rem;">
+        <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
+        <a href="./espace-membre.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Dashboard</a>
+        <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">YouTube</a>
+      </div>
+      <p style="color:rgba(255,255,255,0.25); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.4);">elramonmusic@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script src="../app.js"></script>
+</body>
+</html>

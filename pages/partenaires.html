@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partenaires — El Ramon Music Club</title>
+  <meta name="description" content="Les partenaires d'El Ramon Music Club : Gard Eau Arbres, Suno, Flow Music, Kling, outils IA musique, liens utiles et parrainage." />
+  <meta property="og:title" content="Partenaires — El Ramon Music Club" />
+  <meta property="og:description" content="Découvrez les partenaires et outils recommandés par El Ramon Music Club." />
+  <meta property="og:image" content="../assets/images/logo.png" />
+  <link rel="icon" type="image/png" href="../assets/images/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .partner-section-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid rgba(255,215,0,0.15);
+    }
+
+    .partner-section-title h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .partner-section-icon {
+      font-size: 2rem;
+      min-width: 2.5rem;
+    }
+
+    .tool-link-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-mid);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .tool-link-card:hover {
+      border-color: rgba(255,215,0,0.25);
+      background: rgba(255,215,0,0.04);
+      transform: translateX(5px);
+    }
+
+    .tool-link-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .tool-link-icon {
+      font-size: 2rem;
+      min-width: 2.5rem;
+      text-align: center;
+    }
+
+    .tool-link-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .tool-link-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .gard-eau-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+    }
+
+    .gard-eau-link-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(46,204,113,0.08);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-radius: var(--radius-md);
+      color: var(--palm-green);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all var(--transition-fast);
+    }
+
+    .gard-eau-link-btn:hover {
+      background: rgba(46,204,113,0.15);
+      border-color: rgba(46,204,113,0.4);
+      transform: translateY(-2px);
+    }
+
+    .affiliate-disclaimer {
+      background: rgba(255,215,0,0.06);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-2xl) 0;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      font-style: italic;
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/images/logo.png" alt="El Ramon Music Club" width="40" height="40" />
+      <span>El Ramon Music</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">Accueil</a></li>
+      <li><a href="club.html" class="nav-link">Le Club</a></li>
+      <li><a href="collaborations.html" class="nav-link">Collabs</a></li>
+      <li><a href="partenaires.html" class="nav-link text-yellow">Partenaires</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-yellow">Mon Espace 🦜</a></li>
+      <li data-guest-show><a href="inscription.html" class="nav-cta">Rejoindre le Club</a></li>
+    </ul>
+    <button class="nav-toggle" id="nav-toggle"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="nav-mobile" id="nav-mobile">
+    <a href="../index.html" class="nav-link">🏠 Accueil</a>
+    <a href="club.html" class="nav-link">🎵 Le Club</a>
+    <a href="inscription.html" class="nav-link">✨ Rejoindre</a>
+    <a href="collaborations.html" class="nav-link">🤝 Collabs</a>
+    <a href="contact.html" class="nav-link">✉️ Contact</a>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="tropical-decoration" style="top: 10%; left: 5%; animation-delay: 0s;">🌴</div>
+  <div class="tropical-decoration" style="top: 20%; right: 8%; animation-delay: 2s;">🌺</div>
+  <span class="section-label">🌿 Réseau & Communauté</span>
+  <h1 class="page-hero-title">
+    Nos <span class="text-gradient">Partenaires</span>
+  </h1>
+  <p class="page-hero-subtitle">
+    L'univers El Ramon Music s'appuie sur un réseau de partenaires partageant les mêmes valeurs : créativité, nature, transmission et bonne humeur.
+  </p>
+</section>
+
+<!-- CONTENU -->
+<main class="section section-darker">
+  <div class="container" style="max-width: 900px;">
+
+    <!-- DISCLAIMER AFFILIÉ -->
+    <div class="affiliate-disclaimer">
+      <span style="font-size: 1.2rem;">⚠️</span>
+      <span>Certains liens ci-dessous peuvent être des liens de parrainage et contribuer à soutenir les projets El Ramon Music et Gard Eau Arbres. Cette mention est faite en toute transparence.</span>
+    </div>
+
+    <!-- PARTENAIRE ASSOCIATIF — GARD EAU ARBRES -->
+    <div style="margin-bottom: var(--space-2xl);" class="reveal">
+      <div class="partner-section-title">
+        <span class="partner-section-icon">🌿</span>
+        <div>
+          <h2>Partenaire Associatif</h2>
+          <p style="font-size: 0.875rem; color: rgba(255,255,255,0.5); margin: 0;">Association locale partenaire</p>
+        </div>
+      </div>
+
+      <div class="partner-card" style="margin-bottom: var(--space-md);">
+        <div style="display: flex; align-items: flex-start; gap: var(--space-lg); flex-wrap: wrap;">
+          <div class="partner-logo-wrap" style="background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.2);">
+            🌿
+          </div>
+          <div style="flex: 1; min-width: 200px;">
+            <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--palm-green);">Gard Eau Arbres</h3>
+            <p style="font-size: 0.95rem; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: var(--space-md);">
+              Association engagée pour la nature, les arbres, l'eau et la biodiversité. Gard Eau Arbres partage avec El Ramon Music les valeurs de transmission, de positivité, d'écologie locale et de projets communautaires durables.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: var(--space-md);">
+              <span class="tag tag-green">🌳 Nature</span>
+              <span class="tag tag-turquoise">💧 Eau</span>
+              <span class="tag tag-green">🌱 Biodiversité</span>
+              <span class="tag tag-yellow">☀️ Projets locaux</span>
+              <span class="tag tag-orange">🤝 Transmission</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gard-eau-links">
+          <a href="https://www.helloasso.com/associations/gard-eau-arbres" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            💚 Soutenir l'association
+          </a>
+          <a href="https://www.youtube.com/@gardeauarbres" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            ▶ Chaîne YouTube
+          </a>
+          <a href="https://www.instagram.com/green.essence.ahead/" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            📷 Instagram
+          </a>
+          <a href="https://fr.linkedin.com/in/gard-eau-arbres-lot-96b7222b3" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            💼 LinkedIn
+          </a>
+          <a href="https://gard-eau-arbres.myspreadshop.fr/" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            🛍️ Boutique
+          </a>
+          <a href="https://eu.jotform.com/app/210626225393351?utm_id=97758_v0_s00_e0_tv0" target="_blank" rel="noopener" class="gard-eau-link-btn">
+            📝 Formulaire
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTILS CRÉATIFS IA MUSIQUE -->
+    <div style="margin-bottom: var(--space-2xl);" class="reveal">
+      <div class="partner-section-title">
+        <span class="partner-section-icon">🎵</span>
+        <div>
+          <h2>Outils IA Musique Recommandés</h2>
+          <p style="font-size: 0.875rem; color: rgba(255,255,255,0.5); margin: 0;">Plateformes créatives utilisées par El Ramon Music</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+        <a href="https://suno.com/invite/@ia_records" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">🎵</span>
+            <div>
+              <div class="tool-link-name">Suno — Génération musicale IA</div>
+              <div class="tool-link-desc">Crée des chansons complètes avec l'IA. Utilisé par El Ramon Music pour composer.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-primary">Rejoindre Suno →</span>
+        </a>
+
+        <a href="https://www.flowmusic.app/invite/VDMJX7" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">🎶</span>
+            <div>
+              <div class="tool-link-name">Flow Music — Plateforme musicale</div>
+              <div class="tool-link-desc">Découvre et partage de la musique avec la communauté Flow.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-turquoise">Rejoindre Flow →</span>
+        </a>
+
+        <a href="https://kling.ai/app/invitation?code=7BMNVTGNJYR4" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">🎬</span>
+            <div>
+              <div class="tool-link-name">Kling AI — Génération vidéo IA</div>
+              <div class="tool-link-desc">Crée des clips vidéo avec l'intelligence artificielle. Parfait pour YouTube.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-coral">Rejoindre Kling →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- OUTILS FINANCIERS -->
+    <div style="margin-bottom: var(--space-2xl);" class="reveal">
+      <div class="partner-section-title">
+        <span class="partner-section-icon">💳</span>
+        <div>
+          <h2>Outils Financiers Utiles</h2>
+          <p style="font-size: 0.875rem; color: rgba(255,255,255,0.5); margin: 0;">Pour les artistes indépendants et créateurs</p>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom: var(--space-md);">
+        ℹ️ Ces liens peuvent être des liens de parrainage. Si tu les utilises, tu soutiens les projets El Ramon Music et Gard Eau Arbres. Merci !
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+        <a href="https://app.finom.co/en/signup?fnm_view=referral&fnm_refid=nPyLSAMH" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">🏦</span>
+            <div>
+              <div class="tool-link-name">FINOM — Compte pro en ligne</div>
+              <div class="tool-link-desc">Solution financière pour indépendants, artistes et auto-entrepreneurs.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-secondary">Découvrir →</span>
+        </a>
+
+        <a href="https://my.sogexia.com/s/4pyxev2n" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">💸</span>
+            <div>
+              <div class="tool-link-name">Sogexia — Compte en ligne</div>
+              <div class="tool-link-desc">Compte bancaire en ligne simple et accessible pour créateurs.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-secondary">Découvrir →</span>
+        </a>
+
+        <a href="https://refnocode.trade.re/snx5547z" target="_blank" rel="noopener" class="tool-link-card">
+          <div class="tool-link-info">
+            <span class="tool-link-icon">📈</span>
+            <div>
+              <div class="tool-link-name">Trade Republic — Investissement</div>
+              <div class="tool-link-desc">Plateforme d'investissement simple. Pour diversifier tes revenus créatifs.</div>
+            </div>
+          </div>
+          <span class="btn btn-sm btn-secondary">Découvrir →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CTA COLLABORATION -->
+    <div class="card" style="text-align: center; background: linear-gradient(135deg, rgba(255,140,0,0.1), rgba(255,215,0,0.05)); border-color: rgba(255,215,0,0.2);">
+      <h3 style="font-size: 1.5rem; margin-bottom: var(--space-sm);">Tu veux devenir partenaire ?</h3>
+      <p style="color: rgba(255,255,255,0.65); margin-bottom: var(--space-lg);">
+        El Ramon Music est ouvert aux collaborations avec les marques positives, instruments, logiciels musique et associations.
+      </p>
+      <a href="collaborations.html" class="btn btn-primary btn-lg">🤝 Proposer une collaboration</a>
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="../assets/images/logo.png" alt="El Ramon Music Club" width="36" height="36" />
+          <span>El Ramon Music Club</span>
+        </div>
+        <p class="footer-tagline">El Ramon Music — les chansons tropicales qui donnent le sourire. 🌞</p>
+        <p class="footer-affiliate-note">Certains liens peuvent être des liens de parrainage et contribuer à soutenir les projets El Ramon Music et Gard Eau Arbres.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="../index.html" class="footer-link">Accueil</a></li>
+          <li><a href="club.html" class="footer-link">Le Club</a></li>
+          <li><a href="inscription.html" class="footer-link">Rejoindre</a></li>
+          <li><a href="guides-suno.html" class="footer-link">Guides Suno</a></li>
+          <li><a href="prompts.html" class="footer-link">Prompts IA</a></li>
+          <li><a href="tablatures.html" class="footer-link">Tablatures</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Partenaires</div>
+        <ul class="footer-links">
+          <li><a href="https://www.helloasso.com/associations/gard-eau-arbres" target="_blank" rel="noopener" class="footer-link">🌿 Gard Eau Arbres</a></li>
+          <li><a href="https://suno.com/invite/@ia_records" target="_blank" rel="noopener" class="footer-link">🎵 Suno</a></li>
+          <li><a href="https://www.flowmusic.app/invite/VDMJX7" target="_blank" rel="noopener" class="footer-link">🎶 Flow Music</a></li>
+          <li><a href="https://kling.ai/app/invitation?code=7BMNVTGNJYR4" target="_blank" rel="noopener" class="footer-link">🎬 Kling AI</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Légal</div>
+        <ul class="footer-links">
+          <li><a href="mentions-legales.html" class="footer-link">Mentions légales</a></li>
+          <li><a href="confidentialite.html" class="footer-link">Confidentialité</a></li>
+          <li><a href="contact.html" class="footer-link">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2025–2026 El Ramon Music Club. Tous droits réservés. 🦜</p>
+      <div class="footer-bottom-links">
+        <a href="mentions-legales.html" class="footer-bottom-link">Mentions légales</a>
+        <a href="confidentialite.html" class="footer-bottom-link">Confidentialité</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="../app.js"></script>
+</body>
+</html>

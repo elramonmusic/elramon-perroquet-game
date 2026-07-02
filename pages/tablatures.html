@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tablatures Guitare — El Ramon Music Club</title>
+  <meta name="description" content="Tablatures guitare et ressources musicales exclusives pour les membres El Ramon Music Club. Apprends à jouer les morceaux tropicaux." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Tablatures Guitare — El Ramon Music Club" />
+  <meta property="og:description" content="Ressources guitare exclusives pour les membres. Apprends les morceaux tropicaux." />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .page-hero {
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-3xl);
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(255,107,107,0.15) 0%, transparent 55%),
+                  radial-gradient(ellipse at 30% 60%, rgba(255,215,0,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .page-hero-emoji {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+      display: block;
+      animation: float-parrot 4s ease-in-out infinite;
+    }
+    .page-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      margin-bottom: var(--space-sm);
+    }
+    .page-hero p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.75);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .tab-placeholder {
+      background: rgba(255,255,255,0.04);
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl) var(--space-xl);
+      text-align: center;
+    }
+    .tab-placeholder-icon { font-size: 4rem; margin-bottom: var(--space-lg); display:block; }
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+    .resource-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-mid);
+    }
+    .resource-card:hover {
+      border-color: rgba(255,215,0,0.25);
+      transform: translateY(-4px);
+    }
+    .resource-icon { font-size: 2.2rem; margin-bottom: 0.5rem; display:block; }
+    .resource-title { font-size: 0.95rem; font-weight: 700; color: var(--white-light); margin-bottom: 0.3rem; }
+    .resource-desc { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+    .resource-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      color: var(--orange-tropical); background: rgba(255,140,0,0.1);
+      border: 1px solid rgba(255,140,0,0.3); border-radius: var(--radius-full);
+      padding: 0.2rem 0.8rem; margin-top: 0.6rem;
+    }
+    .resource-badge-live {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      color: var(--palm-green); background: rgba(46,204,113,0.1);
+      border: 1px solid rgba(46,204,113,0.3); border-radius: var(--radius-full);
+      padding: 0.2rem 0.8rem; margin-top: 0.6rem;
+    }
+    .section-alt { background: rgba(22,33,62,0.5); }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH GATE -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.ElRamon) {
+        window.ElRamon.Auth.requireAuth('./inscription.html');
+      } else {
+        try {
+          const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
+          if (!m) window.location.href = './inscription.html';
+        } catch(e) { window.location.href = './inscription.html'; }
+      }
+    });
+  </script>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="./tablatures.html" class="nav-link" style="color:var(--yellow-sun);">🎸 Tablatures</a></li>
+        <li><a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./tablatures.html" class="nav-link text-yellow">🎸 Tablatures</a>
+      <a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="page-hero-emoji">🎸</span>
+      <div class="hero-badge" style="margin: 0 auto var(--space-md);">
+        <span>⭐</span> Contenu Membre Exclusif
+      </div>
+      <h1 class="font-tropical text-gradient-warm">Tablatures Guitare</h1>
+      <p>Apprends à jouer les morceaux d'El Ramon Music et les classiques tropicaux</p>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="intro-card">
+        <span class="intro-icon" style="font-size:3rem;">🎸</span>
+        <div class="intro-text">
+          <h2>Ressources pour guitaristes</h2>
+          <p>Bienvenue dans la section tablatures du Club ! Ici tu trouveras des ressources pour apprendre à jouer les morceaux d'El Ramon Music ainsi que des classiques de musique tropicale : Afrobeat, Zouk, Compas, Bossa Nova et plus. Ressources pour tous les niveaux.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm section-alt">
+    <div class="container">
+
+      <div class="tab-placeholder" style="margin-bottom: var(--space-2xl);">
+        <span class="tab-placeholder-icon">🦜🎸</span>
+        <h2 style="font-size:1.4rem; font-weight:800; color:var(--yellow-sun); margin-bottom:var(--space-sm);">Tablatures en préparation</h2>
+        <p style="color:rgba(255,255,255,0.6); max-width:500px; margin:0 auto; line-height:1.7;">
+          Les premières tablatures sont en cours de création. Elles incluront les morceaux d'El Ramon Music et des arrangements pour différents niveaux (débutant, intermédiaire, avancé).
+        </p>
+      </div>
+
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">🎸 Ressources prévues</span>
+        <h2 class="section-title">Ce qui arrive <span class="text-gradient-warm">bientôt</span></h2>
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <span class="resource-icon">🎵</span>
+          <div class="resource-title">"Ça fait chanter le soleil"</div>
+          <div class="resource-desc">Tablature complète du titre phare d'El Ramon Music. Guitare acoustique, accords et rythmique.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+        <div class="resource-card">
+          <span class="resource-icon">🌴</span>
+          <div class="resource-title">Accords Tropicaux Essentiels</div>
+          <div class="resource-desc">Les 20 accords de base pour jouer de la musique tropicale : Afrobeat, Zouk, Compas, Bossa Nova.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+        <div class="resource-card">
+          <span class="resource-icon">🥁</span>
+          <div class="resource-title">Rythmiques Djembé & Percussions</div>
+          <div class="resource-desc">Partitions simplifiées pour djembé et percussions tropicales. Idéal pour jouer en groupe.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+        <div class="resource-card">
+          <span class="resource-icon">📖</span>
+          <div class="resource-title">Guide Guitare Tropical</div>
+          <div class="resource-desc">PDF complet : techniques, rythmes, accords et conseils pour jouer dans les styles tropicaux.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+        <div class="resource-card">
+          <span class="resource-icon">🎶</span>
+          <div class="resource-title">Classiques Afrobeat</div>
+          <div class="resource-desc">Tablatures des classiques afrobeat adaptées pour guitare. Fela Kuti, Wizkid et plus.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+        <div class="resource-card">
+          <span class="resource-icon">💃</span>
+          <div class="resource-title">Classiques Zouk & Compas</div>
+          <div class="resource-desc">Arrangements guitare des plus grands titres de Zouk et Compas. Tous niveaux.</div>
+          <span class="resource-badge">🔒 Bientôt disponible</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container text-center" style="max-width:600px;">
+      <span style="font-size:3rem; display:block; margin-bottom:var(--space-md);">🚀</span>
+      <h2 style="font-size:1.4rem; margin-bottom:var(--space-sm);">Pendant qu'on prépare les tablatures…</h2>
+      <p style="color:rgba(255,255,255,0.7); margin-bottom:var(--space-xl); line-height:1.7;">
+        Découvre nos guides Suno pour créer de la musique tropicale avec l'IA, ou explore la bibliothèque de prompts prêts à copier-coller !
+      </p>
+      <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+        <a href="./guides-suno.html" class="btn btn-primary">📖 Guides Suno IA</a>
+        <a href="./prompts.html" class="btn btn-secondary">🤖 Prompts IA</a>
+        <a href="./jeu.html" class="btn btn-turquoise">🎮 Mini-Jeu</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
+    <div class="container">
+      <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
+      <div style="display:flex; justify-content:center; gap:var(--space-lg); flex-wrap:wrap; font-size:0.88rem;">
+        <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
+        <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
+        <a href="./tablatures.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Tablatures</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">YouTube</a>
+      </div>
+      <p style="color:rgba(255,255,255,0.25); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.4);">elramonmusic@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script src="../app.js"></script>
+</body>
+</html>

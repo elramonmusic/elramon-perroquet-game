@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- SEO Primary -->
+  <title>El Ramon Music Club — Les chansons tropicales qui donnent le sourire</title>
+  <meta name="description" content="Rejoins le El Ramon Music Club, la communauté tropicale d'El Ramon Music. Mini-jeu, guides Suno, prompts IA musique, tablatures guitare, Afrobeat, zouk, compas, Tropical Soul." />
+  <meta name="keywords" content="El Ramon Music, musique tropicale, chanson tropicale festive, Afrobeat francophone, Tropical Soul, zouk, compas, Suno prompt, prompts musique IA, tablature guitare tropicale, mini-jeu musical, musique soleil" />
+  <meta name="author" content="El Ramon Music" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://elramonmusicclub.fr/" />
+  <meta property="og:title" content="El Ramon Music Club — Les chansons tropicales qui donnent le sourire" />
+  <meta property="og:description" content="Rejoins la communauté d'El Ramon Music. Mini-jeu tropical, guides Suno, prompts IA, tablatures guitare et contenus exclusifs." />
+  <meta property="og:image" content="assets/images/logo.png" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="El Ramon Music Club" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="El Ramon Music Club" />
+  <meta name="twitter:description" content="Les chansons tropicales qui donnent le sourire. Rejoins le Club !" />
+  <meta name="twitter:image" content="assets/images/logo.png" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "El Ramon Music",
+    "url": "https://elramonmusicclub.fr",
+    "description": "El Ramon Music — les chansons tropicales qui donnent le sourire. Afrobeat, Tropical Soul, zouk, compas, guitare, djembé.",
+    "genre": ["Afrobeat", "Tropical Soul", "Zouk", "Compas"],
+    "sameAs": ["https://www.youtube.com/@El-Ramon-Music"]
+  }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Landing-page specific extras */
+    .video-section-bg {
+      background: linear-gradient(180deg, var(--night-blue) 0%, var(--deep-purple) 50%, var(--night-blue) 100%);
+    }
+
+    .universe-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: var(--space-xl) 0;
+    }
+
+    .universe-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .universe-tag:hover {
+      transform: scale(1.08) rotate(-1deg);
+    }
+
+    .game-preview {
+      background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,107,107,0.05) 100%);
+      border: 2px solid rgba(255,215,0,0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-preview::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 60%);
+      animation: rotate-glow 20s linear infinite;
+    }
+
+    @keyframes rotate-glow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .game-pixel-art {
+      font-size: 5rem;
+      display: block;
+      margin: 0 auto var(--space-md);
+      animation: bounce 1s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .collab-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-sm);
+      margin: var(--space-xl) 0;
+    }
+
+    .collab-type-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+    }
+
+    .collab-type-item .icon {
+      font-size: 1.4rem;
+      min-width: 30px;
+    }
+
+    .inscription-section {
+      background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,215,0,0.08) 100%);
+      border-top: 1px solid rgba(255,215,0,0.15);
+      border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+
+    .inscription-form-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+    }
+
+    .youtube-section {
+      background: linear-gradient(180deg, var(--deep-purple) 0%, var(--night-blue) 100%);
+    }
+
+    .yt-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      justify-content: center;
+      margin-top: var(--space-xl);
+    }
+
+    .yt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .yt-btn:hover {
+      background: rgba(255,0,0,0.15);
+      border-color: rgba(255,0,0,0.3);
+      transform: translateY(-2px);
+    }
+
+    .yt-btn.primary {
+      background: #FF0000;
+      border-color: #FF0000;
+      color: white;
+    }
+
+    .yt-btn.primary:hover {
+      background: #cc0000;
+      box-shadow: 0 8px 25px rgba(255,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="site-header">
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <img src="assets/images/logo.png" alt="El Ramon Music Club Logo" width="40" height="40" />
+      <span>El Ramon Music</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#univers" class="nav-link">Univers</a></li>
+      <li><a href="pages/club.html" class="nav-link">Le Club</a></li>
+      <li><a href="pages/collaborations.html" class="nav-link">Collabs</a></li>
+      <li><a href="pages/partenaires.html" class="nav-link">Partenaires</a></li>
+      <li><a href="pages/contact.html" class="nav-link">Contact</a></li>
+      <li data-auth-show style="display:none"><a href="pages/espace-membre.html" class="nav-link text-yellow">Mon Espace 🦜</a></li>
+      <li data-guest-show><a href="pages/inscription.html" class="nav-cta">Rejoindre le Club</a></li>
+    </ul>
+
+    <button class="nav-toggle" aria-label="Menu mobile" id="nav-toggle">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile nav -->
+  <div class="nav-mobile" id="nav-mobile">
+    <a href="#univers" class="nav-link">🌴 Univers</a>
+    <a href="pages/club.html" class="nav-link">🎵 Le Club</a>
+    <a href="pages/inscription.html" class="nav-link">✨ Rejoindre</a>
+    <a href="pages/jeu.html" class="nav-link">🎮 Mini-Jeu</a>
+    <a href="pages/guides-suno.html" class="nav-link">📚 Guides Suno</a>
+    <a href="pages/collaborations.html" class="nav-link">🤝 Collabs</a>
+    <a href="pages/partenaires.html" class="nav-link">🌿 Partenaires</a>
+    <a href="pages/contact.html" class="nav-link">✉️ Contact</a>
+    <a href="pages/espace-membre.html" class="nav-link" data-auth-show style="display:none">🦜 Mon Espace</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-particles"></div>
+
+  <div class="hero-content">
+    <div class="hero-text animate-slide-up">
+      <div class="hero-badge">
+        🌴 Bienvenue dans l'univers tropical
+      </div>
+
+      <h1 class="hero-title">
+        <span class="font-tropical text-gradient">El Ramon</span><br />
+        <span class="text-white-light">Music Club</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Les chansons tropicales qui donnent le sourire. 🌞<br />
+        Rejoins l'univers d'El Ramon Music et débloque les bonus privés : mini-jeu, guides Suno, prompts IA, tablatures et contenus exclusifs.
+      </p>
+
+      <div class="hero-cta">
+        <a href="pages/inscription.html" class="btn btn-primary btn-lg">
+          🦜 Rejoindre le Club gratuitement
+        </a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">
+          ▶ Voir la chaîne YouTube
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">🎵</div>
+          <div class="hero-stat-label">Afrobeat</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">🌴</div>
+          <div class="hero-stat-label">Tropical Soul</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">🎸</div>
+          <div class="hero-stat-label">Guitare</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">🥁</div>
+          <div class="hero-stat-label">Djembé</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-glow"></div>
+      <img src="assets/images/parrot-mascot.png" alt="Mascotte El Ramon Music Club — Perroquet tropical" class="hero-parrot" width="320" height="320" />
+    </div>
+  </div>
+</section>
+
+<!-- ===== UNIVERS ===== -->
+<section class="section video-section-bg" id="univers">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">✨ Notre univers musical</span>
+      <h2 class="section-title">
+        Soleil, fête &amp; <span class="text-gradient">bonne humeur</span>
+      </h2>
+      <p class="section-subtitle">
+        El Ramon Music, c'est un univers tropical, musical, créatif et positif.<br />
+        Ici, on chante, on danse, on apprend, on crée et on partage de la joie.
+      </p>
+    </div>
+
+    <div class="universe-tags reveal">
+      <span class="universe-tag tag-orange">🥁 Afrobeat</span>
+      <span class="universe-tag tag-yellow">🌴 Tropical Soul</span>
+      <span class="universe-tag tag-turquoise">💃 Zouk</span>
+      <span class="universe-tag tag-coral">🎺 Compas</span>
+      <span class="universe-tag tag-green">🎸 Guitare</span>
+      <span class="universe-tag tag-yellow">🪘 Djembé</span>
+      <span class="universe-tag tag-orange">☀️ Soleil</span>
+      <span class="universe-tag tag-turquoise">🏖️ Plage</span>
+      <span class="universe-tag tag-coral">🎉 Fête</span>
+      <span class="universe-tag tag-green">👨‍👩‍👧 Famille</span>
+      <span class="universe-tag tag-yellow">😊 Sourire</span>
+      <span class="universe-tag tag-orange">🎶 Percussions</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VIDEO PRINCIPALE ===== -->
+<section class="section section-dark" id="videos">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">▶ Le clip du moment</span>
+      <h2 class="section-title">
+        🌞 Ça fait chanter <span class="text-gradient-warm">le soleil</span>
+      </h2>
+      <p class="section-subtitle">
+        Découvre le clip tropical d'El Ramon Music — la chanson qui donne le sourire !
+      </p>
+    </div>
+
+    <div class="video-hero-wrap reveal" style="max-width: 800px; margin: 0 auto;">
+      <iframe
+        src="https://www.youtube.com/embed/rgA6sLPfglY?rel=0&modestbranding=1"
+        title="El Ramon Music — Ça fait chanter le soleil"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        loading="lazy">
+      </iframe>
+    </div>
+
+    <!-- Grid clips secondaires -->
+    <div class="video-grid reveal" style="margin-top: var(--space-2xl);">
+      <!-- Clip 2 -->
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="video-card">
+        <div class="video-thumb-wrap">
+          <img
+            src="https://img.youtube.com/vi/rgA6sLPfglY/mqdefault.jpg"
+            alt="El Ramon Music — Clip Tropical"
+            loading="lazy"
+          />
+          <div class="video-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">🎵 Nos clips tropicaux</div>
+          <div class="video-meta">Chaîne YouTube El Ramon Music</div>
+        </div>
+      </a>
+
+      <!-- Playlist -->
+      <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA&pp=sAgC" target="_blank" rel="noopener" class="video-card">
+        <div class="video-thumb-wrap" style="background: linear-gradient(135deg, #FF8C00, #FFD700); display:flex; align-items:center; justify-content:center;">
+          <span style="font-size: 4rem;">🎶</span>
+          <div class="video-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">🌴 Playlist El Ramon Music</div>
+          <div class="video-meta">Toutes les chansons tropicales</div>
+        </div>
+      </a>
+
+      <!-- Shorts -->
+      <a href="https://www.youtube.com/@El-Ramon-Music/shorts" target="_blank" rel="noopener" class="video-card">
+        <div class="video-thumb-wrap" style="background: linear-gradient(135deg, #00CED1, #2ECC71); display:flex; align-items:center; justify-content:center;">
+          <span style="font-size: 4rem;">📱</span>
+          <div class="video-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">⚡ YouTube Shorts</div>
+          <div class="video-meta">Les meilleurs moments en 60s</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CLUB PRIVÉ ===== -->
+<section class="section section-tropical" id="club">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">🔐 Espace membres</span>
+      <h2 class="section-title">
+        Le <span class="text-gradient">El Ramon Music Club</span>
+      </h2>
+      <p class="section-subtitle">
+        Bienvenue dans l'espace tropical où la musique, le soleil et la créativité se rencontrent. Inscris-toi gratuitement et débloque les bonus !
+      </p>
+    </div>
+
+    <div class="bonus-grid">
+      <div class="bonus-card reveal reveal-delay-1">
+        <span class="bonus-icon">🎮</span>
+        <h3 class="bonus-title">Mini-Jeu Tropical</h3>
+        <p class="bonus-desc">Un jeu de plateforme rétro avec ton perroquet. Collecte des fruits, évite les ennemis, affronte le boss final !</p>
+        <span class="lock-badge">🔒 Membres uniquement</span>
+      </div>
+
+      <div class="bonus-card reveal reveal-delay-2">
+        <span class="bonus-icon">🎵</span>
+        <h3 class="bonus-title">Guides Suno IA</h3>
+        <p class="bonus-desc">Apprends à créer des chansons tropicales avec l'IA Suno. Guides complets, exemples et astuces.</p>
+        <span class="lock-badge">🔒 Membres uniquement</span>
+      </div>
+
+      <div class="bonus-card reveal reveal-delay-3">
+        <span class="bonus-icon">🤖</span>
+        <h3 class="bonus-title">Prompts IA Musique</h3>
+        <p class="bonus-desc">Bibliothèque de prompts prêts à copier-coller pour créer de l'Afrobeat, du zouk, du compas avec l'IA.</p>
+        <span class="lock-badge">🔒 Membres uniquement</span>
+      </div>
+
+      <div class="bonus-card reveal reveal-delay-1">
+        <span class="bonus-icon">🎸</span>
+        <h3 class="bonus-title">Tablatures Guitare</h3>
+        <p class="bonus-desc">Accords et tablatures pour jouer les sons tropicaux. Guitare acoustique, djembé, percussions.</p>
+        <span class="lock-badge">🔒 Membres uniquement</span>
+      </div>
+
+      <div class="bonus-card reveal reveal-delay-2">
+        <span class="bonus-icon">🎬</span>
+        <h3 class="bonus-title">Bonus Clips &amp; Coulisses</h3>
+        <p class="bonus-desc">Avant-premières, coulisses des clips, contenus exclusifs et surprises musicales.</p>
+        <span class="bonus-badge">✨ Bientôt</span>
+      </div>
+
+      <div class="bonus-card reveal reveal-delay-3">
+        <span class="bonus-icon">🤝</span>
+        <h3 class="bonus-title">Offres Partenaires</h3>
+        <p class="bonus-desc">Accès aux offres spéciales partenaires, outils IA recommandés et liens exclusifs.</p>
+        <span class="bonus-badge">💎 Premium</span>
+      </div>
+    </div>
+
+    <div class="text-center" style="margin-top: var(--space-2xl);">
+      <a href="pages/club.html" class="btn btn-secondary" style="margin-right: 1rem;">En savoir plus sur le Club</a>
+      <a href="pages/inscription.html" class="btn btn-primary btn-lg">🦜 Rejoindre gratuitement</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MINI-JEU ===== -->
+<section class="section section-warm" id="mini-jeu">
+  <div class="container">
+    <div class="game-preview reveal">
+      <span class="game-pixel-art">🦜</span>
+      <span class="section-label">🎮 Mini-Jeu Exclusif</span>
+      <h2 class="section-title" style="margin-top: var(--space-sm);">
+        Débloque le jeu du<br /><span class="text-gradient">Perroquet Tropical</span>
+      </h2>
+      <p style="color: rgba(255,255,255,0.7); max-width: 550px; margin: var(--space-md) auto var(--space-xl); font-size: 1.05rem; line-height: 1.7;">
+        Un mini-jeu rétro façon plateforme inspiré des classiques. Ton perroquet tropical affronte des ennemis, collecte des fruits, boit des potions magiques et atteint le perchoir final. 3 chances. Un seul objectif : finir le niveau !
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: var(--space-xl);">
+        <div class="tag tag-yellow">🍋 Fruits = points</div>
+        <div class="tag tag-orange">🧪 Potions magiques</div>
+        <div class="tag tag-coral">💀 Ennemis</div>
+        <div class="tag tag-turquoise">🔮 Passages secrets</div>
+        <div class="tag tag-green">👑 Boss final</div>
+        <div class="tag tag-yellow">🪶 3 vies (plumes)</div>
+      </div>
+      <a href="pages/inscription.html" class="btn btn-primary btn-lg">
+        🎮 Débloquer le jeu gratuitement
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== YOUTUBE ===== -->
+<section class="section youtube-section">
+  <div class="container text-center">
+    <div class="section-header reveal">
+      <span class="section-label">📺 YouTube</span>
+      <h2 class="section-title">
+        Rejoins la chaîne <span class="text-gradient-warm">El Ramon Music</span>
+      </h2>
+      <p class="section-subtitle">
+        Des clips tropicaux, des Shorts festifs, des chansons qui donnent le sourire. Abonne-toi et ne rate rien !
+      </p>
+    </div>
+
+    <div class="yt-btns reveal">
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="yt-btn primary">
+        ▶ Voir la chaîne YouTube
+      </a>
+      <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA&pp=sAgC" target="_blank" rel="noopener" class="yt-btn">
+        🎶 Playlist El Ramon
+      </a>
+      <a href="https://www.youtube.com/@El-Ramon-Music/shorts" target="_blank" rel="noopener" class="yt-btn">
+        📱 Shorts
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COLLABORATIONS ===== -->
+<section class="section section-mid" id="collaborations">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">🤝 Collaborations</span>
+      <h2 class="section-title">
+        Travaillons <span class="text-gradient">ensemble</span>
+      </h2>
+      <p class="section-subtitle">
+        El Ramon Music est ouvert aux collaborations avec les marques d'instruments, logiciels musique, outils IA et entreprises positives.
+      </p>
+    </div>
+
+    <div class="collab-types reveal">
+      <div class="collab-type-item"><span class="icon">🎸</span> Instruments de musique</div>
+      <div class="collab-type-item"><span class="icon">🎹</span> Claviers &amp; synthés</div>
+      <div class="collab-type-item"><span class="icon">🥁</span> Percussions &amp; djembés</div>
+      <div class="collab-type-item"><span class="icon">🎙️</span> Micros &amp; casques audio</div>
+      <div class="collab-type-item"><span class="icon">💻</span> Logiciels musique</div>
+      <div class="collab-type-item"><span class="icon">🤖</span> Outils IA musicale</div>
+      <div class="collab-type-item"><span class="icon">🎬</span> Plateformes vidéo</div>
+      <div class="collab-type-item"><span class="icon">🌿</span> Associations écologiques</div>
+      <div class="collab-type-item"><span class="icon">🎪</span> Événements tropicaux</div>
+      <div class="collab-type-item"><span class="icon">👨‍👩‍👧</span> Marques familiales &amp; positives</div>
+    </div>
+
+    <div class="text-center reveal" style="margin-top: var(--space-xl);">
+      <a href="pages/collaborations.html" class="btn btn-turquoise btn-lg">
+        🤝 Proposer une collaboration
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INSCRIPTION ===== -->
+<section class="section inscription-section" id="inscription">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">✨ Rejoins le Club</span>
+      <h2 class="section-title">
+        C'est <span class="text-gradient">gratuit</span> et tropical !
+      </h2>
+      <p class="section-subtitle">
+        Un email, un pseudo et tu es membre. Accès immédiat à tous les bonus du Club.
+      </p>
+    </div>
+
+    <div class="inscription-form-wrap reveal">
+      <form id="inscription-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" class="form-input" placeholder="ton@email.fr" required autocomplete="email" />
+          <div class="form-error" id="email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pseudo">Pseudo YouTube ou réseau social <span class="required">*</span></label>
+          <input type="text" id="pseudo" name="pseudo" class="form-input" placeholder="@TonPseudo" required />
+          <div class="form-error" id="pseudo-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prenom">Prénom ou nom d'artiste</label>
+          <input type="text" id="prenom" name="prenom" class="form-input" placeholder="Ton prénom (facultatif)" autocomplete="given-name" />
+        </div>
+
+        <div style="margin-bottom: var(--space-md);">
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="newsletter" name="newsletter" class="form-checkbox" checked />
+            <label for="newsletter" class="form-checkbox-label">
+              Je souhaite recevoir les bonus et actualités El Ramon Music
+            </label>
+          </div>
+
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="abonne" name="abonne" class="form-checkbox" />
+            <label for="abonne" class="form-checkbox-label">
+              Je suis abonné(e) ou je souhaite suivre la chaîne <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank">El Ramon Music</a>
+            </label>
+          </div>
+
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required />
+            <label for="rgpd" class="form-checkbox-label">
+              J'accepte la <a href="pages/confidentialite.html">politique de confidentialité</a> et le traitement de mes données pour accéder au Club <span class="required">*</span>
+            </label>
+          </div>
+          <div class="form-error" id="rgpd-error"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full btn-lg">
+          🦜 Rejoindre le Club gratuitement
+        </button>
+
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center; margin-top: var(--space-sm);">
+          100% gratuit · Pas de spam · Désinscription à tout moment
+        </p>
+      </form>
+
+      <div class="form-success">
+        <p>🎉 <strong>Bienvenue dans le Club !</strong> Redirection en cours...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="assets/images/logo.png" alt="El Ramon Music Club" width="36" height="36" />
+          <span>El Ramon Music Club</span>
+        </div>
+        <p class="footer-tagline">
+          El Ramon Music — les chansons tropicales qui donnent le sourire. 🌞<br />
+          Afrobeat · Tropical Soul · Zouk · Compas · Guitare · Djembé
+        </p>
+        <div class="footer-social">
+          <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube El Ramon Music">▶</a>
+          <a href="pages/contact.html" class="footer-social-btn" title="Contact">✉</a>
+        </div>
+        <p class="footer-affiliate-note">
+          Certains liens peuvent être des liens de parrainage et contribuer à soutenir les projets El Ramon Music et Gard Eau Arbres.
+        </p>
+      </div>
+
+      <!-- Navigation -->
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="pages/club.html" class="footer-link">Le Club</a></li>
+          <li><a href="pages/inscription.html" class="footer-link">Rejoindre</a></li>
+          <li><a href="pages/espace-membre.html" class="footer-link">Espace Membre</a></li>
+          <li><a href="pages/jeu.html" class="footer-link">Mini-Jeu 🎮</a></li>
+          <li><a href="pages/guides-suno.html" class="footer-link">Guides Suno</a></li>
+          <li><a href="pages/prompts.html" class="footer-link">Prompts IA</a></li>
+          <li><a href="pages/tablatures.html" class="footer-link">Tablatures</a></li>
+        </ul>
+      </div>
+
+      <!-- Liens stratégiques -->
+      <div>
+        <div class="footer-col-title">Outils & Partenaires</div>
+        <ul class="footer-links">
+          <li><a href="https://suno.com/invite/@ia_records" target="_blank" rel="noopener" class="footer-link">🎵 Suno IA Musique</a></li>
+          <li><a href="https://www.flowmusic.app/invite/VDMJX7" target="_blank" rel="noopener" class="footer-link">🎶 Flow Music</a></li>
+          <li><a href="https://kling.ai/app/invitation?code=7BMNVTGNJYR4" target="_blank" rel="noopener" class="footer-link">🎬 Kling IA Vidéo</a></li>
+          <li><a href="pages/partenaires.html" class="footer-link">🌿 Gard Eau Arbres</a></li>
+          <li><a href="pages/collaborations.html" class="footer-link">🤝 Collaborations</a></li>
+          <li><a href="pages/contact.html" class="footer-link">✉ Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Légal -->
+      <div>
+        <div class="footer-col-title">Légal</div>
+        <ul class="footer-links">
+          <li><a href="pages/mentions-legales.html" class="footer-link">Mentions légales</a></li>
+          <li><a href="pages/confidentialite.html" class="footer-link">Confidentialité</a></li>
+        </ul>
+        <div style="margin-top: var(--space-lg);">
+          <div class="footer-col-title">YouTube</div>
+          <ul class="footer-links">
+            <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-link">▶ Chaîne El Ramon Music</a></li>
+            <li><a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA&pp=sAgC" target="_blank" rel="noopener" class="footer-link">🎶 Playlist officielle</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">
+        © 2025–2026 El Ramon Music Club. Tous droits réservés. 🦜
+      </p>
+      <div class="footer-bottom-links">
+        <a href="pages/mentions-legales.html" class="footer-bottom-link">Mentions légales</a>
+        <a href="pages/confidentialite.html" class="footer-bottom-link">Confidentialité</a>
+        <a href="pages/contact.html" class="footer-bottom-link">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== COOKIE BANNER ===== -->
+<div class="cookie-banner" id="cookie-banner">
+  <p class="cookie-text">
+    🍪 Ce site utilise des cookies pour améliorer ton expérience. En continuant, tu acceptes notre <a href="pages/confidentialite.html">politique de confidentialité</a>.
+  </p>
+  <div class="cookie-actions">
+    <button class="btn btn-sm btn-primary" data-cookie-accept>Accepter</button>
+    <button class="btn btn-sm btn-secondary" data-cookie-decline>Refuser</button>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="global-toast"></div>
+
+<!-- Scripts -->
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenue dans le Club ! — El Ramon Music Club</title>
+  <meta name="description" content="Inscription confirmée ! Bienvenue dans le El Ramon Music Club. Accède à tes avantages membres dès maintenant." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Bienvenue dans le Club ! — El Ramon Music Club" />
+  <meta property="og:description" content="Ton inscription est confirmée. Découvre tous tes avantages membres." />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .merci-hero {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-3xl);
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    .merci-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.2) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 70%, rgba(0,206,209,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .merci-icon {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: var(--space-lg);
+      animation: float-parrot 3s ease-in-out infinite;
+    }
+    .merci-title {
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 900;
+      margin-bottom: var(--space-md);
+    }
+    .merci-subtitle {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.8);
+      max-width: 600px;
+      margin: 0 auto var(--space-xl);
+      line-height: 1.7;
+    }
+    .merci-email {
+      display: inline-block;
+      background: rgba(255,215,0,0.12);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: var(--radius-full);
+      padding: 0.5rem 1.5rem;
+      font-weight: 600;
+      color: var(--yellow-sun);
+      margin-bottom: var(--space-2xl);
+    }
+    .merci-actions {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--space-lg);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+    .step-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-mid);
+    }
+    .step-card:hover {
+      border-color: rgba(255,215,0,0.25);
+      transform: translateY(-4px);
+    }
+    .step-card-icon { font-size: 2.5rem; margin-bottom: var(--space-sm); }
+    .step-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--white-light); }
+    .step-card p { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
+        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
+        <li><a href="./espace-membre.html" class="nav-link text-turquoise">🎵 Mon Espace</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">🏠 Accueil</a>
+      <a href="./club.html" class="nav-link">🌴 Le Club</a>
+      <a href="./espace-membre.html" class="nav-link text-turquoise">🎵 Mon Espace</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
+    </nav>
+  </header>
+
+  <section class="merci-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="merci-icon">🦜</span>
+      <h1 class="merci-title text-gradient-warm">Bienvenue dans le Club !</h1>
+      <p class="merci-subtitle">
+        Ton inscription est confirmée. Tu fais maintenant partie de la communauté tropicale El Ramon Music.
+        Prépare-toi à découvrir des contenus exclusifs, des guides, des prompts IA et bien plus encore.
+      </p>
+      <div class="merci-email" id="merci-email">
+        🎵 Membre vérifié
+      </div>
+      <div class="merci-actions">
+        <a href="./espace-membre.html" class="btn btn-primary btn-lg">🎵 Accéder à mon espace</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">&#9654; Voir la chaîne YouTube</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">🚀 Tes prochaines étapes</span>
+        <h2 class="section-title">Que faire <span class="text-gradient-warm">maintenant ?</span></h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card-icon">🎮</div>
+          <h3>Joue au mini-jeu</h3>
+          <p>Découvre le mini-jeu du perroquet tropical et teste tes réflexes musicaux.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card-icon">📖</div>
+          <h3>Lis les guides Suno</h3>
+          <p>Apprends à créer tes propres chansons tropicales avec l'intelligence artificielle.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card-icon">🤖</div>
+          <h3>Copie les prompts IA</h3>
+          <p>Utilise notre bibliothèque de prompts testés pour générer de la musique tropicale.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card-icon">🎸</div>
+          <h3>Apprends la guitare</h3>
+          <p>Accède aux tablatures et ressources pour jouer les morceaux d'El Ramon Music.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm section-alt">
+    <div class="container text-center">
+      <div style="max-width:600px; margin:0 auto;">
+        <span style="font-size:3rem; display:block; margin-bottom:var(--space-md);">&#127902;</span>
+        <h2 style="font-size:1.6rem; margin-bottom:var(--space-sm);">Abonne-toi à la chaîne YouTube</h2>
+        <p style="color:rgba(255,255,255,0.7); margin-bottom:var(--space-xl);">
+          Ne rate aucune nouvelle chanson tropicale ! Des clips, des Shorts et des contenus exclusifs chaque semaine.
+        </p>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+          &#9654; Rejoindre la chaîne YouTube
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+            El Ramon Music
+          </div>
+          <p class="footer-tagline">Les chansons tropicales qui donnent le sourire.</p>
+          <div class="footer-social">
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube">&#9654;</a>
+            <a href="mailto:elramonmusic@gmail.com" class="footer-social-btn" title="Email">&#9993;</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-col-title">Club</p>
+          <ul class="footer-links">
+            <li><a href="club.html" class="footer-link">Le Club</a></li>
+            <li><a href="inscription.html" class="footer-link">Inscription</a></li>
+            <li><a href="espace-membre.html" class="footer-link">Espace Membre</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Contenu</p>
+          <ul class="footer-links">
+            <li><a href="guides-suno.html" class="footer-link">Guides Suno</a></li>
+            <li><a href="prompts.html" class="footer-link">Prompts IA</a></li>
+            <li><a href="tablatures.html" class="footer-link">Tablatures</a></li>
+            <li><a href="jeu.html" class="footer-link">Mini-Jeu</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Info</p>
+          <ul class="footer-links">
+            <li><a href="partenaires.html" class="footer-link">Partenaires</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+            <li><a href="confidentialite.html" class="footer-link">Confidentialité</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2026 El Ramon Music Club. Fait avec soleil et passion.</span>
+        <div class="footer-bottom-links">
+          <a href="mentions-legales.html" class="footer-bottom-link">Mentions légales</a>
+          <a href="confidentialite.html" class="footer-bottom-link">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../app.js"></script>
+  <script>
+    // Afficher l'email si passé en paramètre
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const email = params.get('email');
+      if (email) {
+        document.getElementById('merci-email').innerHTML = '&#9993; ' + email;
+      }
+    });
+  </script>
+</body>
+</html>

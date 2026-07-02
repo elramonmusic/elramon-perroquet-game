@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompts IA Musique — El Ramon Music Club</title>
+  <meta name="description" content="Bibliothèque de prompts IA musique prêts à copier-coller. Crée tes chansons tropicales avec Suno, Afrobeat, Zouk, Compas et plus." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Prompts IA Musique — El Ramon Music Club" />
+  <meta property="og:description" content="Des prompts testés et prêts à l'emploi pour créer de la musique tropicale avec l'IA." />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .page-hero {
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-3xl);
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 40% 40%, rgba(255,215,0,0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(0,206,209,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .page-hero-emoji {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+      display: block;
+      animation: float-parrot 4s ease-in-out infinite;
+    }
+    .page-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      margin-bottom: var(--space-sm);
+    }
+    .page-hero p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.75);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .prompt-card {
+      background: rgba(26,26,46,0.8);
+      border: 1px solid rgba(46,204,113,0.2);
+      border-left: 4px solid var(--palm-green);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      transition: all var(--transition-mid);
+    }
+    .prompt-card:hover {
+      border-color: rgba(255,215,0,0.3);
+      border-left-color: var(--yellow-sun);
+    }
+    .prompt-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .prompt-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--yellow-sun);
+    }
+    .prompt-card-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      background: rgba(0,206,209,0.15);
+      color: var(--turquoise);
+      border: 1px solid rgba(0,206,209,0.3);
+      flex-shrink: 0;
+    }
+    .prompt-card-text {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: var(--palm-green);
+      line-height: 1.6;
+      background: rgba(0,0,0,0.2);
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm) var(--space-md);
+      margin: var(--space-sm) 0;
+    }
+    .prompt-card-desc {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      margin-top: var(--space-sm);
+    }
+    .btn-copy {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: var(--radius-full);
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      color: var(--yellow-sun);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    .btn-copy:hover { background: rgba(255,215,0,0.2); }
+    .btn-copy.copied { background: rgba(46,204,113,0.2); border-color: var(--palm-green); color: var(--palm-green); }
+    .category-filter {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-xl);
+      justify-content: center;
+    }
+    .filter-btn {
+      font-size: 0.82rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(255,215,0,0.15);
+      border-color: rgba(255,215,0,0.4);
+      color: var(--yellow-sun);
+    }
+    .section-alt { background: rgba(22,33,62,0.5); }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH GATE -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.ElRamon) {
+        window.ElRamon.Auth.requireAuth('./inscription.html');
+      } else {
+        try {
+          const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
+          if (!m) window.location.href = './inscription.html';
+        } catch(e) { window.location.href = './inscription.html'; }
+      }
+    });
+  </script>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./prompts.html" class="nav-link" style="color:var(--yellow-sun);">🤖 Prompts</a></li>
+        <li><a href="./tablatures.html" class="nav-link">🎸 Tablatures</a></li>
+        <li><a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./prompts.html" class="nav-link text-yellow">🤖 Prompts</a>
+      <a href="./tablatures.html" class="nav-link">🎸 Tablatures</a>
+      <a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="page-hero-emoji">🤖</span>
+      <div class="hero-badge" style="margin: 0 auto var(--space-md);">
+        <span>⭐</span> Contenu Membre Exclusif
+      </div>
+      <h1 class="font-tropical text-gradient-warm">Prompts IA Musique</h1>
+      <p>Des prompts testés et prêts à copier-coller pour créer tes chansons tropicales</p>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="intro-card">
+        <span class="intro-icon" style="font-size:3rem;">📝</span>
+        <div class="intro-text">
+          <h2>Comment utiliser ces prompts ?</h2>
+          <p>Copie le prompt de ton choix, colle-le dans <strong style="color:var(--yellow-sun)">Suno</strong> ou <strong style="color:var(--yellow-sun)">Flow Music</strong>, et laisse l'IA générer ta musique tropicale. Tu peux modifier les éléments entre crochets [ ] pour personnaliser le résultat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm section-alt">
+    <div class="container">
+
+      <div class="category-filter" id="filter-buttons">
+        <button class="filter-btn active" data-filter="all">🎵 Tous</button>
+        <button class="filter-btn" data-filter="afrobeat">🔥 Afrobeat</button>
+        <button class="filter-btn" data-filter="zouk">💃 Zouk</button>
+        <button class="filter-btn" data-filter="compas">🥁 Compas</button>
+        <button class="filter-btn" data-filter="tropical">🌴 Tropical Soul</button>
+        <button class="filter-btn" data-filter="reggaeton">⚡ Reggaeton</button>
+        <button class="filter-btn" data-filter="instrumental">🎸 Instrumental</button>
+      </div>
+
+      <!-- PROMPTS -->
+      <div id="prompts-container">
+
+        <div class="prompt-card" data-category="afrobeat">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🔥 Afrobeat Tropical Joyeux</span>
+            <span class="prompt-card-tag">Afrobeat</span>
+          </div>
+          <div class="prompt-card-text">"Tropical Afrobeat joyful, acoustic guitar, djembe drums, sunny beach atmosphere, uplifting francophone vocals, 120 BPM, summer vibes"</div>
+          <div class="prompt-card-desc">Idéal pour une chanson joyeuse et dansante avec ambiance plage. Genre principal : Afrobeat avec guitare acoustique et percussions.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="zouk">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">💃 Zouk Romantique</span>
+            <span class="prompt-card-tag">Zouk</span>
+          </div>
+          <div class="prompt-card-text">"Zouk romantique francophone, guitare acoustique, basse groovy, voix douce féminine, coucher de soleil sur la plage, 90 BPM, mélodie envoûtante"</div>
+          <div class="prompt-card-desc">Parfait pour un titre lent et romantique. Zouk classique avec basse groovy et voix douce francophone.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="compas">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🥁 Compas Haïtien Moderne</span>
+            <span class="prompt-card-tag">Compas</span>
+          </div>
+          <div class="prompt-card-text">"Compas haïtien moderne, guitare électrique, percussions tropicales, chant joyeux francophone, tempo 100 BPM, ambiance fête caribéenne"</div>
+          <div class="prompt-card-desc">Un compas moderne et festif, parfait pour les soirées caribéennes. Chant joyeux et percussions tropicales.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="tropical">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🌴 Tropical Soul Féminin</span>
+            <span class="prompt-card-tag">Tropical Soul</span>
+          </div>
+          <div class="prompt-card-text">"Tropical Soul, warm female vocals, nylon guitar, soft congas, ocean waves ambience, 85 BPM, intimate and soulful, francophone lyrics"</div>
+          <div class="prompt-card-desc">Une ballade tropicale intime et soulful. Voix féminine chaleureuse avec guitare nylon et ambiance océanique.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="afrobeat">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🔥 Afrobeat Dansant</span>
+            <span class="prompt-card-tag">Afrobeat</span>
+          </div>
+          <div class="prompt-card-text">"Afrobeat dance hit, heavy bass, synth pads, african percussion, francophone rap verses, melodic chorus, 125 BPM, club ready, tropical energy"</div>
+          <div class="prompt-card-desc">Un Afrobeat puissant pour le club. Basse heavy, synthétiseurs et percussions africaines avec couplets rap francophones.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="reggaeton">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">⚡ Reggaeton Tropical</span>
+            <span class="prompt-card-tag">Reggaeton</span>
+          </div>
+          <div class="prompt-card-text">"Reggaeton tropical, dembow rhythm, spanish guitar accents, steel drums, party vibes, bilingual francophone-spanish vocals, 95 BPM"</div>
+          <div class="prompt-card-desc">Un reggaeton tropical avec rythme dembow et guitare espagnole. Ambiance party bilingue.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="zouk">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">💃 Zouk Love</span>
+            <span class="prompt-card-tag">Zouk</span>
+          </div>
+          <div class="prompt-card-text">"Zouk love, synthetizer melody, deep bassline, sweet vocals, romantic atmosphere, tropical night, 88 BPM, slow dance"</div>
+          <div class="prompt-card-desc">Un zouk love lent et romantique, idéal pour les soirées dansantes. Synthétiseur et basse profonde.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="instrumental">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🎸 Guitare Tropicale Instrumental</span>
+            <span class="prompt-card-tag">Instrumental</span>
+          </div>
+          <div class="prompt-card-text">"Tropical acoustic guitar instrumental, nylon strings, gentle percussion, nature sounds, bird songs, sunset vibes, 70 BPM, relaxing"</div>
+          <div class="prompt-card-desc">Un instrumental relaxant à la guitare nylon avec sons de la nature. Parfait pour la détente tropicale.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="compas">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🥁 Compas Accéléré</span>
+            <span class="prompt-card-tag">Compas</span>
+          </div>
+          <div class="prompt-card-text">"Fast compas, trumpet section, trombone, keyboard melodies, high energy, carnival atmosphere, francophone call and response, 110 BPM"</div>
+          <div class="prompt-card-desc">Un compas rapide et énergique avec cuivres et claviers. Ambiance carnaval haïtien.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="tropical">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🌴 Bossa Nova Tropical</span>
+            <span class="prompt-card-tag">Tropical Soul</span>
+          </div>
+          <div class="prompt-card-text">"Bossa nova tropical, nylon guitar fingerpicking, soft brushes, warm male vocals, french lyrics, seaside café atmosphere, 100 BPM"</div>
+          <div class="prompt-card-desc">Une bossa nova chaleureuse avec guitare fingerstyle et voix masculine. Ambiance café en bord de mer.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="reggaeton">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">⚡ Dancehall Tropical Mix</span>
+            <span class="prompt-card-tag">Reggaeton</span>
+          </div>
+          <div class="prompt-card-text">"Dancehall tropical fusion, reggaeton beat, afrobeat percussion, steel pan melodies, francophone dance vocals, 110 BPM, summer festival"</div>
+          <div class="prompt-card-desc">Un mix dancehall-tropical-reggaeton pour les festivals d'été. Énergique et festif.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+        <div class="prompt-card" data-category="instrumental">
+          <div class="prompt-card-header">
+            <span class="prompt-card-title">🎸 Djembé & Percussions</span>
+            <span class="prompt-card-tag">Instrumental</span>
+          </div>
+          <div class="prompt-card-text">"West African djembe percussion, talking drum, kalimba, shakers, organic rhythms, no vocals, traditional meets modern, 115 BPM"</div>
+          <div class="prompt-card-desc">Un instrumental percussif avec djembé, talking drum et kalimba. Rythmes traditionnels africains modernes.</div>
+          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container text-center">
+      <div style="max-width:600px; margin:0 auto;">
+        <span style="font-size:3rem; display:block; margin-bottom:var(--space-md);">🚀</span>
+        <h2 style="font-size:1.6rem; margin-bottom:var(--space-sm);">Crée ta musique maintenant</h2>
+        <p style="color:rgba(255,255,255,0.7); margin-bottom:var(--space-xl); line-height:1.7;">
+          Utilise ces prompts dans Suno ou Flow Music pour générer tes propres chansons tropicales. Lis les guides pour aller plus loin !
+        </p>
+        <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+          <a href="https://suno.com/invite/@ia_records" target="_blank" rel="noopener" class="btn btn-primary btn-lg">🎵 Rejoindre Suno</a>
+          <a href="https://www.flowmusic.app/invite/VDMJX7" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">🎶 Essayer Flow Music</a>
+          <a href="./guides-suno.html" class="btn btn-turquoise btn-lg">📖 Guides Suno</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
+    <div class="container">
+      <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
+      <div style="display:flex; justify-content:center; gap:var(--space-lg); flex-wrap:wrap; font-size:0.88rem;">
+        <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
+        <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
+        <a href="./tablatures.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Tablatures</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">YouTube</a>
+      </div>
+      <p style="color:rgba(255,255,255,0.25); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.4);">elramonmusic@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script src="../app.js"></script>
+  <script>
+    // Copy prompt to clipboard
+    function copyPrompt(btn) {
+      const card = btn.closest('.prompt-card');
+      const text = card.querySelector('.prompt-card-text').textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✅ Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copier';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = '✅ Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copier';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Category filter
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.prompt-card').forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

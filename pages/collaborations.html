@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collaborations Commerciales — El Ramon Music Club</title>
+  <meta name="description" content="Propose une collaboration à El Ramon Music : marques d'instruments, logiciels musique, outils IA, événements tropicaux. Un univers musical solaire et familial." />
+  <meta property="og:title" content="Collaborations — El Ramon Music Club" />
+  <meta property="og:description" content="Collabore avec El Ramon Music. Marques, instruments, IA musicale, événements." />
+  <meta property="og:image" content="../assets/images/parrot-mascot.png" />
+  <link rel="icon" href="../assets/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .collab-hero {
+      min-height: 55vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-3xl);
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    .collab-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 40% 40%, rgba(255,215,0,0.18) 0%, transparent 55%),
+                  radial-gradient(ellipse at 70% 70%, rgba(0,206,209,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .collab-hero-emoji {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+      display: block;
+      animation: float-parrot 4s ease-in-out infinite;
+    }
+    .collab-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      margin-bottom: var(--space-sm);
+    }
+    .collab-hero p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.75);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .collab-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .collab-layout { grid-template-columns: 1fr; }
+    }
+    .collab-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(20px);
+    }
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-md);
+    }
+    .reason-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all var(--transition-mid);
+    }
+    .reason-card:hover {
+      border-color: rgba(255,215,0,0.25);
+      transform: translateY(-4px);
+    }
+    .reason-icon { font-size: 2.2rem; margin-bottom: var(--space-sm); display:block; }
+    .reason-card h3 { font-size: 1rem; font-weight: 700; color: var(--yellow-sun); margin-bottom: 0.4rem; }
+    .reason-card p { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.6; }
+    .partners-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: var(--space-xl);
+    }
+    .partner-type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      background: rgba(0,206,209,0.08);
+      border: 1px solid rgba(0,206,209,0.2);
+      color: var(--turquoise);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+    }
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+    }
+    .info-icon { font-size: 1.4rem; min-width: 2rem; text-align: center; }
+    .info-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 0.2rem; }
+    .info-value { font-size: 0.9rem; color: var(--white-light); font-weight: 600; }
+    .section-alt { background: rgba(22,33,62,0.5); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+        El Ramon
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">Accueil</a></li>
+        <li><a href="club.html" class="nav-link">Le Club</a></li>
+        <li><a href="partenaires.html" class="nav-link">Partenaires</a></li>
+        <li><a href="collaborations.html" class="nav-link" style="color:var(--yellow-sun);">Collaborations</a></li>
+        <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
+        <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">Accueil</a>
+      <a href="club.html" class="nav-link">Le Club</a>
+      <a href="partenaires.html" class="nav-link">Partenaires</a>
+      <a href="collaborations.html" class="nav-link text-yellow">Collaborations</a>
+      <a href="espace-membre.html" class="nav-link" data-auth-show style="display:none">Mon Espace</a>
+      <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
+    </nav>
+  </header>
+
+  <section class="collab-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="collab-hero-emoji">🤝</span>
+      <h1 class="text-gradient-warm">Collaborations Commerciales</h1>
+      <p>Tu represents une marque, un studio ou une entreprise ? Travaillons ensemble pour créer des synergies dans l'univers musical tropical d'El Ramon Music.</p>
+    </div>
+  </section>
+
+  <!-- PARTNERS SOUGHT -->
+  <section class="section-sm">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">🎯 Profils recherchés</span>
+        <h2 class="section-title">Avec qui nous voulons <span class="text-gradient-warm">collaborer</span></h2>
+        <p class="section-subtitle">Tous les acteurs de la musique, de l'IA créative et de l'univers tropical positif</p>
+      </div>
+
+      <div class="partners-types">
+        <span class="partner-type-tag">🎸 Marques d'instruments</span>
+        <span class="partner-type-tag">🥁 Percussions & Djembés</span>
+        <span class="partner-type-tag">🎹 Claviers</span>
+        <span class="partner-type-tag">🎙️ Micros</span>
+        <span class="partner-type-tag">🎧 Casques audio</span>
+        <span class="partner-type-tag">💻 Logiciels musique</span>
+        <span class="partner-type-tag">🤖 Outils IA musicale</span>
+        <span class="partner-type-tag">🎬 Plateformes vidéo</span>
+        <span class="partner-type-tag">🏢 Studios</span>
+        <span class="partner-type-tag">🎪 Événements tropicaux</span>
+        <span class="partner-type-tag">🌱 Associations écologiques</span>
+        <span class="partner-type-tag">👨‍👩‍👧 Marques familiales</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY COLLABORATE -->
+  <section class="section-sm section-alt">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">💡 Pourquoi nous</span>
+        <h2 class="section-title">Pourquoi collaborer avec <span class="text-gradient-tropical">El Ramon Music ?</span></h2>
+      </div>
+
+      <div class="reasons-grid">
+        <div class="reason-card">
+          <span class="reason-icon">☀️</span>
+          <h3>Univers musical solaire</h3>
+          <p>Une identité tropicale forte, joyeuse et populaire qui inspire la bonne humeur et touche une audience réceptive aux valeurs positives.</p>
+        </div>
+        <div class="reason-card">
+          <span class="reason-icon">&#9654;</span>
+          <h3>Contenus YouTube réguliers</h3>
+          <p>Des clips, Shorts et playlists publiés chaque semaine. Une visibilité continue et un flux constant de contenus pour mettre en avant tes produits.</p>
+        </div>
+        <div class="reason-card">
+          <span class="reason-icon">👨‍👩‍👧</span>
+          <h3>Audience familiale et positive</h3>
+          <p>Une communauté chaleureuse, familiale et bienveillante. Un environnement sûr et valorisant pour ta marque.</p>
+        </div>
+        <div class="reason-card">
+          <span class="reason-icon">🌴</span>
+          <h3>Identité tropicale forte</h3>
+          <p>Un univers unique et reconnaissable : perroquet mascotte, couleurs chaudes, ambiance plage et fête. Ta marque bénéficiera de cette identité.</p>
+        </div>
+        <div class="reason-card">
+          <span class="reason-icon">🎵</span>
+          <h3>Écosystème complet</h3>
+          <p>Clips, Shorts, guides, mini-jeu et communauté Club. De multiples points de contact naturels pour intégrer tes produits dans l'univers musical.</p>
+        </div>
+        <div class="reason-card">
+          <span class="reason-icon">🔗</span>
+          <h3>Intégration naturelle</h3>
+          <p>Possibilité d'intégration produit dans les clips, les guides, le mini-jeu ou les contenus partenaires. Des placements authentiques, pas intrusifs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="section-sm">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: var(--space-xl);">
+        <span class="section-label">📨 Proposer une collaboration</span>
+        <h2 class="section-title">Parlons de ton <span class="text-gradient-warm">projet</span></h2>
+        <p class="section-subtitle">Remplis ce formulaire et on reviendra vers toi rapidement</p>
+      </div>
+
+      <div class="collab-layout">
+
+        <!-- FORM -->
+        <div>
+          <div class="collab-card">
+            <!-- SUCCESS MESSAGE -->
+            <div class="form-success" id="form-success-msg" style="margin-bottom:1.5rem;">
+              <p style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Demande envoyée !</p>
+              <p>Merci pour ton intérêt. On te répond très vite pour discuter de la collaboration.</p>
+            </div>
+
+            <form id="collaboration-form" novalidate>
+
+              <div class="form-group">
+                <label class="form-label" for="company">Nom de l'entreprise <span class="required">*</span></label>
+                <input type="text" id="company" name="company" class="form-input" placeholder="Ex : Guitares Tropicales SARL" required />
+                <p class="form-error" id="company-error"></p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="contact-name">Nom du contact <span class="required">*</span></label>
+                <input type="text" id="contact-name" name="contact-name" class="form-input" placeholder="Ton nom complet" required />
+                <p class="form-error" id="contact-name-error"></p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="email">Email professionnel <span class="required">*</span></label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="contact@entreprise.com" required autocomplete="email" />
+                <p class="form-error" id="email-error"></p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="website">Site web</label>
+                <input type="url" id="website" name="website" class="form-input" placeholder="https://www.entreprise.com" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="collab-type">Type de collaboration <span class="required">*</span></label>
+                <select id="collab-type" name="collab-type" class="form-input" required>
+                  <option value="">Choisir un type</option>
+                  <option value="instrument">Marque d'instruments</option>
+                  <option value="logiciel">Logiciel musique / DAW</option>
+                  <option value="ia">Outil IA musicale</option>
+                  <option value="audio">Matériel audio (micros, casques)</option>
+                  <option value="video">Plateforme vidéo / création</option>
+                  <option value="event">Événement / Festival</option>
+                  <option value="association">Association / Écologie</option>
+                  <option value="sponsoring">Sponsoring</option>
+                  <option value="autre">Autre</option>
+                </select>
+                <p class="form-error" id="collab-type-error"></p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="product">Produit ou service proposé</label>
+                <input type="text" id="product" name="product" class="form-input" placeholder="Ex : Gamme de guitares acoustiques tropicales" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="budget">Budget ou échange envisagé</label>
+                <select id="budget" name="budget" class="form-input">
+                  <option value="">Choisir une fourchette (facultatif)</option>
+                  <option value="echelle">Échange de bonne volonté / visibilité</option>
+                  <option value="500-2000">500 € — 2 000 €</option>
+                  <option value="2000-5000">2 000 € — 5 000 €</option>
+                  <option value="5000-10000">5 000 € — 10 000 €</option>
+                  <option value="10000+">10 000 € et plus</option>
+                  <option value="adiscuter">À discuter</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="collab-message">Message <span class="required">*</span></label>
+                <textarea id="collab-message" name="collab-message" class="form-textarea" rows="6" placeholder="Décris ta proposition de collaboration, tes objectifs et ce que tu recherches..." required></textarea>
+                <p class="form-error" id="collab-message-error"></p>
+              </div>
+
+              <div class="form-checkbox-group" style="margin-top:.5rem;padding:.75rem;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:12px;">
+                <input type="checkbox" id="collab-rgpd" name="collab-rgpd" class="form-checkbox" required />
+                <label class="form-checkbox-label" for="collab-rgpd">
+                  <strong style="color:var(--white-light);">J'accepte que mes données soient traitées</strong>
+                  pour répondre à ma demande de collaboration, conformément à la
+                  <a href="confidentialite.html" style="color:var(--turquoise);text-decoration:underline;">politique de confidentialité</a>.
+                </label>
+              </div>
+              <p class="form-error" id="collab-rgpd-error" style="margin-top:.25rem;"></p>
+
+              <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.5rem;font-size:1.05rem;">
+                Envoyer ma proposition
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- INFO SIDEBAR -->
+        <aside>
+          <div class="info-card">
+            <h3 style="font-size:1.1rem;font-weight:800;color:var(--yellow-sun);margin-bottom:var(--space-md);">Coordonnées</h3>
+
+            <div class="info-item">
+              <span class="info-icon">📧</span>
+              <div>
+                <div class="info-label">Email pro</div>
+                <div class="info-value">elramonmusic@gmail.com</div>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="info-icon">⏱️</span>
+              <div>
+                <div class="info-label">Réponse</div>
+                <div class="info-value">Sous 72h ouvrées</div>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="info-icon">&#9654;</span>
+              <div>
+                <div class="info-label">Chaîne</div>
+                <div class="info-value"><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" style="color:var(--turquoise);text-decoration:none;">@El-Ramon-Music</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card" style="margin-top:var(--space-md);">
+            <h3 style="font-size:1rem;font-weight:700;color:var(--white-light);margin-bottom:var(--space-md);">Formats possibles</h3>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Placement produit dans un clip
+              </li>
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Test / review instrument
+              </li>
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Lien partenaire dédié
+              </li>
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Sponsoring Shorts / Clips
+              </li>
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Co-création de contenu
+              </li>
+              <li style="font-size:.88rem;color:rgba(255,255,255,0.7);padding:.4rem 0;display:flex;gap:.5rem;">
+                <span style="color:var(--palm-green);">✓</span> Intégration mini-jeu
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.png" alt="El Ramon Music Club" />
+            El Ramon Music
+          </div>
+          <p class="footer-tagline">Les chansons tropicales qui donnent le sourire.</p>
+          <div class="footer-social">
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube">&#9654;</a>
+            <a href="mailto:elramonmusic@gmail.com" class="footer-social-btn" title="Email">&#9993;</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-col-title">Club</p>
+          <ul class="footer-links">
+            <li><a href="club.html" class="footer-link">Le Club</a></li>
+            <li><a href="inscription.html" class="footer-link">Inscription</a></li>
+            <li><a href="espace-membre.html" class="footer-link">Espace Membre</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Contenu</p>
+          <ul class="footer-links">
+            <li><a href="guides-suno.html" class="footer-link">Guides Suno</a></li>
+            <li><a href="prompts.html" class="footer-link">Prompts IA</a></li>
+            <li><a href="tablatures.html" class="footer-link">Tablatures</a></li>
+            <li><a href="jeu.html" class="footer-link">Mini-Jeu</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Info</p>
+          <ul class="footer-links">
+            <li><a href="partenaires.html" class="footer-link">Partenaires</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+            <li><a href="confidentialite.html" class="footer-link">Confidentialité</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2026 El Ramon Music Club. Fait avec soleil et passion.</span>
+        <div class="footer-bottom-links">
+          <a href="mentions-legales.html" class="footer-bottom-link">Mentions légales</a>
+          <a href="confidentialite.html" class="footer-bottom-link">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../app.js"></script>
+  <script>
+    // Validation RGPD supplémentaire pour le formulaire de collaboration
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('collaboration-form');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          const rgpd = document.getElementById('collab-rgpd');
+          const rgpdError = document.getElementById('collab-rgpd-error');
+          if (rgpd && !rgpd.checked) {
+            if (rgpdError) {
+              rgpdError.textContent = 'Tu dois accepter la politique de confidentialité.';
+              rgpdError.classList.add('visible');
+            }
+          } else if (rgpdError) {
+            rgpdError.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
