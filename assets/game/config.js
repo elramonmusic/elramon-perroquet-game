@@ -10,9 +10,9 @@ const GAME_CONFIG = {
 
   // --- PHYSIQUE ---
   physics: {
-    gravity: 800,
-    playerSpeed: 200,
-    playerJump: -380,
+    gravity: 700,
+    playerSpeed: 220,
+    playerJump: -460,
     bulletSpeed: 400,
     bulletMaxDist: 350,
   },
@@ -40,14 +40,15 @@ const GAME_CONFIG = {
       { x: 2200, y: 400, w: 400, h: 50, type: 'ground' },
       { x: 2700, y: 400, w: 1300, h: 50, type: 'ground' },
 
-      // Plateformes en hauteur
-      { x: 350, y: 310, w: 120, h: 16, type: 'platform' },
-      { x: 600, y: 260, w: 100, h: 16, type: 'platform' },
-      { x: 1000, y: 300, w: 130, h: 16, type: 'platform' },
-      { x: 1300, y: 250, w: 100, h: 16, type: 'platform' },
-      { x: 1700, y: 320, w: 110, h: 16, type: 'platform' },
-      { x: 2000, y: 270, w: 120, h: 16, type: 'platform' },
-      { x: 2400, y: 300, w: 100, h: 16, type: 'platform' },
+      // Plateformes en hauteur (accessibles avec saut -460)
+      { x: 300, y: 330, w: 130, h: 16, type: 'platform' },
+      { x: 550, y: 280, w: 110, h: 16, type: 'platform' },
+      { x: 850, y: 310, w: 120, h: 16, type: 'platform' },
+      { x: 1100, y: 280, w: 110, h: 16, type: 'platform' },
+      { x: 1400, y: 310, w: 120, h: 16, type: 'platform' },
+      { x: 1700, y: 280, w: 110, h: 16, type: 'platform' },
+      { x: 2000, y: 320, w: 110, h: 16, type: 'platform' },
+      { x: 2300, y: 290, w: 120, h: 16, type: 'platform' },
 
       // Zone boss
       { x: 3200, y: 400, w: 800, h: 50, type: 'boss' },
@@ -55,25 +56,28 @@ const GAME_CONFIG = {
 
     // Fruits : { x, y, type: 'banana'|'orange'|'cherry' }
     fruits: [
+      // Sol — faciles
       { x: 250, y: 370, type: 'banana' },
-      { x: 400, y: 280, type: 'orange' },
-      { x: 650, y: 230, type: 'cherry' },
       { x: 950, y: 370, type: 'banana' },
-      { x: 1050, y: 270, type: 'orange' },
       { x: 1250, y: 370, type: 'cherry' },
-      { x: 1350, y: 220, type: 'banana' },
       { x: 1550, y: 370, type: 'orange' },
-      { x: 1750, y: 290, type: 'cherry' },
-      { x: 2050, y: 240, type: 'banana' },
       { x: 2300, y: 370, type: 'orange' },
-      { x: 2450, y: 270, type: 'cherry' },
       { x: 2800, y: 370, type: 'banana' },
       { x: 2950, y: 370, type: 'orange' },
       { x: 3100, y: 370, type: 'cherry' },
+      // Sur plateformes (20px au-dessus du haut)
+      { x: 365, y: 310, type: 'orange' },    // plateforme x:300 y:330
+      { x: 605, y: 260, type: 'cherry' },     // plateforme x:550 y:280
+      { x: 910, y: 290, type: 'banana' },     // plateforme x:850 y:310
+      { x: 1155, y: 260, type: 'orange' },    // plateforme x:1100 y:280
+      { x: 1460, y: 290, type: 'banana' },    // plateforme x:1400 y:310
+      { x: 1755, y: 260, type: 'cherry' },    // plateforme x:1700 y:280
+      { x: 2055, y: 300, type: 'banana' },    // plateforme x:2000 y:320
+      { x: 2360, y: 270, type: 'cherry' },    // plateforme x:2300 y:290
     ],
 
     // Potion invincibilité
-    potion: { x: 1350, y: 190 },
+    potion: { x: 2360, y: 268 },
 
     // Ennemis : { x, y, type, range, speed }
     enemies: [
@@ -83,16 +87,16 @@ const GAME_CONFIG = {
       { x: 2100, y: 372, type: 'crabe', range: 100, speed: 70 },
       { x: 2500, y: 372, type: 'serpent', range: 130, speed: 110 },
       { x: 2900, y: 372, type: 'crabe', range: 160, speed: 90 },
-      // Singe lanceur (stationnaire, lance des noix de coco)
-      { x: 1400, y: 218, type: 'singe', range: 0, speed: 0 },
-      { x: 2050, y: 238, type: 'singe', range: 0, speed: 0 },
+      // Singe lanceur (stationnaire, sur plateformes)
+      { x: 1460, y: 294, type: 'singe', range: 0, speed: 0 },
+      { x: 2055, y: 304, type: 'singe', range: 0, speed: 0 },
     ],
 
     // Boss
     boss: {
       name: 'Toucan Tambour',
       x: 3500,
-      y: 340,
+      y: 376,
       hp: 3,
       speed: 80,
       jumpForce: -250,

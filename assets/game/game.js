@@ -342,6 +342,7 @@ class Level1Scene extends Phaser.Scene {
       this.physics.add.overlap(this.player, enemy, this.hitEnemy, null, this);
 
       if (e.type === 'singe') {
+        enemy.body.allowGravity = false;
         enemy.lastShot = 0;
       }
       this.enemies.push(enemy);
@@ -676,6 +677,7 @@ class Level1Scene extends Phaser.Scene {
 
     this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'toucan');
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
+    this.boss.body.allowGravity = false;
     this.boss.body.setSize(48, 44).setOffset(2, 4);
     this.boss.facingRight = false;
     this.physics.add.collider(this.boss, this.platforms);
