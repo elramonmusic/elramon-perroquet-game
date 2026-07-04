@@ -349,7 +349,7 @@ async function handleInscription(event) {
     // Tentative d'envoi vers le backend
     let serverSaved = false;
     try {
-      const response = await fetch('/functions/subscribe', {
+      const response = await fetch('/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -403,7 +403,7 @@ async function handleContact(event) {
   Form.setLoading(btn, true);
 
   try {
-    const response = await fetch('/functions/contact', {
+    const response = await fetch('/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nom, email, sujet, message }),
@@ -455,7 +455,7 @@ async function handleCollaboration(event) {
   Form.setLoading(btn, true);
 
   try {
-    await fetch('/functions/collaboration', {
+    await fetch('/collaboration', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
