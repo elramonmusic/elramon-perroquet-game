@@ -1916,6 +1916,266 @@ a:focus-visible {
 }
 
 /* ============================================================
+   CAGNOTTE — Bouton hypnotique solidarité
+   ============================================================ */
+@keyframes hypnotic-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(46,204,113,0.3), 0 0 60px rgba(255,215,0,0.1);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(46,204,113,0.5), 0 0 80px rgba(255,215,0,0.2);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes hypnotic-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes hypnotic-glow-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.25); }
+  50% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+}
+
+.cagnotte-section {
+  background: linear-gradient(135deg, rgba(46,204,113,0.06) 0%, rgba(255,215,0,0.06) 50%, rgba(0,206,209,0.04) 100%);
+  border-top: 1px solid rgba(46,204,113,0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.cagnotte-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(255,215,0,0.03) 0%, transparent 50%),
+              radial-gradient(circle at 70% 50%, rgba(46,204,113,0.03) 0%, transparent 50%);
+  animation: pulse-glow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cagnotte-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--space-2xl) 0;
+}
+
+.cagnotte-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(46,204,113,0.12);
+  border: 1px solid rgba(46,204,113,0.35);
+  color: var(--palm-green);
+  padding: 0.3rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-md);
+  animation: hypnotic-glow-ring 2.5s ease-in-out infinite;
+}
+
+.cagnotte-title {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  font-weight: 900;
+  color: var(--white-light);
+  margin-bottom: var(--space-sm);
+  line-height: 1.3;
+}
+
+.cagnotte-title .text-gradient {
+  background: linear-gradient(135deg, #FFD700, #2ECC71, #FFD700);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hypnotic-shimmer 4s linear infinite;
+}
+
+.cagnotte-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.6);
+  max-width: 520px;
+  margin: 0 auto var(--space-lg);
+  line-height: 1.6;
+}
+
+.cagnotte-partners {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--space-lg);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.cagnotte-partners .partner-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+}
+
+.cagnotte-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: linear-gradient(135deg, #2ECC71 0%, #FFD700 100%);
+  background-size: 200% auto;
+  color: var(--night-blue);
+  padding: 1rem 2.2rem;
+  border-radius: var(--radius-full);
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all var(--transition-mid);
+  animation: hypnotic-pulse 3s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+}
+
+.cagnotte-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  animation: hypnotic-shimmer 3s linear infinite;
+  pointer-events: none;
+}
+
+.cagnotte-btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 40px rgba(46,204,113,0.35), 0 0 80px rgba(255,215,0,0.15);
+  background-position: right center;
+}
+
+.cagnotte-btn:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+.cagnotte-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.cagnotte-note {
+  margin-top: var(--space-md);
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+}
+
+/* Version compacte pour le dashboard */
+.cagnotte-card {
+  background: linear-gradient(145deg, rgba(46,204,113,0.08) 0%, rgba(255,215,0,0.08) 100%);
+  border: 1px solid rgba(46,204,113,0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  transition: all var(--transition-mid);
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.cagnotte-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  animation: hypnotic-shimmer 4s linear infinite;
+  pointer-events: none;
+}
+
+.cagnotte-card:hover {
+  border-color: rgba(46,204,113,0.4);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 40px rgba(46,204,113,0.15), 0 0 60px rgba(255,215,0,0.08);
+}
+
+.cagnotte-card .cagnotte-card-icon {
+  font-size: 2rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.cagnotte-card h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--white-light);
+  margin: 0;
+}
+
+.cagnotte-card p {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cagnotte-card .cagnotte-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: linear-gradient(135deg, rgba(46,204,113,0.15), rgba(255,215,0,0.15));
+  border: 1px solid rgba(255,215,0,0.3);
+  color: var(--yellow-sun);
+  padding: 0.2rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  animation: hypnotic-glow-ring 2.5s ease-in-out infinite;
+}
+
+@media (max-width: 600px) {
+  .cagnotte-btn {
+    padding: 0.85rem 1.6rem;
+    font-size: 1rem;
+  }
+  .cagnotte-partners {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cagnotte-btn,
+  .cagnotte-btn::after,
+  .cagnotte-badge,
+  .cagnotte-section::before,
+  .cagnotte-card::before,
+  .cagnotte-card .cagnotte-card-icon {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
    TURNSTILE — Anti-bot widget
    ============================================================ */
 .cf-turnstile {
