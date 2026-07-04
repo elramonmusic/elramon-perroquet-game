@@ -304,6 +304,7 @@ class Level1Scene extends Phaser.Scene {
     this.player.body.setSize(28, 28);
     this.player.body.setOffset(4, 6);
     this.physics.add.collider(this.player, this.platforms);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
     // --- Fruits (groupe statique pour overlap) ---
     const fruitTextures = { banana: 'banana', orange: 'orange_fruit', cherry: 'cherry' };
