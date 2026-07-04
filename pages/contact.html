@@ -84,6 +84,7 @@
     .info-value a { color: var(--turquoise); text-decoration: none; }
     .info-value a:hover { text-decoration: underline; }
   </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -170,6 +171,7 @@
                 <p class="form-error" id="message-error"></p>
               </div>
 
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
               <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1rem;font-size:1.05rem;">
                 Envoyer le message
               </button>

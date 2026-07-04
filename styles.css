@@ -1915,6 +1915,26 @@ a:focus-visible {
   border-color: rgba(0,206,209,0.3);
 }
 
+/* ============================================================
+   TURNSTILE — Anti-bot widget
+   ============================================================ */
+.cf-turnstile {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 0;
+}
+
+.cf-turnstile > div {
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+@media (max-width: 480px) {
+  .cf-turnstile > div {
+    transform: scale(0.78);
+  }
+}
+
 /* --- Utility overrides --- */
 .mb-0 { margin-bottom: 0 !important; }
 .mt-auto { margin-top: auto; }

@@ -13,6 +13,20 @@ const CONFIG = {
   SITE_NAME: 'El Ramon Music Club',
   EMAIL_CONTACT: 'elramonmusic@gmail.com',
   YOUTUBE_URL: 'https://www.youtube.com/@El-Ramon-Music',
+  TURNSTILE_SITEKEY: '0x4AAAAAADvpVNb0l4gq0dkE',
+};
+
+// ============================================================
+// TURNSTILE — Callback anti-bot (Cloudflare)
+// ============================================================
+window._turnstileToken = undefined;
+
+window.onTurnstileSuccess = function(token) {
+  window._turnstileToken = token;
+};
+
+window.onTurnstileError = function() {
+  window._turnstileToken = undefined;
 };
 
 // ============================================================
@@ -344,7 +358,7 @@ async function handleInscription(event) {
 
   try {
     // Envoi vers Cloudflare Pages Function
-    const payload = { email, pseudo, prenom, newsletter, abonne, rgpd };
+    const payload = { email, pseudo, prenom, newsletter, abonne, rgpd, turnstile: window._turnstileToken || '' };
 
     // Tentative d'envoi vers le backend
     let serverSaved = false;
@@ -361,6 +375,8 @@ async function handleInscription(event) {
     } catch (fetchError) {
       console.warn('Backend unavailable, saving to localStorage only:', fetchError.message);
     }
+
+    window._turnstileToken = undefined;
 
     // Toujours sauvegarder en localStorage (session)
     const member = Auth.saveMember({ email, pseudo, prenom });
@@ -406,8 +422,10 @@ async function handleContact(event) {
     const response = await fetch('/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom, email, sujet, message }),
+      body: JSON.stringify({ nom, email, sujet, message, turnstile: window._turnstileToken || '' }),
     });
+
+    window._turnstileToken = undefined;
 
     const successEl = form.querySelector('.form-success');
     if (successEl) {
@@ -458,8 +476,10 @@ async function handleCollaboration(event) {
     await fetch('/collaboration', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, turnstile: window._turnstileToken || '' }),
     });
+
+    window._turnstileToken = undefined;
 
     const successEl = form.querySelector('.form-success');
     if (successEl) {

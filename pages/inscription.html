@@ -58,6 +58,7 @@
       line-height: 1.5;
     }
   </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -208,6 +209,7 @@
               <p class="form-error" id="rgpd-error" style="margin-top:.25rem;"></p>
 
               <!-- SUBMIT -->
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
               <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.75rem;font-size:1.05rem;">
                 Rejoindre le Club gratuitement
               </button>

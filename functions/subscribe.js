@@ -46,6 +46,36 @@ export async function onRequestPost(context) {
 
   const { email, pseudo, prenom, newsletter, abonne, rgpd } = data;
 
+  // Vérification Turnstile anti-bot
+  if (env.TURNSTILE_SECRET_KEY) {
+    const turnstileToken = data.turnstile;
+    if (!turnstileToken) {
+      return new Response(JSON.stringify({ error: 'Vérification anti-bot requise' }), {
+        status: 400,
+        headers: CORS_HEADERS,
+      });
+    }
+    try {
+      const cfResp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: env.TURNSTILE_SECRET_KEY,
+          response: turnstileToken,
+        }),
+      });
+      const cfResult = await cfResp.json();
+      if (!cfResult.success) {
+        return new Response(JSON.stringify({ error: 'Vérification anti-bot échouée' }), {
+          status: 400,
+          headers: CORS_HEADERS,
+        });
+      }
+    } catch (err) {
+      console.error('Turnstile verification error:', err.message);
+    }
+  }
+
   // Validation des champs obligatoires
   if (!email || !isValidEmail(email)) {
     return new Response(JSON.stringify({ error: 'Adresse email invalide ou manquante' }), {

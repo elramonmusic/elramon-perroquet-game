@@ -120,6 +120,7 @@
     .info-value { font-size: 0.9rem; color: var(--white-light); font-weight: 600; }
     .section-alt { background: rgba(22,33,62,0.5); }
   </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -324,6 +325,7 @@
               </div>
               <p class="form-error" id="collab-rgpd-error" style="margin-top:.25rem;"></p>
 
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
               <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.5rem;font-size:1.05rem;">
                 Envoyer ma proposition
               </button>
