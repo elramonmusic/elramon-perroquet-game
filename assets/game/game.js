@@ -200,6 +200,12 @@ class BootScene extends Phaser.Scene {
     g.fillTriangle(1, 7, 15, 7, 8, 16);
     g.generateTexture('heart_empty', 16, 16);
 
+    // --- Texture invisible pour plateformes (1x1 pixel) ---
+    g.clear();
+    g.fillStyle(0xFFFFFF, 0);
+    g.fillRect(0, 0, 1, 1);
+    g.generateTexture('platform_hitbox', 1, 1);
+
     g.destroy();
   }
 }
@@ -328,8 +334,9 @@ class Level1Scene extends Phaser.Scene {
         gfx.fillStyle(0x4CAF50, 1);
         gfx.fillRect(p.x, p.y, p.w, 6);
       }
-      const body = this.add.rectangle(p.x + p.w / 2, p.y + p.h / 2, p.w, p.h, 0x000000, 0);
-      this.platforms.add(body);
+      const body = this.physics.add.staticSprite(p.x + p.w / 2, p.y + p.h / 2, 'platform_hitbox');
+      body.setDisplaySize(p.w, p.h);
+      body.setAlpha(0);
       body.refreshBody();
     });
 
@@ -396,7 +403,10 @@ class Level1Scene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.bossProjectiles, this.hitByBossProjectile, null, this);
 
     // --- Zone boss ---
-    this.bossZone = this.physics.add.staticSprite(level.boss.x, level.worldHeight / 2, null);
+    this.bossZone = this.physics.add.staticSprite(level.boss.x, level.worldHeight / 2, 'platform_hitbox');
+    this.bossZone.setDisplaySize(60, level.worldHeight);
+    this.bossZone.setAlpha(0);
+    this.bossZone.refreshBody();
     this.bossZone.body.setSize(60, level.worldHeight);
     this.bossZone.body.setImmovable(true);
     this.bossZone.setVisible(false);
