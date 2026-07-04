@@ -5,8 +5,8 @@
  * POST /functions/subscribe
  * Body: { email, pseudo, prenom, newsletter, abonne, rgpd }
  *
- * V1 : stockage en variable d'environnement (KV ou D1 à venir)
- * V2 : intégration Supabase
+ * V2 : stockage en variable d'environnement (KV ou D1 à venir)
+ *      → intégration Supabase (via env.SUPABASE_URL + env.SUPABASE_SERVICE_KEY)
  */
 
 const CORS_HEADERS = {
@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
     source: 'elramon-music-club',
   };
 
-  // V2 : Envoi vers Supabase (à configurer via variables d'environnement)
+  // Stockage Supabase (via variables d'environnement Cloudflare)
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
     try {
       const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {

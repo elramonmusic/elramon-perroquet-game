@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
     ip: request.headers.get('cf-connecting-ip') || 'unknown',
   };
 
-  // V2 : Stockage Supabase
+  // Stockage Supabase (via variables d'environnement Cloudflare)
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
     try {
       await fetch(`${env.SUPABASE_URL}/rest/v1/contact_messages`, {

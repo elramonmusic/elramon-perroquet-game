@@ -13,12 +13,11 @@ const CONFIG = {
   SITE_NAME: 'El Ramon Music Club',
   EMAIL_CONTACT: 'elramonmusic@gmail.com',
   YOUTUBE_URL: 'https://www.youtube.com/@El-Ramon-Music',
-  SUPABASE_URL: '', // à remplir en V2
-  SUPABASE_ANON_KEY: '', // à remplir en V2
 };
 
 // ============================================================
-// AUTH UTILS (V1 — localStorage)
+// AUTH UTILS (localStorage — session client uniquement)
+// La base de données Supabase est gérée côté serveur (Cloudflare Functions).
 // ============================================================
 const Auth = {
   /**
@@ -78,11 +77,10 @@ const Auth = {
   },
 
   /**
-   * Injection login en V2 (Supabase) — placeholder
+   * Injection login en V2 (Supabase Auth) — à venir
    */
   async loginWithEmail(email, password) {
-    // V2: appel Supabase Auth
-    console.warn('Supabase login not configured yet (V2)');
+    console.warn('Auth Supabase (V2) non encore implémentée.');
     return { error: 'Backend non configuré' };
   }
 };
