@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A1A2E" />
   <title>Guides Suno IA Musique — El Ramon Music Club</title>
   <meta name="description" content="Maîtrise la création musicale avec Suno IA. Guides exclusifs membres El Ramon Music Club : prompts, bonnes pratiques, téléchargements PDF." />
   <meta name="robots" content="noindex, nofollow" />
@@ -169,12 +170,12 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if(window.ElRamon) window.ElRamon.Auth.requireAuth('../pages/inscription.html');
+      if(window.ElRamon) window.ElRamon.Auth.requireAuth('./inscription.html');
       else {
         try {
           const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
-          if (!m) window.location.href = '../pages/inscription.html';
-        } catch(e) { window.location.href = '../pages/inscription.html'; }
+          if (!m) window.location.href = './inscription.html';
+        } catch(e) { window.location.href = './inscription.html'; }
       }
     });
   </script>
@@ -182,7 +183,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" />
+        <img src="../assets/images/parrot-mascot.png" alt="El Ramon" onerror="this.style.display='none'" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">

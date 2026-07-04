@@ -497,7 +497,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .nav-mobile .nav-link {
   font-size: 1rem;
-  padding: var(--space-xs) 0;
+  padding: var(--space-sm) 0;
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -1712,6 +1712,207 @@ h1, h2, h3, h4, h5, h6 {
   .bonus-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================
+   MOBILE — Small phones (360px and below)
+   ============================================================ */
+@media (max-width: 360px) {
+  .container {
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+  }
+  .dash-grid,
+  .video-grid,
+  .bonus-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-stats {
+    gap: var(--space-sm);
+  }
+  .footer-bottom-links {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY — Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY — Focus visible
+   ============================================================ */
+.btn:focus-visible,
+.nav-link:focus-visible,
+.nav-cta:focus-visible,
+.dash-card:focus-visible,
+.video-card:focus-visible,
+.partner-card:focus-visible,
+.bonus-card:focus-visible,
+.card:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--yellow-sun);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   YOUTUBE CTA — Bouton rouge style YouTube
+   ============================================================ */
+.yt-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #FF0000;
+  color: #fff;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all var(--transition-mid);
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
+}
+.yt-cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255, 0, 0, 0.4);
+  background: #CC0000;
+}
+.yt-cta-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* ============================================================
+   VIDEO FEATURED — Section vidéo vedette
+   ============================================================ */
+.video-featured {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+.video-featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 0, 0, 0.15);
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  color: #FF6B6B;
+  padding: 0.3rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-md);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   MERCI — Section YouTube post-inscription
+   ============================================================ */
+.merci-yt-section {
+  background: linear-gradient(135deg, rgba(255,0,0,0.08) 0%, rgba(255,215,0,0.05) 100%);
+  border: 1px solid rgba(255, 0, 0, 0.15);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  text-align: center;
+}
+
+/* ============================================================
+   ESPACE MEMBRE — Séparateur sections
+   ============================================================ */
+.dash-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-mid);
+  margin-bottom: var(--space-lg);
+}
+.dash-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  min-width: 40px;
+}
+.dash-card-locked {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.dash-card-locked:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================
+   BONUS PAGE — Cards playlists
+   ============================================================ */
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+.playlist-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  transition: all var(--transition-mid);
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.playlist-card:hover {
+  border-color: rgba(255,0,0,0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(255, 0, 0, 0.08);
+}
+.playlist-card-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+.playlist-card h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--white-light);
+  margin-bottom: 0.4rem;
+}
+.playlist-card p {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+.playlist-card-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: var(--radius-full);
+  background: rgba(255,0,0,0.12);
+  color: #FF6B6B;
+  border: 1px solid rgba(255,0,0,0.3);
+}
+.playlist-card-badge.turquoise {
+  background: rgba(0,206,209,0.12);
+  color: var(--turquoise);
+  border-color: rgba(0,206,209,0.3);
 }
 
 /* --- Utility overrides --- */
