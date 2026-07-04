@@ -81,34 +81,64 @@ export async function onRequestPost(context) {
 
   // Stockage Supabase (via variables d'environnement Cloudflare)
   let supabaseStatus = 'non_configuré';
+  let supabaseDetails = { url: '', keyPrefix: '' };
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
-    supabaseStatus = 'ok';
+    supabaseStatus = 'tentative';
+    const supabaseUrl = env.SUPABASE_URL.replace(/\/$/, '');
+    const serviceKey = env.SUPABASE_SERVICE_KEY;
+    supabaseDetails = {
+      url: supabaseUrl,
+      keyPrefix: serviceKey.substring(0, 15) + '...',
+      keyLength: serviceKey.length,
+    };
     try {
-      const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {
-        method: 'POST',
+      // 1. Test d'abord si l'endpoint est joignable (GET racine)
+      const healthCheck = await fetch(`${supabaseUrl}/rest/v1/`, {
+        method: 'GET',
         headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates',
+          'apikey': serviceKey,
+          'Authorization': `Bearer ${serviceKey}`,
         },
-        body: JSON.stringify(member),
       });
+      supabaseDetails.healthCheck = healthCheck.status;
 
-      if (!supabaseResponse.ok) {
-        const errorText = await supabaseResponse.text();
-        console.error('Supabase error:', errorText);
-        supabaseStatus = 'erreur_' + supabaseResponse.status + ': ' + errorText;
+      if (!healthCheck.ok) {
+        const healthText = await healthCheck.text();
+        supabaseDetails.healthError = healthText;
+        supabaseStatus = 'erreur_health_' + healthCheck.status;
+      } else {
+        // 2. Si l'endpoint est OK, essayer l'INSERT
+        const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/members`, {
+          method: 'POST',
+          headers: {
+            'apikey': serviceKey,
+            'Authorization': `Bearer ${serviceKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates',
+          },
+          body: JSON.stringify(member),
+        });
+
+        if (!supabaseResponse.ok) {
+          const errorText = await supabaseResponse.text();
+          console.error('Supabase insert error:', errorText);
+          supabaseStatus = 'erreur_insert_' + supabaseResponse.status;
+          supabaseDetails.insertError = errorText;
+        } else {
+          supabaseStatus = 'ok';
+          const insertResult = await supabaseResponse.json();
+          supabaseDetails.inserted = insertResult;
+        }
       }
     } catch (err) {
       console.error('Supabase fetch error:', err.message);
       supabaseStatus = 'catch_' + err.message;
     }
   } else {
-    console.error('Variables Supabase manquantes:', {
+    supabaseDetails.missing = {
       hasUrl: !!env.SUPABASE_URL,
       hasKey: !!env.SUPABASE_SERVICE_KEY,
-    });
+    };
   }
 
   // V2 : Envoi d'email de bienvenue (via Cloudflare Email Workers ou Resend)
@@ -121,7 +151,7 @@ export async function onRequestPost(context) {
     success: true,
     message: 'Bienvenue dans le El Ramon Music Club !',
     member: { email: member.email, pseudo: member.pseudo, role: member.role },
-    _debug: { supabase: supabaseStatus },
+    _debug: { supabase: supabaseStatus, details: supabaseDetails },
   }), {
     status: 200,
     headers: CORS_HEADERS,
