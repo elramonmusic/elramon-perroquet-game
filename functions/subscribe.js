@@ -80,7 +80,9 @@ export async function onRequestPost(context) {
   };
 
   // Stockage Supabase (via variables d'environnement Cloudflare)
+  let supabaseStatus = 'non_configuré';
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
+    supabaseStatus = 'ok';
     try {
       const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {
         method: 'POST',
@@ -94,13 +96,19 @@ export async function onRequestPost(context) {
       });
 
       if (!supabaseResponse.ok) {
-        console.error('Supabase error:', await supabaseResponse.text());
-        // On continue même en cas d'erreur Supabase (fallback)
+        const errorText = await supabaseResponse.text();
+        console.error('Supabase error:', errorText);
+        supabaseStatus = 'erreur_' + supabaseResponse.status + ': ' + errorText;
       }
     } catch (err) {
       console.error('Supabase fetch error:', err.message);
-      // Fallback silencieux — le client gère déjà le localStorage
+      supabaseStatus = 'catch_' + err.message;
     }
+  } else {
+    console.error('Variables Supabase manquantes:', {
+      hasUrl: !!env.SUPABASE_URL,
+      hasKey: !!env.SUPABASE_SERVICE_KEY,
+    });
   }
 
   // V2 : Envoi d'email de bienvenue (via Cloudflare Email Workers ou Resend)
@@ -113,6 +121,7 @@ export async function onRequestPost(context) {
     success: true,
     message: 'Bienvenue dans le El Ramon Music Club !',
     member: { email: member.email, pseudo: member.pseudo, role: member.role },
+    _debug: { supabase: supabaseStatus },
   }), {
     status: 200,
     headers: CORS_HEADERS,
