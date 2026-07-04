@@ -1,6 +1,7 @@
 /**
  * Cloudflare Pages Function — /functions/subscribe
  * Gère les inscriptions au El Ramon Music Club
+ * Clés Supabase : env.SUPABASE_URL + env.SUPABASE_SERVICE_KEY (format JWT eyJ...)
  *
  * POST /functions/subscribe
  * Body: { email, pseudo, prenom, newsletter, abonne, rgpd }
