@@ -86,8 +86,11 @@ export async function onRequestPost(context) {
     }
   }
 
-  // V2 : Notification email à l'admin
+  // Notification email via Resend
   if (env.RESEND_API_KEY) {
+    const resendFrom = 'El Ramon Music <onboarding@elramon-music-club.onresend.com>';
+
+    // Email 1 — Notification admin
     try {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -96,7 +99,7 @@ export async function onRequestPost(context) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'El Ramon Music <noreply@elramonmusicclub.fr>',
+          from: resendFrom,
           to: ['elramonmusic@gmail.com'],
           reply_to: collaboration.email,
           subject: `[Collaboration] ${collaboration.company} — ${collaboration.collab_type}`,
@@ -104,7 +107,37 @@ export async function onRequestPost(context) {
         }),
       });
     } catch (err) {
-      console.error('Email error:', err.message);
+      console.error('Resend admin email error:', err.message);
+    }
+
+    // Email 2 — Accusé de réception au collaborateur
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: resendFrom,
+          to: [collaboration.email],
+          subject: `Ta demande de collaboration est bien reçue ! — El Ramon Music Club`,
+          text: `Salut ${collaboration.contact_name || collaboration.company} !
+
+Merci pour ta proposition de collaboration (${collaboration.collab_type}).
+
+Nous avons bien reçu ta demande et nous reviendrons vers toi rapidement pour en discuter.
+
+En attendant, découvre le projet :
+📺 Chaîne YouTube : https://www.youtube.com/@El-Ramon-Music
+🌐 Site : https://9ba25447.elramon-music-club.pages.dev/
+
+À très vite !
+— El Ramon 🦜`,
+        }),
+      });
+    } catch (err) {
+      console.error('Resend auto-reply error:', err.message);
     }
   }
 

@@ -102,6 +102,71 @@ export async function onRequestPost(context) {
     }
   }
 
+  // Notification email via Resend
+  if (env.RESEND_API_KEY) {
+    const resendFrom = 'El Ramon Music <onboarding@elramon-music-club.onresend.com>';
+
+    // Email 1 — Bienvenue au nouveau membre
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: resendFrom,
+          to: [member.email],
+          subject: `🎵 Bienvenue dans le El Ramon Music Club, ${member.pseudo} !`,
+          text: `Salut ${member.pseudo} !
+
+Bienvenue dans le El Ramon Music Club ! 🎉
+
+Ton inscription est confirmée. Voici ce qui t'attend :
+▶ Guides Suno IA pour créer tes propres beats
+▶ Prompts et astuces pour tes compositions
+▶ Tablatures et ressources musicales
+▶ Le mini-jeu Perroquet
+▶ Et bien plus...
+
+📺 Rejoins la chaîne YouTube : https://www.youtube.com/@El-Ramon-Music
+🎧 Écoute nos playlists : https://9ba25447.elramon-music-club.pages.dev/pages/bonus.html
+
+À très vite dans le Club !
+— El Ramon 🦜`,
+        }),
+      });
+    } catch (err) {
+      console.error('Resend welcome email error:', err.message);
+    }
+
+    // Email 2 — Notification admin
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: resendFrom,
+          to: ['elramonmusic@gmail.com'],
+          subject: `[Nouveau membre] ${member.pseudo} (${member.email})`,
+          text: `Nouveau membre inscrit
+
+Pseudo : ${member.pseudo}
+Email : ${member.email}
+Prénom : ${member.prenom || 'Non renseigné'}
+Newsletter : ${member.newsletter ? 'Oui' : 'Non'}
+Abonné YouTube : ${member.abonne ? 'Oui' : 'Non'}
+Date : ${member.created_at}`,
+        }),
+      });
+    } catch (err) {
+      console.error('Resend admin notification error:', err.message);
+    }
+  }
+
   console.log(`Nouvelle inscription: ${member.email} (${member.pseudo})`);
 
   return new Response(JSON.stringify({
