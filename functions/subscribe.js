@@ -81,6 +81,7 @@ export async function onRequestPost(context) {
   };
 
   // Stockage Supabase (via variables d'environnement Cloudflare)
+  let supabaseResult = 'non_configuré';
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
     try {
       const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {
@@ -94,20 +95,30 @@ export async function onRequestPost(context) {
         body: JSON.stringify(member),
       });
 
-      if (!supabaseResponse.ok) {
-        console.error('Supabase error:', await supabaseResponse.text());
+      if (supabaseResponse.ok) {
+        const result = await supabaseResponse.json();
+        supabaseResult = 'ok';
+      } else {
+        const errText = await supabaseResponse.text();
+        console.error('Supabase error:', errText);
+        supabaseResult = 'erreur_' + supabaseResponse.status + ': ' + errText;
       }
     } catch (err) {
       console.error('Supabase fetch error:', err.message);
+      supabaseResult = 'catch: ' + err.message;
     }
+  } else {
+    console.error('Variables manquantes:', { url: !!env.SUPABASE_URL, key: !!env.SUPABASE_SERVICE_KEY });
+    supabaseResult = 'variables_manquantes';
   }
 
-  console.log(`Nouvelle inscription: ${member.email} (${member.pseudo})`);
+  console.log(`Nouvelle inscription: ${member.email} (${member.pseudo}) — Supabase: ${supabaseResult}`);
 
   return new Response(JSON.stringify({
     success: true,
     message: 'Bienvenue dans le El Ramon Music Club !',
     member: { email: member.email, pseudo: member.pseudo, role: member.role },
+    _debug: { supabase: supabaseResult, received: { email, pseudo, prenom, newsletter, abonne, rgpd } },
   }), {
     status: 200,
     headers: CORS_HEADERS,
