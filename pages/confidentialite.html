@@ -70,6 +70,7 @@
   <meta name="twitter:description" content="Politique de confidentialité du site El Ramon Music Club. Collecte, traitement et protection de vos données personnelles conformément au RGPD." />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <header class="site-header" id="site-header">
     <nav class="nav">
@@ -84,7 +85,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -96,6 +97,8 @@
       <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="legal-hero">
     <div style="position:relative; z-index:2;">
@@ -261,13 +264,15 @@
       </ul>
     </div>
 
-    <p style="text-align:center; color:rgba(255,255,255,0.3); font-size:0.8rem; margin-top:var(--space-3xl);">
+    <p style="text-align:center; color:rgba(255,255,255,0.55); font-size:0.8rem; margin-top:var(--space-3xl);">
       Dernière mise à jour : juillet 2026
     </p>
 
   </div>
 
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

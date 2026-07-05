@@ -119,7 +119,9 @@ function initNavigation() {
     toggle.addEventListener('click', () => {
       toggle.classList.toggle('active');
       mobileNav.classList.toggle('active');
-      document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+      const isOpen = mobileNav.classList.contains('active');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
 
     // Close on link click
@@ -127,6 +129,7 @@ function initNavigation() {
       link.addEventListener('click', () => {
         toggle.classList.remove('active');
         mobileNav.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
       });
     });

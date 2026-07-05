@@ -137,6 +137,7 @@
   <meta name="twitter:image" content="https://elramon-music-club.pages.dev/assets/images/parrot-mascot.webp" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <header class="site-header" id="site-header">
     <nav class="nav">
@@ -152,7 +153,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -165,6 +166,8 @@
       <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="collab-hero">
     <div style="position:relative; z-index:2;">
@@ -267,20 +270,20 @@
 
               <div class="form-group">
                 <label class="form-label" for="company">Nom de l'entreprise <span class="required">*</span></label>
-                <input type="text" id="company" name="company" class="form-input" placeholder="Ex : Guitares Tropicales SARL" required />
-                <p class="form-error" id="company-error"></p>
+                <input type="text" id="company" name="company" class="form-input" placeholder="Ex : Guitares Tropicales SARL" required aria-describedby="company-error" />
+                <p class="form-error" id="company-error" role="alert"></p>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="contact-name">Nom du contact <span class="required">*</span></label>
-                <input type="text" id="contact-name" name="contact-name" class="form-input" placeholder="Ton nom complet" required />
-                <p class="form-error" id="contact-name-error"></p>
+                <input type="text" id="contact-name" name="contact-name" class="form-input" placeholder="Ton nom complet" required aria-describedby="contact-name-error" />
+                <p class="form-error" id="contact-name-error" role="alert"></p>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="email">Email professionnel <span class="required">*</span></label>
-                <input type="email" id="email" name="email" class="form-input" placeholder="contact@entreprise.com" required autocomplete="email" />
-                <p class="form-error" id="email-error"></p>
+                <input type="email" id="email" name="email" class="form-input" placeholder="contact@entreprise.com" required autocomplete="email" aria-describedby="email-error" />
+                <p class="form-error" id="email-error" role="alert"></p>
               </div>
 
               <div class="form-group">
@@ -290,7 +293,7 @@
 
               <div class="form-group">
                 <label class="form-label" for="collab-type">Type de collaboration <span class="required">*</span></label>
-                <select id="collab-type" name="collab-type" class="form-input" required>
+                <select id="collab-type" name="collab-type" class="form-input" required aria-describedby="collab-type-error">
                   <option value="">Choisir un type</option>
                   <option value="instrument">Marque d'instruments</option>
                   <option value="logiciel">Logiciel musique / DAW</option>
@@ -302,7 +305,7 @@
                   <option value="sponsoring">Sponsoring</option>
                   <option value="autre">Autre</option>
                 </select>
-                <p class="form-error" id="collab-type-error"></p>
+                <p class="form-error" id="collab-type-error" role="alert"></p>
               </div>
 
               <div class="form-group">
@@ -325,19 +328,19 @@
 
               <div class="form-group">
                 <label class="form-label" for="collab-message">Message <span class="required">*</span></label>
-                <textarea id="collab-message" name="collab-message" class="form-textarea" rows="6" placeholder="Décris ta proposition de collaboration, tes objectifs et ce que tu recherches..." required></textarea>
-                <p class="form-error" id="collab-message-error"></p>
+                <textarea id="collab-message" name="collab-message" class="form-textarea" rows="6" placeholder="Décris ta proposition de collaboration, tes objectifs et ce que tu recherches..." required aria-describedby="collab-message-error"></textarea>
+                <p class="form-error" id="collab-message-error" role="alert"></p>
               </div>
 
               <div class="form-checkbox-group" style="margin-top:.5rem;padding:.75rem;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:12px;">
-                <input type="checkbox" id="collab-rgpd" name="collab-rgpd" class="form-checkbox" required />
+                <input type="checkbox" id="collab-rgpd" name="collab-rgpd" class="form-checkbox" required aria-describedby="collab-rgpd-error" />
                 <label class="form-checkbox-label" for="collab-rgpd">
                   <strong style="color:var(--white-light);">J'accepte que mes données soient traitées</strong>
                   pour répondre à ma demande de collaboration, conformément à la
                   <a href="confidentialite.html" style="color:var(--turquoise);text-decoration:underline;">politique de confidentialité</a>.
                 </label>
               </div>
-              <p class="form-error" id="collab-rgpd-error" style="margin-top:.25rem;"></p>
+              <p class="form-error" id="collab-rgpd-error" role="alert" style="margin-top:.25rem;"></p>
 
               <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
               <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.5rem;font-size:1.05rem;">
@@ -406,7 +409,9 @@
     </div>
   </section>
 
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

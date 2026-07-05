@@ -60,6 +60,7 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <!-- AUTH GATE -->
   <script>
@@ -78,7 +79,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="El Ramon" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -90,7 +91,7 @@
         <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
         <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -104,6 +105,8 @@
       <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="bonus-hero">
     <div style="position:relative; z-index:2;">
@@ -218,7 +221,9 @@
     </div>
   </section>
 
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

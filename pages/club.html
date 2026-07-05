@@ -26,6 +26,7 @@
   <meta name="twitter:image" content="https://elramon-music-club.pages.dev/assets/images/parrot-mascot.webp" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <!-- ===== HEADER ===== -->
   <header class="site-header">
@@ -43,7 +44,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" aria-label="Menu" id="nav-toggle" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -58,10 +59,12 @@
     </nav>
   </header>
 
+<main id="main-content">
+
   <!-- ===== HERO ===== -->
   <section class="hero" style="min-height:90vh;">
-    <div class="hero-bg" style="background-image:url('../assets/images/hero-bg.webp');"></div>
-    <div class="hero-overlay"></div>
+    <div class="hero-bg" style="background-image:url('../assets/images/hero-bg.webp');" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
     <div class="hero-particles"></div>
     <div class="hero-content">
       <div class="hero-text">
@@ -90,7 +93,7 @@
         </div>
       </div>
       <div class="hero-visual">
-        <div class="hero-glow"></div>
+        <div class="hero-glow" aria-hidden="true"></div>
         <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet El Ramon" class="hero-parrot" loading="lazy" />
       </div>
     </div>
@@ -123,7 +126,7 @@
       </div>
       <div class="card card-dark reveal" style="max-width:800px;margin:3rem auto 0;padding:2.5rem;">
         <div class="flex items-center gap-md" style="margin-bottom:1.5rem;">
-          <img src="../assets/images/parrot-mascot.webp" alt="Mascotte" style="width:70px;height:70px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(255,215,0,0.3));" loading="lazy" />
+          <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" style="width:70px;height:70px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(255,215,0,0.3));" loading="lazy" />
           <div>
             <h3 class="font-tropical text-yellow" style="font-size:1.3rem;">Le mot du createur</h3>
             <p style="color:rgba(255,255,255,.5);font-size:.85rem;">El Ramon Music</p>
@@ -236,7 +239,9 @@
   </section>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

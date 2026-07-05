@@ -128,6 +128,7 @@
   <meta name="twitter:image" content="https://elramon-music-club.pages.dev/assets/images/logo.webp" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
 <!-- HEADER -->
 <header class="site-header">
@@ -145,7 +146,7 @@
       <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-yellow">Mon Espace 🦜</a></li>
       <li data-guest-show><a href="inscription.html" class="nav-cta">Rejoindre le Club</a></li>
     </ul>
-    <button class="nav-toggle" id="nav-toggle"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile"><span></span><span></span><span></span></button>
   </nav>
   <div class="nav-mobile" id="nav-mobile">
     <a href="../index.html" class="nav-link">🏠 Accueil</a>
@@ -155,6 +156,8 @@
     <a href="contact.html" class="nav-link">✉️ Contact</a>
   </div>
 </header>
+
+<main id="main-content">
 
 <!-- PAGE HERO -->
 <section class="page-hero">
@@ -344,6 +347,8 @@
 </main>
 
 <!-- FOOTER -->
+</main>
+
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

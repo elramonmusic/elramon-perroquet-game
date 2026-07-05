@@ -958,7 +958,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .form-input::placeholder,
 .form-textarea::placeholder {
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.55);
 }
 
 .form-textarea {
@@ -1356,7 +1356,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .footer-bottom-text {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.6);
 }
 
 .footer-bottom-links {
@@ -1366,7 +1366,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .footer-bottom-link {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.6);
   transition: color var(--transition-fast);
 }
 
@@ -1376,7 +1376,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .footer-affiliate-note {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.55);
   font-style: italic;
   margin-top: var(--space-sm);
 }
@@ -1767,6 +1767,39 @@ a:focus-visible {
 }
 
 /* ============================================================
+   ACCESSIBILITY — Skip link & landmarks
+   ============================================================ */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--yellow-sun);
+  color: var(--night-blue);
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  z-index: 9999;
+  border-radius: 0 0 var(--radius-md) 0;
+  transition: top var(--transition-fast);
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
    YOUTUBE CTA — Bouton rouge style YouTube
    ============================================================ */
 .yt-cta-btn {
@@ -2081,7 +2114,7 @@ a:focus-visible {
 .cagnotte-note {
   margin-top: var(--space-md);
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.6);
 }
 
 /* Version compacte pour le dashboard */

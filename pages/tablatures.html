@@ -96,6 +96,7 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <!-- AUTH GATE -->
   <script>
@@ -114,7 +115,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="El Ramon" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -124,7 +125,7 @@
         <li><a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a></li>
         <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -136,6 +137,8 @@
       <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="page-hero">
     <div style="position:relative; z-index:2;">
@@ -284,7 +287,9 @@
     </div>
   </section>
 
-  <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
+  </main>
+
+<footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
     <div class="container">
       <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
       <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
@@ -294,7 +299,7 @@
         <a href="./tablatures.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Tablatures</a>
         <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">YouTube</a>
       </div>
-      <p style="color:rgba(255,255,255,0.25); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.4);">elramonmusic@gmail.com</a></p>
+      <p style="color:rgba(255,255,255,0.55); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.6);">elramonmusic@gmail.com</a></p>
     </div>
   </footer>
 

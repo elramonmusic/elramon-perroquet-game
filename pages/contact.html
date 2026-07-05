@@ -101,6 +101,7 @@
   <meta name="twitter:image" content="https://elramon-music-club.pages.dev/assets/images/parrot-mascot.webp" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <header class="site-header" id="site-header">
     <nav class="nav">
@@ -115,7 +116,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -127,6 +128,8 @@
       <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="contact-hero">
     <div style="position:relative; z-index:2;">
@@ -155,14 +158,14 @@
 
               <div class="form-group">
                 <label class="form-label" for="nom">Nom complet <span class="required">*</span></label>
-                <input type="text" id="nom" name="nom" class="form-input" placeholder="Ton nom" required autocomplete="name" />
-                <p class="form-error" id="nom-error"></p>
+                <input type="text" id="nom" name="nom" class="form-input" placeholder="Ton nom" required autocomplete="name" aria-describedby="nom-error" />
+                <p class="form-error" id="nom-error" role="alert"></p>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="email">Adresse email <span class="required">*</span></label>
-                <input type="email" id="email" name="email" class="form-input" placeholder="tonemail@exemple.com" required autocomplete="email" />
-                <p class="form-error" id="email-error"></p>
+                <input type="email" id="email" name="email" class="form-input" placeholder="tonemail@exemple.com" required autocomplete="email" aria-describedby="email-error" />
+                <p class="form-error" id="email-error" role="alert"></p>
               </div>
 
               <div class="form-group">
@@ -181,8 +184,8 @@
 
               <div class="form-group">
                 <label class="form-label" for="message">Message <span class="required">*</span></label>
-                <textarea id="message" name="message" class="form-textarea" rows="6" placeholder="Ton message..." required></textarea>
-                <p class="form-error" id="message-error"></p>
+                <textarea id="message" name="message" class="form-textarea" rows="6" placeholder="Ton message..." required aria-describedby="message-error"></textarea>
+                <p class="form-error" id="message-error" role="alert"></p>
               </div>
 
               <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
@@ -243,7 +246,9 @@
     </div>
   </section>
 
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

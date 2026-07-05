@@ -207,6 +207,7 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
 <!-- ===== HEADER ===== -->
 <header class="site-header" id="site-header">
@@ -226,7 +227,7 @@
       <li data-guest-show><a href="pages/inscription.html" class="nav-cta">Rejoindre le Club</a></li>
     </ul>
 
-    <button class="nav-toggle" aria-label="Menu mobile" id="nav-toggle">
+    <button class="nav-toggle" aria-label="Menu mobile" id="nav-toggle" aria-expanded="false" aria-controls="nav-mobile">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -245,11 +246,13 @@
   </div>
 </header>
 
+<main id="main-content">
+
 <!-- ===== HERO ===== -->
 <section class="hero" id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
-  <div class="hero-particles"></div>
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-overlay" aria-hidden="true"></div>
+  <div class="hero-particles" aria-hidden="true"></div>
 
   <div class="hero-content">
     <div class="hero-text animate-slide-up">
@@ -298,7 +301,7 @@
     </div>
 
     <div class="hero-visual">
-      <div class="hero-glow"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
       <img src="assets/images/parrot-mascot.webp" alt="Mascotte El Ramon Music Club — Perroquet tropical" class="hero-parrot" width="320" height="320" />
     </div>
   </div>
@@ -587,14 +590,14 @@
       <form id="inscription-form" novalidate>
         <div class="form-group">
           <label class="form-label" for="email">Email <span class="required">*</span></label>
-          <input type="email" id="email" name="email" class="form-input" placeholder="ton@email.fr" required autocomplete="email" />
-          <div class="form-error" id="email-error"></div>
+          <input type="email" id="email" name="email" class="form-input" placeholder="ton@email.fr" required autocomplete="email" aria-describedby="email-error" />
+          <div class="form-error" id="email-error" role="alert"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="pseudo">Pseudo YouTube ou réseau social <span class="required">*</span></label>
-          <input type="text" id="pseudo" name="pseudo" class="form-input" placeholder="@TonPseudo" required />
-          <div class="form-error" id="pseudo-error"></div>
+          <input type="text" id="pseudo" name="pseudo" class="form-input" placeholder="@TonPseudo" required aria-describedby="pseudo-error" />
+          <div class="form-error" id="pseudo-error" role="alert"></div>
         </div>
 
         <div class="form-group">
@@ -618,19 +621,19 @@
           </div>
 
           <div class="form-checkbox-group">
-            <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required />
+            <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required aria-describedby="rgpd-error" />
             <label for="rgpd" class="form-checkbox-label">
               J'accepte la <a href="pages/confidentialite.html">politique de confidentialité</a> et le traitement de mes données pour accéder au Club <span class="required">*</span>
             </label>
           </div>
-          <div class="form-error" id="rgpd-error"></div>
+          <div class="form-error" id="rgpd-error" role="alert"></div>
         </div>
 
         <button type="submit" class="btn btn-primary w-full btn-lg">
           🦜 Rejoindre le Club gratuitement
         </button>
 
-        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center; margin-top: var(--space-sm);">
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-align: center; margin-top: var(--space-sm);">
           100% gratuit · Pas de spam · Désinscription à tout moment
         </p>
       </form>
@@ -655,7 +658,7 @@
       </p>
       <div class="cagnotte-partners">
         <span class="partner-logo">🦜 El Ramon Music</span>
-        <span style="color:rgba(255,255,255,0.3);">×</span>
+        <span style="color:rgba(255,255,255,0.55);">×</span>
         <span class="partner-logo">🌱 Gard Eau Arbres</span>
       </div>
       <a href="https://gofund.me/a915eaf1e" target="_blank" rel="noopener" class="cagnotte-btn">
@@ -668,6 +671,8 @@
 </section>
 
 <!-- ===== FOOTER ===== -->
+</main>
+
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -759,7 +764,7 @@
 </div>
 
 <!-- ===== TOAST ===== -->
-<div class="toast" id="global-toast"></div>
+<div class="toast" id="global-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Scripts -->
 <script src="app.js" defer></script>

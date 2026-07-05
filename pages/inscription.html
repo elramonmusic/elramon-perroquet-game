@@ -75,6 +75,7 @@
   <meta name="twitter:image" content="https://elramon-music-club.pages.dev/assets/images/parrot-mascot.webp" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <!-- ===== HEADER ===== -->
   <header class="site-header">
@@ -92,7 +93,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" aria-label="Menu" id="nav-toggle" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -106,6 +107,8 @@
       <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <!-- ===== PAGE HERO ===== -->
   <section class="page-hero" style="padding-bottom:3rem;">
@@ -130,7 +133,7 @@
         <div>
           <div class="form-card">
             <div class="flex items-center gap-md" style="margin-bottom:2rem;">
-              <img src="../assets/images/parrot-mascot.webp" alt="Perroquet" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(255,215,0,.3));" loading="lazy" />
+              <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(255,215,0,.3));" loading="lazy" />
               <div>
                 <h2 style="font-size:1.4rem;font-weight:800;color:var(--white-light);">Creer mon compte</h2>
                 <p style="color:rgba(255,255,255,.5);font-size:.85rem;">Acces immediat apres inscription</p>
@@ -157,9 +160,9 @@
                   class="form-input"
                   placeholder="tonemail@exemple.com"
                   required
-                  autocomplete="email"
+                  autocomplete="email" aria-describedby="email-error"
                 />
-                <p class="form-error" id="email-error"></p>
+                <p class="form-error" id="email-error" role="alert"></p>
               </div>
 
               <!-- PSEUDO -->
@@ -174,9 +177,9 @@
                   class="form-input"
                   placeholder="TonPseudo"
                   required
-                  autocomplete="username"
+                  autocomplete="username" aria-describedby="pseudo-error"
                 />
-                <p class="form-error" id="pseudo-error"></p>
+                <p class="form-error" id="pseudo-error" role="alert"></p>
               </div>
 
               <!-- PRENOM -->
@@ -214,13 +217,13 @@
 
               <!-- RGPD -->
               <div class="form-checkbox-group" style="margin-top:.5rem;padding:.75rem;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:12px;">
-                <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required />
+                <input type="checkbox" id="rgpd" name="rgpd" class="form-checkbox" required aria-describedby="rgpd-error" />
                 <label class="form-checkbox-label" for="rgpd">
                   <strong style="color:var(--white-light);">J'accepte la politique de confidentialite et le traitement de mes donnees</strong>
                   — conformement au RGPD. <a href="confidentialite.html" style="color:var(--turquoise);text-decoration:underline;">Lire la politique</a>
                 </label>
               </div>
-              <p class="form-error" id="rgpd-error" style="margin-top:.25rem;"></p>
+              <p class="form-error" id="rgpd-error" role="alert" style="margin-top:.25rem;"></p>
 
               <!-- SUBMIT -->
               <div class="cf-turnstile" data-sitekey="0x4AAAAAADvpVNb0l4gq0dkE" data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
@@ -317,7 +320,9 @@
   </section>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">

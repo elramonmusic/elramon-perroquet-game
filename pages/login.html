@@ -79,6 +79,7 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <header class="site-header" id="site-header">
     <nav class="nav">
@@ -92,7 +93,7 @@
         <li data-auth-show style="display:none"><a href="espace-membre.html" class="nav-link text-turquoise">Mon Espace</a></li>
         <li data-guest-show><a href="inscription.html" class="nav-cta" style="background:var(--grad-warm);color:var(--night-blue);">Rejoindre</a></li>
       </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
       </button>
     </nav>
@@ -103,6 +104,8 @@
       <a href="inscription.html" class="btn btn-primary btn-sm" data-guest-show>Rejoindre</a>
     </nav>
   </header>
+
+<main id="main-content">
 
   <section class="login-hero">
     <div style="position:relative; z-index:2;">
@@ -117,7 +120,7 @@
       <div class="login-section">
         <div class="login-card">
           <div class="flex items-center gap-md" style="margin-bottom: 2rem;">
-            <img src="../assets/images/parrot-mascot.webp" alt="Perroquet" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(255,215,0,.3));" loading="lazy" />
+            <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(255,215,0,.3));" loading="lazy" />
             <div>
               <h2 style="font-size:1.3rem;font-weight:800;color:var(--white-light);">Bon retour !</h2>
               <p style="color:rgba(255,255,255,.5);font-size:.85rem;">Entre ton email pour te connecter</p>
@@ -142,9 +145,9 @@
                 class="form-input"
                 placeholder="tonemail@exemple.com"
                 required
-                autocomplete="email"
+                autocomplete="email" aria-describedby="login-email-error"
               />
-              <p class="form-error" id="login-email-error"></p>
+              <p class="form-error" id="login-email-error" role="alert"></p>
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:1.5rem;font-size:1.05rem;">
@@ -169,7 +172,9 @@
     </div>
   </section>
 
-  <footer class="site-footer">
+  </main>
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
