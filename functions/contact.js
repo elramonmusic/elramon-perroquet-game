@@ -112,10 +112,14 @@ export async function onRequestPost(context) {
   }
 
   // Notification email via Resend
+  // ⚠️ Domaine non vérifié : on utilise le sandbox onboarding@resend.dev
+  //     Le from temporaire ne peut envoyer QUE vers elramonmusic@gmail.com
+  //     TODO V2 : vérifier un vrai domaine (notifications.elramonmusicclub.fr)
   if (env.RESEND_API_KEY) {
-    const resendFrom = 'El Ramon Music <onboarding@elramon-music-club.onresend.com>';
+    const resendFrom = 'El Ramon Music Club <onboarding@resend.dev>';
+    const adminEmail = 'elramonmusic@gmail.com';
 
-    // Email 1 — Notification admin
+    // Email admin — notification du message de contact
     try {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -125,45 +129,18 @@ export async function onRequestPost(context) {
         },
         body: JSON.stringify({
           from: resendFrom,
-          to: ['elramonmusic@gmail.com'],
+          to: [adminEmail],
           reply_to: contactMessage.email,
           subject: `[Contact] ${contactMessage.sujet} — ${contactMessage.nom}`,
-          text: `Nouveau message de contact\n\nDe: ${contactMessage.nom} <${contactMessage.email}>\nSujet: ${contactMessage.sujet}\n\n${contactMessage.message}`,
+          text: `Nouveau message de contact\n\nDe: ${contactMessage.nom} <${contactMessage.email}>\nSujet: ${contactMessage.sujet}\n\n${contactMessage.message}\n\nℹ️ L'auto-réponse au contacteur sera activée quand le domaine sera vérifié dans Resend.`,
         }),
       });
     } catch (err) {
       console.error('Resend admin email error:', err.message);
     }
 
-    // Email 2 — Auto-réponse au contacteur
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: resendFrom,
-          to: [contactMessage.email],
-          subject: `Nous avons bien reçu ton message ! — El Ramon Music Club`,
-          text: `Salut ${contactMessage.nom} !
-
-Merci pour ton message sur le sujet "${contactMessage.sujet}".
-
-Nous l'avons bien reçu et nous te répondrons très vite.
-En attendant, découvre nos dernières créations :
-
-📺 Chaîne YouTube : https://www.youtube.com/@El-Ramon-Music
-🎧 Playlists & recommandations : https://9ba25447.elramon-music-club.pages.dev/pages/bonus.html
-
-À bientôt !
-— El Ramon 🦜`,
-        }),
-      });
-    } catch (err) {
-      console.error('Resend auto-reply error:', err.message);
-    }
+    // TODO V2 : Auto-réponse au contacteur (désactivée tant que le domaine n'est pas vérifié)
+    // Pour l'instant, onboarding@resend.dev ne peut envoyer qu'à elramonmusic@gmail.com
   }
 
   console.log(`Message de contact: ${contactMessage.email} - ${contactMessage.sujet}`);

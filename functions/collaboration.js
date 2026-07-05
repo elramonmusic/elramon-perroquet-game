@@ -117,10 +117,14 @@ export async function onRequestPost(context) {
   }
 
   // Notification email via Resend
+  // ⚠️ Domaine non vérifié : on utilise le sandbox onboarding@resend.dev
+  //     Le from temporaire ne peut envoyer QUE vers elramonmusic@gmail.com
+  //     TODO V2 : vérifier un vrai domaine (notifications.elramonmusicclub.fr)
   if (env.RESEND_API_KEY) {
-    const resendFrom = 'El Ramon Music <onboarding@elramon-music-club.onresend.com>';
+    const resendFrom = 'El Ramon Music Club <onboarding@resend.dev>';
+    const adminEmail = 'elramonmusic@gmail.com';
 
-    // Email 1 — Notification admin
+    // Email admin — notification de collaboration
     try {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -130,45 +134,18 @@ export async function onRequestPost(context) {
         },
         body: JSON.stringify({
           from: resendFrom,
-          to: ['elramonmusic@gmail.com'],
+          to: [adminEmail],
           reply_to: collaboration.email,
           subject: `[Collaboration] ${collaboration.company} — ${collaboration.collab_type}`,
-          text: `Nouvelle demande de collaboration\n\nEntreprise: ${collaboration.company}\nContact: ${collaboration.contact_name}\nEmail: ${collaboration.email}\nSite: ${collaboration.website}\nType: ${collaboration.collab_type}\nProduit: ${collaboration.product}\nBudget: ${collaboration.budget}\n\nMessage:\n${collaboration.message}`,
+          text: `Nouvelle demande de collaboration\n\nEntreprise: ${collaboration.company}\nContact: ${collaboration.contact_name}\nEmail: ${collaboration.email}\nSite: ${collaboration.website}\nType: ${collaboration.collab_type}\nProduit: ${collaboration.product}\nBudget: ${collaboration.budget}\n\nMessage:\n${collaboration.message}\n\nℹ️ L'accusé de réception au collaborateur sera activé quand le domaine sera vérifié dans Resend.`,
         }),
       });
     } catch (err) {
       console.error('Resend admin email error:', err.message);
     }
 
-    // Email 2 — Accusé de réception au collaborateur
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: resendFrom,
-          to: [collaboration.email],
-          subject: `Ta demande de collaboration est bien reçue ! — El Ramon Music Club`,
-          text: `Salut ${collaboration.contact_name || collaboration.company} !
-
-Merci pour ta proposition de collaboration (${collaboration.collab_type}).
-
-Nous avons bien reçu ta demande et nous reviendrons vers toi rapidement pour en discuter.
-
-En attendant, découvre le projet :
-📺 Chaîne YouTube : https://www.youtube.com/@El-Ramon-Music
-🌐 Site : https://9ba25447.elramon-music-club.pages.dev/
-
-À très vite !
-— El Ramon 🦜`,
-        }),
-      });
-    } catch (err) {
-      console.error('Resend auto-reply error:', err.message);
-    }
+    // TODO V2 : Accusé de réception au collaborateur (désactivé tant que le domaine n'est pas vérifié)
+    // Pour l'instant, onboarding@resend.dev ne peut envoyer qu'à elramonmusic@gmail.com
   }
 
   console.log(`Demande collaboration: ${collaboration.company} (${collaboration.email})`);
