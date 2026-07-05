@@ -593,9 +593,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const collabForm = document.querySelector('#collaboration-form');
   if (collabForm) collabForm.addEventListener('submit', handleCollaboration);
-
-  // Logout si présent
-  initLogout();
 });
 
 // Export pour usage dans d'autres scripts

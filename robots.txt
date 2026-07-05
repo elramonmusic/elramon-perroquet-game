@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+# Pages publiques indexables
+Allow: /pages/club.html
+Allow: /pages/inscription.html
+Allow: /pages/partenaires.html
+Allow: /pages/collaborations.html
+Allow: /pages/contact.html
+Allow: /pages/confidentialite.html
+Allow: /pages/mentions-legales.html
+
+# Pages membres — non indexées
+Disallow: /pages/espace-membre.html
+Disallow: /pages/jeu.html
+Disallow: /pages/bonus.html
+Disallow: /pages/prompts.html
+Disallow: /pages/guides-suno.html
+Disallow: /pages/tablatures.html
+Disallow: /pages/merci.html
+Disallow: /pages/login.html
+Disallow: /pages/dashboard.html
+
+# Fonctions serveur
+Disallow: /subscribe
+Disallow: /contact
+Disallow: /collaboration
+
+# Assets statiques
+Disallow: /assets/
+
+Sitemap: https://elramon-music-club.pages.dev/sitemap.xml

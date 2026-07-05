@@ -1,0 +1,5 @@
+# El Ramon Music Club — Redirects Cloudflare Pages
+# Format: source destination status
+
+# dashboard.html → espace-membre.html (remplace le meta refresh)
+/pages/dashboard.html  /pages/espace-membre.html  301

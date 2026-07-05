@@ -3,8 +3,7 @@
    Version: 1.0
    ============================================================ */
 
-/* --- Google Fonts --- */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Pacifico&display=swap');
+/* --- Google Fonts chargées via <link> dans le <head> --- */
 
 /* --- CSS Custom Properties --- */
 :root {
@@ -514,7 +513,8 @@ h1, h2, h3, h4, h5, h6 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('assets/images/hero-bg.png');
+  background-image: url('assets/images/hero-bg.webp');
+  background-image: image-set(url('assets/images/hero-bg.webp') 1x, url('assets/images/hero-bg.jpg') 1x);
   background-size: cover;
   background-position: center;
   z-index: 0;

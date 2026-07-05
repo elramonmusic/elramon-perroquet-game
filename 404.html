@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A1A2E" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>404 — Page introuvable | El Ramon Music Club</title>
+  <meta name="description" content="Cette page n'existe pas. Retour à l'accueil du El Ramon Music Club." />
+  <link rel="icon" href="/assets/images/logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, var(--night-blue) 0%, var(--deep-purple) 100%);
+      font-family: 'Outfit', sans-serif;
+      color: var(--white-light);
+      text-align: center;
+      padding: 2rem;
+    }
+    .error-wrap {
+      max-width: 500px;
+      animation: fadeInUp 0.8s ease;
+    }
+    .error-code {
+      font-size: clamp(5rem, 18vw, 9rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--yellow-sun), var(--orange-sun));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      text-shadow: 0 10px 40px rgba(255,215,0,0.2);
+    }
+    .error-parrot {
+      font-size: 4rem;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+    }
+    .error-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 1rem 0 0.5rem;
+      color: var(--white-light);
+    }
+    .error-text {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .error-btn {
+      display: inline-block;
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, var(--orange-sun), var(--coral-red));
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(255,140,0,0.3);
+    }
+    .error-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,140,0,0.4);
+    }
+    .error-links {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .error-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .error-link:hover { color: var(--yellow-sun); }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .error-parrot, .error-wrap { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="error-wrap">
+    <div class="error-parrot">🦜</div>
+    <p class="error-code">404</p>
+    <h1 class="error-title">Cette page s'est envolée !</h1>
+    <p class="error-text">
+      Le perroquet a dû l'emporter vers des tropiques lointains...<br />
+      Mais pas de panique, on va te ramener au Club !
+    </p>
+    <a href="/" class="error-btn">🎵 Retour à l'accueil</a>
+    <div class="error-links">
+      <a href="/pages/club.html" class="error-link">Le Club</a>
+      <a href="/pages/inscription.html" class="error-link">Inscription</a>
+      <a href="/pages/contact.html" class="error-link">Contact</a>
+    </div>
+  </div>
+</body>
+</html>
