@@ -41,6 +41,18 @@ const Auth = {
     }
     return true;
   },
+
+  /**
+   * Protection automatique des pages membres.
+   */
+  protectPage(redirectUrl) {
+    const target = redirectUrl || (window.location.pathname.includes('/pages/') ? './inscription.html' : '/pages/inscription.html');
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isLoggedIn()) {
+        window.location.href = target;
+      }
+    });
+  },
 };
 
 // ============================================================

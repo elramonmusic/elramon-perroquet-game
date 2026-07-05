@@ -96,6 +96,20 @@ const Auth = {
   async loginWithEmail(email, password) {
     console.warn('Auth Supabase (V2) non encore implémentée.');
     return { error: 'Backend non configuré' };
+  },
+
+  /**
+   * Protection automatique des pages membres.
+   * À appeler via <body data-protect> ou <script>ElRamon.Auth.protectPage()</script>
+   * Détecte automatiquement l'URL de redirection selon la profondeur de la page.
+   */
+  protectPage(redirectUrl) {
+    const target = redirectUrl || (isSubPage() ? './inscription.html' : '/pages/inscription.html');
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isLoggedIn()) {
+        window.location.href = target;
+      }
+    });
   }
 };
 
@@ -107,10 +121,17 @@ function initNavigation() {
   const toggle = document.querySelector('.nav-toggle');
   const mobileNav = document.querySelector('.nav-mobile');
 
-  // Scroll effect
+  // Scroll effect (throttled via requestAnimationFrame)
   if (header) {
+    let ticking = false;
     window.addEventListener('scroll', () => {
-      header.classList.toggle('scrolled', window.scrollY > 50);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          header.classList.toggle('scrolled', window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     }, { passive: true });
   }
 
@@ -208,13 +229,16 @@ function initParticles() {
 // TOAST NOTIFICATIONS
 // ============================================================
 const Toast = {
+  _el: null,  // cache DOM
+
   show(message, type = 'info', duration = 4000) {
-    let toast = document.querySelector('.toast');
+    let toast = this._el || document.querySelector('.toast');
     if (!toast) {
       toast = document.createElement('div');
       toast.className = 'toast';
       document.body.appendChild(toast);
     }
+    this._el = toast;  // mémorise pour les appels suivants
 
     const icons = {
       success: '✅',
@@ -320,6 +344,13 @@ async function handleInscription(event) {
   const form = event.target;
   const btn = form.querySelector('[type="submit"]');
 
+  // Anti double-soumission
+  if (btn.dataset.submitting === '1') return;
+  btn.dataset.submitting = '1';
+  event.preventDefault();
+  const form = event.target;
+  const btn = form.querySelector('[type="submit"]');
+
   Form.clearErrors(form);
 
   // Récupération des champs
@@ -393,6 +424,7 @@ async function handleInscription(event) {
     console.error('Inscription error:', err);
     Toast.show('Une erreur est survenue. Réessaie dans un instant.', 'error');
     Form.setLoading(btn, false);
+    btn.dataset.submitting = '0';
   }
 }
 
@@ -403,6 +435,10 @@ async function handleContact(event) {
   event.preventDefault();
   const form = event.target;
   const btn = form.querySelector('[type="submit"]');
+
+  // Anti double-soumission
+  if (btn.dataset.submitting === '1') return;
+  btn.dataset.submitting = '1';
 
   Form.clearErrors(form);
 
@@ -441,6 +477,7 @@ async function handleContact(event) {
     Toast.show('Erreur d\'envoi. Écris-nous directement : ' + CONFIG.EMAIL_CONTACT, 'error', 6000);
   } finally {
     Form.setLoading(btn, false);
+    btn.dataset.submitting = '0';
   }
 }
 
@@ -449,6 +486,12 @@ async function handleContact(event) {
 // ============================================================
 async function handleCollaboration(event) {
   event.preventDefault();
+  const form = event.target;
+  const btn = form.querySelector('[type="submit"]');
+
+  // Anti double-soumission
+  if (btn.dataset.submitting === '1') return;
+  btn.dataset.submitting = '1';
   const form = event.target;
   const btn = form.querySelector('[type="submit"]');
 
@@ -495,6 +538,7 @@ async function handleCollaboration(event) {
     Toast.show('Erreur d\'envoi. Écris-nous directement : ' + CONFIG.EMAIL_CONTACT, 'error', 6000);
   } finally {
     Form.setLoading(btn, false);
+    btn.dataset.submitting = '0';
   }
 }
 
@@ -557,16 +601,14 @@ function animateCounters() {
         const el = entry.target;
         const target = parseInt(el.dataset.count);
         const duration = 2000;
-        const step = target / (duration / 16);
-        let current = 0;
-        const timer = setInterval(() => {
-          current += step;
-          if (current >= target) {
-            current = target;
-            clearInterval(timer);
-          }
-          el.textContent = Math.floor(current).toLocaleString('fr-FR');
-        }, 16);
+        const startTime = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          el.textContent = Math.floor(target * progress).toLocaleString('fr-FR');
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
         observer.unobserve(el);
       }
     });

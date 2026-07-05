@@ -14,103 +14,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../styles.css" />
-  <style>
-    .page-hero {
-      min-height: 50vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px var(--space-md) var(--space-3xl);
-      background: var(--grad-hero);
-      position: relative;
-      overflow: hidden;
-    }
-    .page-hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 60% 40%, rgba(255,107,107,0.15) 0%, transparent 55%),
-                  radial-gradient(ellipse at 30% 60%, rgba(255,215,0,0.12) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    .page-hero-emoji {
-      font-size: 4rem;
-      margin-bottom: var(--space-md);
-      display: block;
-      animation: float-parrot 4s ease-in-out infinite;
-    }
-    .page-hero h1 {
-      font-size: clamp(2.2rem, 6vw, 4rem);
-      font-weight: 900;
-      margin-bottom: var(--space-sm);
-    }
-    .page-hero p {
-      font-size: 1.15rem;
-      color: rgba(255,255,255,0.75);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .tab-placeholder {
-      background: rgba(255,255,255,0.04);
-      border: 2px dashed rgba(255,255,255,0.15);
-      border-radius: var(--radius-xl);
-      padding: var(--space-3xl) var(--space-xl);
-      text-align: center;
-    }
-    .tab-placeholder-icon { font-size: 4rem; margin-bottom: var(--space-lg); display:block; }
-    .resource-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: var(--space-md);
-      margin-top: var(--space-xl);
-    }
-    .resource-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
-      text-align: center;
-      transition: all var(--transition-mid);
-    }
-    .resource-card:hover {
-      border-color: rgba(255,215,0,0.25);
-      transform: translateY(-4px);
-    }
-    .resource-icon { font-size: 2.2rem; margin-bottom: 0.5rem; display:block; }
-    .resource-title { font-size: 0.95rem; font-weight: 700; color: var(--white-light); margin-bottom: 0.3rem; }
-    .resource-desc { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
-    .resource-badge {
-      display: inline-block; font-size: 0.72rem; font-weight: 600;
-      color: var(--orange-tropical); background: rgba(255,140,0,0.1);
-      border: 1px solid rgba(255,140,0,0.3); border-radius: var(--radius-full);
-      padding: 0.2rem 0.8rem; margin-top: 0.6rem;
-    }
-    .resource-badge-live {
-      display: inline-block; font-size: 0.72rem; font-weight: 600;
-      color: var(--palm-green); background: rgba(46,204,113,0.1);
-      border: 1px solid rgba(46,204,113,0.3); border-radius: var(--radius-full);
-      padding: 0.2rem 0.8rem; margin-top: 0.6rem;
-    }
-    .section-alt { background: rgba(22,33,62,0.5); }
-  </style>
+  <link rel="stylesheet" href="../styles/pages.css" />
+  <!-- CSS commun des sous-pages : styles/pages.css -->
 </head>
 <body>
   <a href="#main-content" class="skip-link">Aller au contenu</a>
 
-  <!-- AUTH GATE -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.ElRamon) {
-        window.ElRamon.Auth.requireAuth('./inscription.html');
-      } else {
-        try {
-          const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
-          if (!m) window.location.href = './inscription.html';
-        } catch(e) { window.location.href = './inscription.html'; }
-      }
-    });
-  </script>
+  <!-- Auth gate : protection membre (auto via app.js) -->
+  <script>ElRamon.Auth.protectPage();</script>
 
   <header class="site-header" id="site-header">
     <nav class="nav">

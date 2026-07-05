@@ -178,19 +178,8 @@
 <body>
   <a href="#main-content" class="skip-link">Aller au contenu</a>
 
-  <!-- AUTH GATE -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.ElRamon) {
-        window.ElRamon.Auth.requireAuth('./inscription.html');
-      } else {
-        try {
-          const m = JSON.parse(localStorage.getItem('elramon_member') || 'null');
-          if (!m) window.location.href = './inscription.html';
-        } catch(e) { window.location.href = './inscription.html'; }
-      }
-    });
-  </script>
+  <!-- Auth gate : protection membre (auto via app.js) -->
+  <script>ElRamon.Auth.protectPage();</script>
 
   <!-- Navigation minimale -->
   <nav class="game-nav">
