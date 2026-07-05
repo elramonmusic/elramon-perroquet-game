@@ -338,8 +338,315 @@
   font-size: 1.8rem;
 }
 
+/* ============================================================
+   BIBLIOTHÈQUE DE PROMPTS — 3 niveaux
+   ============================================================ */
+
+/* --- Onglets de niveau --- */
+.level-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-xl);
+}
+.level-tab {
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-mid);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.level-tab:hover {
+  border-color: rgba(255,215,0,0.3);
+  color: var(--white-light);
+}
+.level-tab.active {
+  background: var(--grad-warm);
+  color: var(--night-blue);
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(255,140,0,0.25);
+}
+.level-tab .level-count {
+  font-size: 0.7rem;
+  background: rgba(0,0,0,0.2);
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+.level-tab.active .level-count {
+  background: rgba(26,26,46,0.2);
+}
+
+/* --- Section niveau (panneau) --- */
+.level-panel { display: none; }
+.level-panel.active { display: block; animation: fadeInUp 0.4s ease; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Bandeau d'info niveau --- */
+.level-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+.level-banner-discover {
+  background: rgba(46,204,113,0.08);
+  border: 1px solid rgba(46,204,113,0.2);
+}
+.level-banner-studio {
+  background: rgba(0,206,209,0.08);
+  border: 1px solid rgba(0,206,209,0.2);
+}
+.level-banner-pro {
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.2);
+}
+.level-banner-icon { font-size: 2rem; flex-shrink: 0; }
+.level-banner-text h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.2rem; }
+.level-banner-text p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin: 0; }
+
+/* --- Filtres par catégorie --- */
+.category-filter {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+}
+.filter-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.filter-btn:hover {
+  border-color: rgba(255,215,0,0.3);
+  color: var(--white-light);
+}
+.filter-btn.active {
+  background: rgba(255,215,0,0.15);
+  border-color: rgba(255,215,0,0.4);
+  color: var(--yellow-sun);
+}
+
+/* --- Grille de prompts --- */
+.prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+/* --- Carte prompt (Découverte & Studio) --- */
+.prompt-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: all var(--transition-mid);
+}
+.prompt-card:hover {
+  border-color: rgba(255,215,0,0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+}
+.prompt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.prompt-card-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--white-light);
+}
+.prompt-card-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.tag-afrobeat { background: rgba(255,107,107,0.15); color: var(--coral-red); }
+.tag-zouk { background: rgba(255,107,157,0.15); color: #FF6B9D; }
+.tag-compas { background: rgba(255,140,0,0.15); color: var(--orange-sun); }
+.tag-tropical { background: rgba(46,204,113,0.15); color: var(--palm-green); }
+.tag-reggaeton { background: rgba(255,215,0,0.15); color: var(--yellow-sun); }
+.tag-instrumental { background: rgba(0,206,209,0.15); color: var(--turquoise); }
+.tag-studio { background: rgba(141,110,99,0.2); color: #B39DDB; }
+
+.prompt-card-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--palm-green);
+  background: rgba(26,26,46,0.6);
+  border-left: 3px solid var(--palm-green);
+  padding: 0.7rem;
+  border-radius: var(--radius-sm);
+}
+.prompt-card-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  flex: 1;
+}
+.prompt-card-meta {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.prompt-meta-chip {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.6);
+}
+.prompt-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.3rem;
+}
+.btn-copy {
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--grad-warm);
+  color: var(--night-blue);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.btn-copy:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(255,140,0,0.3);
+}
+.btn-copy.copied {
+  background: linear-gradient(135deg, #2ECC71 0%, #00CED1 100%);
+  color: var(--white-light);
+}
+.btn-copy-lg {
+  padding: 0.55rem 1.3rem;
+  font-size: 0.85rem;
+}
+
+/* --- Carte Pro (verrouillée) --- */
+.prompt-card-locked {
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,215,0,0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  overflow: hidden;
+}
+.prompt-card-locked::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 20px,
+    rgba(255,215,0,0.02) 20px,
+    rgba(255,215,0,0.02) 40px
+  );
+  pointer-events: none;
+}
+.prompt-card-locked > * { position: relative; z-index: 1; }
+.prompt-locked-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.5);
+}
+.prompt-locked-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.6;
+  flex: 1;
+}
+.prompt-locked-blur {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.3);
+  background: rgba(26,26,46,0.4);
+  border-left: 3px solid rgba(255,215,0,0.3);
+  padding: 0.7rem;
+  border-radius: var(--radius-sm);
+  filter: blur(3px);
+  user-select: none;
+}
+.prompt-locked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--yellow-sun);
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+}
+
+/* --- Bloc de déblocage Pro --- */
+.pro-unlock-cta {
+  text-align: center;
+  padding: var(--space-2xl);
+  background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.04) 100%);
+  border: 2px solid rgba(255,215,0,0.2);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-xl);
+}
+.pro-unlock-cta h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--yellow-sun);
+  margin-bottom: var(--space-sm);
+}
+.pro-unlock-cta p {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: var(--space-lg);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .intro-card { flex-direction: column; gap: var(--space-md); }
   .discog-grid { grid-template-columns: 1fr; }
+  .prompts-grid { grid-template-columns: 1fr; }
+  .level-banner { flex-direction: column; text-align: center; }
 }

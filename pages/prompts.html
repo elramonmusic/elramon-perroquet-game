@@ -10,12 +10,11 @@
   <meta property="og:title" content="Prompts IA Musique — El Ramon Music Club" />
   <meta property="og:description" content="Des prompts testés et prêts à l'emploi pour créer de la musique tropicale avec l'IA." />
   <link rel="icon" href="../assets/images/logo.webp" type="image/webp" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../styles/pages.css" />
-  <!-- CSS commun des sous-pages : styles/pages.css -->
 </head>
 <body>
   <a href="#main-content" class="skip-link">Aller au contenu</a>
@@ -34,7 +33,7 @@
         <li><a href="./prompts.html" class="nav-link" style="color:var(--yellow-sun);">🤖 Prompts</a></li>
         <li><a href="./tablatures.html" class="nav-link">🎸 Tablatures</a></li>
         <li><a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a></li>
-        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">&#9654; YouTube</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-cta">&#9654; YouTube</a></li>
       </ul>
       <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
         <span></span><span></span><span></span>
@@ -45,7 +44,7 @@
       <a href="./prompts.html" class="nav-link text-yellow">🤖 Prompts</a>
       <a href="./tablatures.html" class="nav-link">🎸 Tablatures</a>
       <a href="./jeu.html" class="nav-link">🎮 Mini-Jeu</a>
-      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link text-yellow">&#9654; YouTube</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link text-yellow">&#9654; YouTube</a>
     </nav>
   </header>
 
@@ -57,7 +56,7 @@
       <div class="hero-badge" style="margin: 0 auto var(--space-md);">
         <span>⭐</span> Contenu Membre Exclusif
       </div>
-      <h1 class="font-tropical text-gradient-warm">Prompts IA Musique</h1>
+      <h1 class="font-tropical text-gradient-warm">Bibliothèque de Prompts IA</h1>
       <p>Des prompts testés et prêts à copier-coller pour créer tes chansons tropicales</p>
     </div>
   </section>
@@ -74,158 +73,381 @@
     </div>
   </section>
 
+  <!-- ===== ONGLETS DE NIVEAU ===== -->
   <section class="section-sm section-alt">
     <div class="container">
 
-      <div class="category-filter" id="filter-buttons">
-        <button class="filter-btn active" data-filter="all">🎵 Tous</button>
-        <button class="filter-btn" data-filter="afrobeat">🔥 Afrobeat</button>
-        <button class="filter-btn" data-filter="zouk">💃 Zouk</button>
-        <button class="filter-btn" data-filter="compas">🥁 Compas</button>
-        <button class="filter-btn" data-filter="tropical">🌴 Tropical Soul</button>
-        <button class="filter-btn" data-filter="reggaeton">⚡ Reggaeton</button>
-        <button class="filter-btn" data-filter="instrumental">🎸 Instrumental</button>
+      <div class="level-tabs" role="tablist" aria-label="Niveau de prompts">
+        <button class="level-tab active" data-level="discover" role="tab" aria-selected="true">
+          🌱 Découverte <span class="level-count">12</span>
+        </button>
+        <button class="level-tab" data-level="studio" role="tab" aria-selected="false">
+          🎛️ Studio <span class="level-count">8</span>
+        </button>
+        <button class="level-tab" data-level="pro" role="tab" aria-selected="false">
+          🔒 Pro <span class="level-count">bientôt</span>
+        </button>
       </div>
 
-      <!-- PROMPTS -->
-      <div id="prompts-container">
+      <!-- ============================================ -->
+      <!-- NIVEAU 1 : DÉCOUVERTE (live, 12 prompts)    -->
+      <!-- ============================================ -->
+      <div class="level-panel active" id="panel-discover" role="tabpanel">
 
-        <div class="prompt-card" data-category="afrobeat">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🔥 Afrobeat Tropical Joyeux</span>
-            <span class="prompt-card-tag">Afrobeat</span>
+        <div class="level-banner level-banner-discover">
+          <span class="level-banner-icon">🌱</span>
+          <div class="level-banner-text">
+            <h3>Niveau Découverte</h3>
+            <p>Des prompts simples et efficaces, parfaits pour démarrer avec Suno ou Flow Music.</p>
           </div>
-          <div class="prompt-card-text">"Tropical Afrobeat joyful, acoustic guitar, djembe drums, sunny beach atmosphere, uplifting francophone vocals, 120 BPM, summer vibes"</div>
-          <div class="prompt-card-desc">Idéal pour une chanson joyeuse et dansante avec ambiance plage. Genre principal : Afrobeat avec guitare acoustique et percussions.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
         </div>
 
-        <div class="prompt-card" data-category="zouk">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">💃 Zouk Romantique</span>
-            <span class="prompt-card-tag">Zouk</span>
-          </div>
-          <div class="prompt-card-text">"Zouk romantique francophone, guitare acoustique, basse groovy, voix douce féminine, coucher de soleil sur la plage, 90 BPM, mélodie envoûtante"</div>
-          <div class="prompt-card-desc">Parfait pour un titre lent et romantique. Zouk classique avec basse groovy et voix douce francophone.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        <div class="category-filter" id="filter-discover">
+          <button class="filter-btn active" data-filter="all">🎵 Tous</button>
+          <button class="filter-btn" data-filter="afrobeat">🔥 Afrobeat</button>
+          <button class="filter-btn" data-filter="zouk">💃 Zouk</button>
+          <button class="filter-btn" data-filter="compas">🥁 Compas</button>
+          <button class="filter-btn" data-filter="tropical">🌴 Tropical</button>
+          <button class="filter-btn" data-filter="reggaeton">⚡ Reggaeton</button>
+          <button class="filter-btn" data-filter="instrumental">🎸 Instrumental</button>
         </div>
 
-        <div class="prompt-card" data-category="compas">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🥁 Compas Haïtien Moderne</span>
-            <span class="prompt-card-tag">Compas</span>
+        <div class="prompts-grid">
+
+          <div class="prompt-card" data-category="afrobeat">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🔥 Afrobeat Tropical Joyeux</span>
+              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
+            </div>
+            <div class="prompt-card-text">"Tropical Afrobeat joyful, acoustic guitar, djembe drums, sunny beach atmosphere, uplifting francophone vocals, 120 BPM, summer vibes"</div>
+            <div class="prompt-card-desc">Idéal pour une chanson joyeuse et dansante avec ambiance plage.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">120 BPM</span><span class="prompt-meta-chip">Francophone</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
           </div>
-          <div class="prompt-card-text">"Compas haïtien moderne, guitare électrique, percussions tropicales, chant joyeux francophone, tempo 100 BPM, ambiance fête caribéenne"</div>
-          <div class="prompt-card-desc">Un compas moderne et festif, parfait pour les soirées caribéennes. Chant joyeux et percussions tropicales.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+
+          <div class="prompt-card" data-category="zouk">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">💃 Zouk Romantique</span>
+              <span class="prompt-card-tag tag-zouk">Zouk</span>
+            </div>
+            <div class="prompt-card-text">"Zouk romantique francophone, guitare acoustique, basse groovy, voix douce féminine, coucher de soleil sur la plage, 90 BPM, mélodie envoûtante"</div>
+            <div class="prompt-card-desc">Parfait pour un titre lent et romantique.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">90 BPM</span><span class="prompt-meta-chip">Voix féminine</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="compas">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🥁 Compas Haïtien Moderne</span>
+              <span class="prompt-card-tag tag-compas">Compas</span>
+            </div>
+            <div class="prompt-card-text">"Compas haïtien moderne, guitare électrique, percussions tropicales, chant joyeux francophone, tempo 100 BPM, ambiance fête caribéenne"</div>
+            <div class="prompt-card-desc">Un compas moderne et festif, pour les soirées caribéennes.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">100 BPM</span><span class="prompt-meta-chip">Francophone</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="tropical">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🌴 Tropical Soul Féminin</span>
+              <span class="prompt-card-tag tag-tropical">Tropical</span>
+            </div>
+            <div class="prompt-card-text">"Tropical Soul, warm female vocals, nylon guitar, soft congas, ocean waves ambience, 85 BPM, intimate and soulful, francophone lyrics"</div>
+            <div class="prompt-card-desc">Une ballade tropicale intime et soulful.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">85 BPM</span><span class="prompt-meta-chip">Voix féminine</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="afrobeat">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🔥 Afrobeat Dansant</span>
+              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
+            </div>
+            <div class="prompt-card-text">"Afrobeat dance hit, heavy bass, synth pads, african percussion, francophone rap verses, melodic chorus, 125 BPM, club ready, tropical energy"</div>
+            <div class="prompt-card-desc">Un Afrobeat puissant pour le club.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">125 BPM</span><span class="prompt-meta-chip">Rap + chant</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="reggaeton">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">⚡ Reggaeton Tropical</span>
+              <span class="prompt-card-tag tag-reggaeton">Reggaeton</span>
+            </div>
+            <div class="prompt-card-text">"Reggaeton tropical, dembow rhythm, spanish guitar accents, steel drums, party vibes, bilingual francophone-spanish vocals, 95 BPM"</div>
+            <div class="prompt-card-desc">Un reggaeton tropical avec rythme dembow et guitare espagnole.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">95 BPM</span><span class="prompt-meta-chip">Bilingue</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="zouk">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">💃 Zouk Love</span>
+              <span class="prompt-card-tag tag-zouk">Zouk</span>
+            </div>
+            <div class="prompt-card-text">"Zouk love, synthetizer melody, deep bassline, sweet vocals, romantic atmosphere, tropical night, 88 BPM, slow dance"</div>
+            <div class="prompt-card-desc">Un zouk love lent et romantique pour les soirées dansantes.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">88 BPM</span><span class="prompt-meta-chip">Slow dance</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="instrumental">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🎸 Guitare Tropicale Instrumental</span>
+              <span class="prompt-card-tag tag-instrumental">Instrumental</span>
+            </div>
+            <div class="prompt-card-text">"Tropical acoustic guitar instrumental, nylon strings, gentle percussion, nature sounds, bird songs, sunset vibes, 70 BPM, relaxing"</div>
+            <div class="prompt-card-desc">Un instrumental relaxant à la guitare nylon avec sons de nature.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">70 BPM</span><span class="prompt-meta-chip">Sans voix</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="compas">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🥁 Compas Accéléré</span>
+              <span class="prompt-card-tag tag-compas">Compas</span>
+            </div>
+            <div class="prompt-card-text">"Fast compas, trumpet section, trombone, keyboard melodies, high energy, carnival atmosphere, francophone call and response, 110 BPM"</div>
+            <div class="prompt-card-desc">Un compas rapide et énergique avec cuivres et claviers.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">110 BPM</span><span class="prompt-meta-chip">Carnaval</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="tropical">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🌴 Bossa Nova Tropical</span>
+              <span class="prompt-card-tag tag-tropical">Tropical</span>
+            </div>
+            <div class="prompt-card-text">"Bossa nova tropical, nylon guitar fingerpicking, soft brushes, warm male vocals, french lyrics, seaside café atmosphere, 100 BPM"</div>
+            <div class="prompt-card-desc">Une bossa nova chaleureuse, ambiance café en bord de mer.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">100 BPM</span><span class="prompt-meta-chip">Voix masculine</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="reggaeton">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">⚡ Dancehall Tropical Mix</span>
+              <span class="prompt-card-tag tag-reggaeton">Reggaeton</span>
+            </div>
+            <div class="prompt-card-text">"Dancehall tropical fusion, reggaeton beat, afrobeat percussion, steel pan melodies, francophone dance vocals, 110 BPM, summer festival"</div>
+            <div class="prompt-card-desc">Un mix dancehall-tropical-reggaeton pour les festivals d'été.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">110 BPM</span><span class="prompt-meta-chip">Festival</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="instrumental">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🎸 Djembé & Percussions</span>
+              <span class="prompt-card-tag tag-instrumental">Instrumental</span>
+            </div>
+            <div class="prompt-card-text">"West African djembe percussion, talking drum, kalimba, shakers, organic rhythms, no vocals, traditional meets modern, 115 BPM"</div>
+            <div class="prompt-card-desc">Un instrumental percussif traditionnel africain modernisé.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">115 BPM</span><span class="prompt-meta-chip">Sans voix</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- NIVEAU 2 : STUDIO (intermédiaire, 8 prompts) -->
+      <!-- ============================================ -->
+      <div class="level-panel" id="panel-studio" role="tabpanel">
+
+        <div class="level-banner level-banner-studio">
+          <span class="level-banner-icon">🎛️</span>
+          <div class="level-banner-text">
+            <h3>Niveau Studio</h3>
+            <p>Prompts avancés avec structure détaillée : sections, instruments précis, dynamique, tempo et instructions de production.</p>
+          </div>
         </div>
 
-        <div class="prompt-card" data-category="tropical">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🌴 Tropical Soul Féminin</span>
-            <span class="prompt-card-tag">Tropical Soul</span>
-          </div>
-          <div class="prompt-card-text">"Tropical Soul, warm female vocals, nylon guitar, soft congas, ocean waves ambience, 85 BPM, intimate and soulful, francophone lyrics"</div>
-          <div class="prompt-card-desc">Une ballade tropicale intime et soulful. Voix féminine chaleureuse avec guitare nylon et ambiance océanique.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+        <div class="category-filter" id="filter-studio">
+          <button class="filter-btn active" data-filter="all">🎛️ Tous</button>
+          <button class="filter-btn" data-filter="afrobeat">🔥 Afrobeat</button>
+          <button class="filter-btn" data-filter="zouk">💃 Zouk</button>
+          <button class="filter-btn" data-filter="compas">🥁 Compas</button>
+          <button class="filter-btn" data-filter="tropical">🌴 Tropical</button>
+          <button class="filter-btn" data-filter="instrumental">🎸 Instrumental</button>
         </div>
 
-        <div class="prompt-card" data-category="afrobeat">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🔥 Afrobeat Dansant</span>
-            <span class="prompt-card-tag">Afrobeat</span>
+        <div class="prompts-grid">
+
+          <div class="prompt-card" data-category="afrobeat">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🔥 Afrobeat Cinématique — Structure Complète</span>
+              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
+            </div>
+            <div class="prompt-card-text">"Tropical Afrobeat, 118 BPM. Intro: solo djembe 4 bars. Verse: nylon guitar + soft bass + male francophone vocals, nostalgic tone. Pre-chorus: add brass section (trumpet, saxophone). Chorus: full energy, layered vocals, shakers, uplifting melody. Bridge: percussion breakdown, call and response. Outro: fade with guitar riff. Warm analog production, sunny beach atmosphere."</div>
+            <div class="prompt-card-desc">Structure complète avec intro, couplets, refrain, pont et outro. Production analogique chaleureuse.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">118 BPM</span><span class="prompt-meta-chip">Brass section</span><span class="prompt-meta-chip">Structure A-B-A-C</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
           </div>
-          <div class="prompt-card-text">"Afrobeat dance hit, heavy bass, synth pads, african percussion, francophone rap verses, melodic chorus, 125 BPM, club ready, tropical energy"</div>
-          <div class="prompt-card-desc">Un Afrobeat puissant pour le club. Basse heavy, synthétiseurs et percussions africaines avec couplets rap francophones.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+
+          <div class="prompt-card" data-category="zouk">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">💃 Zouk Love — Duo Voix</span>
+              <span class="prompt-card-tag tag-zouk">Zouk</span>
+            </div>
+            <div class="prompt-card-text">"Zouk love, 92 BPM, female and male duet vocals. Verse 1: female lead, synth pad + fingerstyle guitar. Verse 2: male lead enters. Chorus: harmonized duet, lush strings, gentle percussion. Key change in final chorus (+2 semitones). Romantic Caribbean night atmosphere, moonlight ocean. Production: reverb-heavy, warm low-end, smooth dynamics."</div>
+            <div class="prompt-card-desc">Duo vocal avec modulation de tonalité dans le dernier refrain.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">92 BPM</span><span class="prompt-meta-chip">Duo vocal</span><span class="prompt-meta-chip">Key change</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="compas">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🥁 Compas Groove — Live Band Feel</span>
+              <span class="prompt-card-tag tag-compas">Compas</span>
+            </div>
+            <div class="prompt-card-text">"Compas haïtien, 104 BPM, live band recording feel. Drums: tight groove with ghost notes. Bass: melodic walking lines. Guitar: syncopated comping pattern. Keys: Hammond organ pads. Horns: trumpet fills between vocal lines. Lead vocal: passionate male francophone. Crowd ambience in background. Organic, warm, vintage tone, minimal compression."</div>
+            <div class="prompt-card-desc">Sensation live band avec orgue Hammond et cuivres. Sonorité vintage.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">104 BPM</span><span class="prompt-meta-chip">Live band</span><span class="prompt-meta-chip">Orgue Hammond</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="tropical">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🌴 Tropical Soul — Build Émotionnel</span>
+              <span class="prompt-card-tag tag-tropical">Tropical</span>
+            </div>
+            <div class="prompt-card-text">"Tropical Soul, 80 BPM, slow emotional build. Intro: solo fingerpicked nylon guitar + ocean ambience. Verse 1: intimate female vocal, minimal percussion. Pre-chorus: add congas + light bass. Chorus: full arrangement, layered backing vocals, warm pad swell. Drop to silence before final chorus. Outro: stripped back to guitar + vocal. Sunset, deep emotion, tears of joy."</div>
+            <div class="prompt-card-desc">Construction émotionnelle progressive avec drop de silence avant le refrain final.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">80 BPM</span><span class="prompt-meta-chip">Build progressif</span><span class="prompt-meta-chip">Voix féminine</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="afrobeat">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🔥 Afro-Pop Radio Hit</span>
+              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
+            </div>
+            <div class="prompt-card-text">"Afro-pop, 112 BPM, radio-ready production. Catchy synth hook intro. Verse: rhythmic autotuned male vocal, afrobeat percussion pattern. Chorus: massive singalong melody, crowd-friendly, hand claps. Post-chorus: instrumental synth lead. 808 sub-bass. Modern mixing, wide stereo, punchy. Tropical but urban, Francophone with occasional English ad-libs."</div>
+            <div class="prompt-card-desc">Hit radio Afro-pop moderne avec 808, autotune et synth accrocheur.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">112 BPM</span><span class="prompt-meta-chip">808 bass</span><span class="prompt-meta-chip">Radio-ready</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="tropical">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🌴 Sunset Chill — Ambiance Lounge</span>
+              <span class="prompt-card-tag tag-tropical">Tropical</span>
+            </div>
+            <div class="prompt-card-text">"Tropical chillout lounge, 75 BPM. Muted nylon guitar chords, soft Rhodes piano, subtle shaker, warm vinyl crackle. Wordless female vocal hums in background. Deep sub-bass pulse. Reverb-drenched atmosphere. Beachfront sunset bar, cocktail in hand. Lo-fi meets tropical, hypnotic, dreamy, 6-minute arrangement."</div>
+            <div class="prompt-card-desc">Lounge chillout hypnotique avec piano Rhodes et vinyle. Ambiance bar de plage.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">75 BPM</span><span class="prompt-meta-chip">Lounge</span><span class="prompt-meta-chip">Vinyl crackle</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="instrumental">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">🎸 Percussion Storm — Tribal Build</span>
+              <span class="prompt-card-tag tag-instrumental">Instrumental</span>
+            </div>
+            <div class="prompt-card-text">"African percussion ensemble, no vocals. Start: single djembe pattern. 30 sec: add second djembe counter-rhythm. 60 sec: add talking drum + kalimba melody. 90 sec: full ensemble, dunun bass drums, shakers, bells. Build to thunderous polyrhythmic climax at 2 min. Then strip back to single drum. 120 BPM. Live recording energy, raw and powerful."</div>
+            <div class="prompt-card-desc">Build percussif tribal en 4 couches jusqu'à un climax polyrythmique.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">120 BPM</span><span class="prompt-meta-chip">Polyrythmie</span><span class="prompt-meta-chip">Sans voix</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="prompt-card" data-category="zouk">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">💃 Zouk Rétro — Synthwave Tropical</span>
+              <span class="prompt-card-tag tag-zouk">Zouk</span>
+            </div>
+            <div class="prompt-card-text">"Retro 80s zouk, 96 BPM. Analog synth bass (Moog-style), gated reverb snare, lush synth strings. Female lead vocal with gentle chorus effect. Saxophone solo in bridge. Verse-chorus-verse-chorus-bridge-solo-double chorus. Nostalgic, neon-lit Caribbean night, vintage warmth, tape saturation. Francophone lyrics about lost summer love."</div>
+            <div class="prompt-card-desc">Zouk rétro années 80 avec synthétiseurs analogiques et saturation bande.</div>
+            <div class="prompt-card-meta"><span class="prompt-meta-chip">96 BPM</span><span class="prompt-meta-chip">80s retro</span><span class="prompt-meta-chip">Solo saxo</span></div>
+            <div class="prompt-card-actions"><button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- NIVEAU 3 : PRO (bloqué, teaser)             -->
+      <!-- ============================================ -->
+      <div class="level-panel" id="panel-pro" role="tabpanel">
+
+        <div class="level-banner level-banner-pro">
+          <span class="level-banner-icon">🔒</span>
+          <div class="level-banner-text">
+            <h3>Niveau Pro — Bientôt disponible</h3>
+            <p>Prompts de niveau professionnel : mastering, structures complexes, fusions de genres, techniques de production avancées.</p>
+          </div>
         </div>
 
-        <div class="prompt-card" data-category="reggaeton">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">⚡ Reggaeton Tropical</span>
-            <span class="prompt-card-tag">Reggaeton</span>
+        <div class="prompts-grid">
+
+          <div class="prompt-card-locked">
+            <div class="prompt-card-header">
+              <span class="prompt-locked-title">🏆 Mastering Afrobeat Orchestral</span>
+              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
+            </div>
+            <div class="prompt-locked-blur">"Full orchestral afrobeat arrangement, 30-piece string section, 5-piece horn section, 3 percussionists, mixed at Abbey Road quality, LUFs -14, dynamic mastering, cinematic..."</div>
+            <div class="prompt-locked-desc">Arrangement orchestral complet avec mastering professionnel.</div>
+            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
           </div>
-          <div class="prompt-card-text">"Reggaeton tropical, dembow rhythm, spanish guitar accents, steel drums, party vibes, bilingual francophone-spanish vocals, 95 BPM"</div>
-          <div class="prompt-card-desc">Un reggaeton tropical avec rythme dembow et guitare espagnole. Ambiance party bilingue.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
+
+          <div class="prompt-card-locked">
+            <div class="prompt-card-header">
+              <span class="prompt-locked-title">🏆 Fusion Tropicale Multi-Genre</span>
+              <span class="prompt-card-tag tag-tropical">Tropical</span>
+            </div>
+            <div class="prompt-locked-blur">"Genre fusion experiment: zouk verse, compas pre-chorus, afrobeat chorus, reggaeton bridge. Tempo morphing 90→110 BPM. Polyphonic vocal arrangement. Advanced harmonic structure..."</div>
+            <div class="prompt-locked-desc">Fusion de 4 genres avec modulation de tempo.</div>
+            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
+          </div>
+
+          <div class="prompt-card-locked">
+            <div class="prompt-card-header">
+              <span class="prompt-locked-title">🏆 Production Cinématique Épique</span>
+              <span class="prompt-card-tag tag-instrumental">Instrumental</span>
+            </div>
+            <div class="prompt-locked-blur">"Epic cinematic tropical score, 5-act structure, full orchestra meets electronic, 120 BPM building to 140. Hans Zimmer-style production. Dolby Atmos mixing. Feature film trailer energy..."</div>
+            <div class="prompt-locked-desc">Score cinématique épique en 5 actes pour bande-annonce.</div>
+            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
+          </div>
+
+          <div class="prompt-card-locked">
+            <div class="prompt-card-header">
+              <span class="prompt-locked-title">🏆 Album Cohérent 10 Titres</span>
+              <span class="prompt-card-tag tag-zouk">Zouk</span>
+            </div>
+            <div class="prompt-locked-blur">"Concept album, 10 tracks, cohesive sonic identity, recurring melodic motifs, key relationships between tracks, narrative arc, interludes, unified production aesthetic..."</div>
+            <div class="prompt-locked-desc">Génération d'un album cohérent de 10 titres avec identité sonore.</div>
+            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
+          </div>
+
         </div>
 
-        <div class="prompt-card" data-category="zouk">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">💃 Zouk Love</span>
-            <span class="prompt-card-tag">Zouk</span>
+        <div class="pro-unlock-cta">
+          <h3>🚀 Le Niveau Pro arrive bientôt</h3>
+          <p>Prompts de niveau professionnel : mastering orchestral, fusions multi-genres, production cinématique, albums complets. En attendant, profite des niveaux Découverte et Studio !</p>
+          <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-lg" onclick="switchLevel('discover')">🌱 Voir les prompts Découverte</button>
+            <button class="btn btn-turquoise btn-lg" onclick="switchLevel('studio')">🎛️ Voir les prompts Studio</button>
           </div>
-          <div class="prompt-card-text">"Zouk love, synthetizer melody, deep bassline, sweet vocals, romantic atmosphere, tropical night, 88 BPM, slow dance"</div>
-          <div class="prompt-card-desc">Un zouk love lent et romantique, idéal pour les soirées dansantes. Synthétiseur et basse profonde.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
-        </div>
-
-        <div class="prompt-card" data-category="instrumental">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🎸 Guitare Tropicale Instrumental</span>
-            <span class="prompt-card-tag">Instrumental</span>
-          </div>
-          <div class="prompt-card-text">"Tropical acoustic guitar instrumental, nylon strings, gentle percussion, nature sounds, bird songs, sunset vibes, 70 BPM, relaxing"</div>
-          <div class="prompt-card-desc">Un instrumental relaxant à la guitare nylon avec sons de la nature. Parfait pour la détente tropicale.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
-        </div>
-
-        <div class="prompt-card" data-category="compas">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🥁 Compas Accéléré</span>
-            <span class="prompt-card-tag">Compas</span>
-          </div>
-          <div class="prompt-card-text">"Fast compas, trumpet section, trombone, keyboard melodies, high energy, carnival atmosphere, francophone call and response, 110 BPM"</div>
-          <div class="prompt-card-desc">Un compas rapide et énergique avec cuivres et claviers. Ambiance carnaval haïtien.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
-        </div>
-
-        <div class="prompt-card" data-category="tropical">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🌴 Bossa Nova Tropical</span>
-            <span class="prompt-card-tag">Tropical Soul</span>
-          </div>
-          <div class="prompt-card-text">"Bossa nova tropical, nylon guitar fingerpicking, soft brushes, warm male vocals, french lyrics, seaside café atmosphere, 100 BPM"</div>
-          <div class="prompt-card-desc">Une bossa nova chaleureuse avec guitare fingerstyle et voix masculine. Ambiance café en bord de mer.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
-        </div>
-
-        <div class="prompt-card" data-category="reggaeton">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">⚡ Dancehall Tropical Mix</span>
-            <span class="prompt-card-tag">Reggaeton</span>
-          </div>
-          <div class="prompt-card-text">"Dancehall tropical fusion, reggaeton beat, afrobeat percussion, steel pan melodies, francophone dance vocals, 110 BPM, summer festival"</div>
-          <div class="prompt-card-desc">Un mix dancehall-tropical-reggaeton pour les festivals d'été. Énergique et festif.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
-        </div>
-
-        <div class="prompt-card" data-category="instrumental">
-          <div class="prompt-card-header">
-            <span class="prompt-card-title">🎸 Djembé & Percussions</span>
-            <span class="prompt-card-tag">Instrumental</span>
-          </div>
-          <div class="prompt-card-text">"West African djembe percussion, talking drum, kalimba, shakers, organic rhythms, no vocals, traditional meets modern, 115 BPM"</div>
-          <div class="prompt-card-desc">Un instrumental percussif avec djembé, talking drum et kalimba. Rythmes traditionnels africains modernes.</div>
-          <button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>
         </div>
 
       </div>
+
     </div>
   </section>
 
+  <!-- ===== CTA FINAL ===== -->
   <section class="section-sm">
     <div class="container text-center">
       <div style="max-width:600px; margin:0 auto;">
         <span style="font-size:3rem; display:block; margin-bottom:var(--space-md);">🚀</span>
         <h2 style="font-size:1.6rem; margin-bottom:var(--space-sm);">Crée ta musique maintenant</h2>
         <p style="color:rgba(255,255,255,0.7); margin-bottom:var(--space-xl); line-height:1.7;">
-          Utilise ces prompts dans Suno ou Flow Music pour générer tes propres chansons tropicales. Lis les guides pour aller plus loin !
+          Utilise ces prompts dans Suno ou Flow Music pour générer tes propres chansons tropicales. Et télécharge les packs PDF premium pour aller plus loin !
         </p>
         <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
           <a href="https://suno.com/invite/@ia_records" target="_blank" rel="noopener" class="btn btn-primary btn-lg">🎵 Rejoindre Suno</a>
           <a href="https://www.flowmusic.app/invite/VDMJX7" target="_blank" rel="noopener" class="btn btn-secondary btn-lg">🎶 Essayer Flow Music</a>
-          <a href="./guides-suno.html" class="btn btn-turquoise btn-lg">📖 Guides Suno</a>
+          <a href="./guides-suno.html" class="btn btn-turquoise btn-lg">📖 Packs PDF Premium</a>
         </div>
       </div>
     </div>
@@ -236,12 +458,14 @@
 <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
     <div class="container">
       <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
-      <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
+      <p style="color:rgba(255,255,255,0.6); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
       <div style="display:flex; justify-content:center; gap:var(--space-lg); flex-wrap:wrap; font-size:0.88rem;">
         <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
         <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
+        <a href="./guides-suno.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Guides Suno</a>
         <a href="./tablatures.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Tablatures</a>
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">YouTube</a>
+        <a href="./discographie.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Discographie</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link" style="color:var(--coral-red);">YouTube</a>
       </div>
       <p style="color:rgba(255,255,255,0.55); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.6);">elramonmusic@gmail.com</a></p>
     </div>
@@ -249,46 +473,60 @@
 
   <script src="../app.js" defer></script>
   <script>
-    // Copy prompt to clipboard
+    // === Copier un prompt ===
     function copyPrompt(btn) {
       const card = btn.closest('.prompt-card');
       const text = card.querySelector('.prompt-card-text').textContent.trim();
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = '✅ Copié !';
         btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = '📋 Copier';
-          btn.classList.remove('copied');
-        }, 2000);
+        setTimeout(() => { btn.textContent = '📋 Copier'; btn.classList.remove('copied'); }, 2000);
       }).catch(() => {
-        // Fallback
         const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        btn.textContent = '✅ Copié !';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = '📋 Copier';
-          btn.classList.remove('copied');
-        }, 2000);
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        btn.textContent = '✅ Copié !'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '📋 Copier'; btn.classList.remove('copied'); }, 2000);
       });
     }
 
-    // Category filter
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.prompt-card').forEach(card => {
-          if (filter === 'all' || card.dataset.category === filter) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
+    // === Changement de niveau (onglets) ===
+    function switchLevel(level) {
+      // Onglets
+      document.querySelectorAll('.level-tab').forEach(t => {
+        const active = t.dataset.level === level;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      // Panneaux
+      document.querySelectorAll('.level-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'panel-' + level);
+      });
+      // Reset filtres
+      const panel = document.getElementById('panel-' + level);
+      if (panel) {
+        panel.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        const first = panel.querySelector('.filter-btn[data-filter="all"]');
+        if (first) first.classList.add('active');
+        panel.querySelectorAll('.prompt-card').forEach(c => c.style.display = '');
+      }
+    }
+
+    document.querySelectorAll('.level-tab').forEach(tab => {
+      tab.addEventListener('click', () => switchLevel(tab.dataset.level));
+    });
+
+    // === Filtres par catégorie (par panneau) ===
+    document.querySelectorAll('.category-filter').forEach(filterGroup => {
+      const panel = filterGroup.closest('.level-panel');
+      filterGroup.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          panel.querySelectorAll('.prompt-card').forEach(card => {
+            card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+          });
         });
       });
     });
