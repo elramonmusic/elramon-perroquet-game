@@ -4,6 +4,7 @@ Allow: /
 # Pages publiques indexables
 Allow: /pages/club.html
 Allow: /pages/inscription.html
+Allow: /pages/discographie.html
 Allow: /pages/partenaires.html
 Allow: /pages/collaborations.html
 Allow: /pages/contact.html
