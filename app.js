@@ -100,16 +100,13 @@ const Auth = {
 
   /**
    * Protection automatique des pages membres.
-   * À appeler via <body data-protect> ou <script>ElRamon.Auth.protectPage()</script>
-   * Détecte automatiquement l'URL de redirection selon la profondeur de la page.
+   * À appeler via <body data-protect> — app.js détecte l'attribut au DOMContentLoaded.
    */
   protectPage(redirectUrl) {
     const target = redirectUrl || (isSubPage() ? './inscription.html' : '/pages/inscription.html');
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!Auth.isLoggedIn()) {
-        window.location.href = target;
-      }
-    });
+    if (!this.isLoggedIn()) {
+      window.location.href = target;
+    }
   }
 };
 
@@ -347,9 +344,6 @@ async function handleInscription(event) {
   // Anti double-soumission
   if (btn.dataset.submitting === '1') return;
   btn.dataset.submitting = '1';
-  event.preventDefault();
-  const form = event.target;
-  const btn = form.querySelector('[type="submit"]');
 
   Form.clearErrors(form);
 
@@ -492,8 +486,6 @@ async function handleCollaboration(event) {
   // Anti double-soumission
   if (btn.dataset.submitting === '1') return;
   btn.dataset.submitting = '1';
-  const form = event.target;
-  const btn = form.querySelector('[type="submit"]');
 
   Form.clearErrors(form);
 
@@ -621,6 +613,11 @@ function animateCounters() {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Protection des pages membres (data-protect sur <body>)
+  if (document.body.dataset.protect !== undefined) {
+    Auth.protectPage();
+  }
+
   initNavigation();
   initScrollReveal();
   initParticles();

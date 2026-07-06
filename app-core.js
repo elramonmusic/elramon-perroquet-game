@@ -120,6 +120,10 @@ function initLogout() {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Protection des pages membres (data-protect sur <body>)
+  if (document.body.dataset.protect !== undefined) {
+    Auth.protectPage();
+  }
   initNavigation();
   initLogout();
 });
