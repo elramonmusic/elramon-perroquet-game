@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classement Perroquet Tropical - El Ramon Music Club</title>
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Styles spécifiques Leaderboard */
+    body { background-color: #0F172A; color: #F8FAFC; }
+    .leaderboard-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .leaderboard-header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #FFD700, #FF8C00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .leaderboard-header p {
+      color: #94A3B8;
+      font-size: 1rem;
+    }
+    .score-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 12px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .score-item:hover {
+      transform: translateX(5px);
+      background: rgba(30, 41, 59, 0.9);
+    }
+    .score-rank {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #FFD700;
+      min-width: 40px;
+    }
+    .score-item.rank-1 .score-rank { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    .score-item.rank-2 .score-rank { color: #C0C0C0; }
+    .score-item.rank-3 .score-rank { color: #CD7F32; }
+    
+    .score-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .score-pseudo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #F8FAFC;
+    }
+    .score-badge {
+      font-size: 0.85rem;
+      color: #2ECC71;
+      margin-top: 4px;
+    }
+    .score-points {
+      font-size: 1.4rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      color: #FF8C00;
+    }
+    .loading-scores {
+      text-align: center;
+      color: #94A3B8;
+      padding: 40px;
+    }
+    .btn-play {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(135deg, #FF8C00, #E53935);
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 30px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-play:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(229, 57, 53, 0.4);
+      color: white;
+    }
+    .btn-back {
+      display: block;
+      text-align: center;
+      color: #94A3B8;
+      margin-top: 15px;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .btn-back:hover { color: #F8FAFC; }
+  </style>
+</head>
+<body data-protect="true">
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="./espace-membre.html" class="logo">El Ramon Music Club</a>
+      <button class="nav-toggle" aria-label="Ouvrir le menu">
+        <span class="hamburger"></span>
+      </button>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="./espace-membre.html">Tableau de bord</a></li>
+          <li><a href="#" data-logout="true" class="btn-primary">Déconnexion</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main style="padding-top: 80px;">
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <h1>🏆 Classement Tropical</h1>
+        <p>Les meilleurs joueurs du Perroquet Tropical</p>
+      </div>
+
+      <ul class="score-list" id="scoreList">
+        <div class="loading-scores">Chargement des scores... 🦜</div>
+      </ul>
+
+      <a href="./jeu.html" class="btn-play">🎮 Jouer et battre un record</a>
+      <a href="./espace-membre.html" class="btn-back">Retour à l'espace membre</a>
+    </div>
+  </main>
+
+  <script src="../app-core.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const scoreList = document.getElementById('scoreList');
+      try {
+        const res = await fetch('/functions/game-score');
+        if (!res.ok) throw new Error('Erreur de chargement');
+        const scores = await res.json();
+
+        scoreList.innerHTML = '';
+        if (scores.length === 0) {
+          scoreList.innerHTML = '<div class="loading-scores">Aucun score pour le moment. Sois le premier !</div>';
+          return;
+        }
+
+        scores.forEach((s, index) => {
+          const rank = index + 1;
+          const li = document.createElement('li');
+          li.className = `score-item rank-${rank}`;
+          
+          let rankDisplay = `#${rank}`;
+          if (rank === 1) rankDisplay = '🥇';
+          if (rank === 2) rankDisplay = '🥈';
+          if (rank === 3) rankDisplay = '🥉';
+
+          li.innerHTML = `
+            <div class="score-rank">${rankDisplay}</div>
+            <div class="score-info">
+              <div class="score-pseudo">${s.pseudo}</div>
+              <div class="score-badge">${s.badge || '🦜 Explorateur'}</div>
+            </div>
+            <div class="score-points">${s.score} <span style="font-size:0.8rem;color:#94A3B8;">pts</span></div>
+          `;
+          scoreList.appendChild(li);
+        });
+
+      } catch (err) {
+        console.error(err);
+        scoreList.innerHTML = '<div class="loading-scores">Impossible de charger le classement. Réessaie plus tard.</div>';
+      }
+    });
+  </script>
+</body>
+</html>

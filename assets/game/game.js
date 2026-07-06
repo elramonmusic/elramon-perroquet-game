@@ -786,7 +786,7 @@ class Level1Scene extends Phaser.Scene {
 
     if (this.lives <= 0) {
       this.gameOver = true;
-      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score }));
+      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives }));
     }
   }
 
@@ -803,7 +803,7 @@ class Level1Scene extends Phaser.Scene {
     
     if (this.lives <= 0) {
       this.gameOver = true;
-      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score }));
+      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives }));
     } else {
       // Respawn
       this.player.setPosition(100, 300);
@@ -982,7 +982,7 @@ class Level1Scene extends Phaser.Scene {
   reachPerch(player, perch) {
     perch.destroy();
     this.saveProgress();
-    this.scene.start('Victory', { score: this.score, fruitsCollected: this.fruits });
+    this.scene.start('Victory', { score: this.score, fruitsCollected: this.fruits, lives: this.lives });
   }
 
   // --- Visuel invincibilité ---
@@ -1073,27 +1073,40 @@ class GameOverScene extends Phaser.Scene {
     bg.fillGradientStyle(0x1A1A2E, 0x1A1A2E, 0x4A0000, 0x4A0000, 1);
     bg.fillRect(0, 0, w, h);
 
-    this.add.text(w / 2, h * 0.25, '🪶 Oh non !', {
+    this.add.text(w / 2, h * 0.20, '☠️ Oh non !', {
       fontSize: '36px', fontFamily: 'Arial Black', color: '#E53935', align: 'center',
     }).setOrigin(0.5);
 
-    this.add.text(w / 2, h * 0.4, 'Le perroquet a perdu toutes ses plumes !', {
+    this.add.text(w / 2, h * 0.35, 'Le perroquet a perdu toutes ses plumes !', {
       fontSize: '15px', fontFamily: 'Arial', color: '#CCCCCC', align: 'center',
     }).setOrigin(0.5);
 
-    this.add.text(w / 2, h * 0.52, 'Score : ' + score, {
-      fontSize: '18px', fontFamily: 'Arial Black', color: '#FFD700',
+    this.add.text(w / 2, h * 0.45, 'Score : ' + score, {
+      fontSize: '22px', fontFamily: 'Arial Black', color: '#FFD700',
     }).setOrigin(0.5);
 
-    const btnReplay = this.add.text(w / 2, h * 0.68, '🔄  Rejouer', {
-      fontSize: '20px', fontFamily: 'Arial Black', color: '#FFFFFF',
+    const badgeText = this.add.text(w / 2, h * 0.55, 'Sauvegarde du score...', {
+      fontSize: '14px', fontFamily: 'Arial', color: '#AAAAAA'
+    }).setOrigin(0.5);
+
+    this.events.once('score_saved', (badge) => {
+      badgeText.setText('Badge débloqué : ' + badge).setColor('#2ECC71').setFontFamily('Arial Black');
+    });
+    saveGameScore(this, false, data);
+
+    const btnReplay = this.add.text(w / 2, h * 0.70, '🔄  Rejouer', {
+      fontSize: '18px', fontFamily: 'Arial Black', color: '#FFFFFF',
       backgroundColor: '#FF8C00', padding: { x: 20, y: 10 }, align: 'center',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnReplay.on('pointerover', () => btnReplay.setStyle({ backgroundColor: '#FFA726' }));
-    btnReplay.on('pointerout', () => btnReplay.setStyle({ backgroundColor: '#FF8C00' }));
     btnReplay.on('pointerdown', () => this.scene.start('Level1'));
 
-    const btnBack = this.add.text(w / 2, h * 0.82, '🏠  Retour espace membre', {
+    const btnLeaderboard = this.add.text(w / 2, h * 0.82, '🏆 Voir le classement', {
+      fontSize: '15px', fontFamily: 'Arial Black', color: '#FFFFFF',
+      backgroundColor: '#0F3460', padding: { x: 20, y: 10 }, align: 'center',
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    btnLeaderboard.on('pointerdown', () => window.location.href = './leaderboard.html');
+
+    const btnBack = this.add.text(w / 2, h * 0.92, '🔙  Retour espace membre', {
       fontSize: '13px', fontFamily: 'Arial', color: '#888888',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     btnBack.on('pointerdown', () => window.location.href = './espace-membre.html');
@@ -1137,64 +1150,49 @@ class VictoryScene extends Phaser.Scene {
       fontSize: '16px', fontFamily: 'Arial', color: '#FAFAFA', align: 'center',
     }).setOrigin(0.5);
 
-    // Badge
+    // Badge dynamique
     const badgeBg = this.add.graphics();
     badgeBg.fillStyle(0xFFD700, 0.15).fillRoundedRect(w / 2 - 140, h * 0.31, 280, 50, 12);
     badgeBg.lineStyle(2, 0xFFD700, 0.5).strokeRoundedRect(w / 2 - 140, h * 0.31, 280, 50, 12);
 
-    this.add.text(w / 2, h * 0.365, '🏆 Badge : ' + GAME_CONFIG.badges.level1, {
+    const badgeText = this.add.text(w / 2, h * 0.365, '🏆 Sauvegarde du score...', {
       fontSize: '13px', fontFamily: 'Arial Black', color: '#FFD700', align: 'center',
     }).setOrigin(0.5);
 
-    this.add.text(w / 2, h * 0.47, '⭐ ' + score + ' points  |  🍌 ' + fruits + ' fruits', {
-      fontSize: '14px', fontFamily: 'Arial', color: '#AAAAAA',
+    this.events.once('score_saved', (badge) => {
+      badgeText.setText('Badge obtenu : ' + badge);
+    });
+    saveGameScore(this, true, data);
+
+    this.add.text(w / 2, h * 0.47, '⭐ ' + score + ' points  |  🥭 ' + fruits + ' fruits', {
+      fontSize: '16px', fontFamily: 'Arial Black', color: '#AAAAAA',
     }).setOrigin(0.5);
 
-    this.add.text(w / 2, h * 0.55, '🎁 Tu as gagné une récompense du Club !', {
-      fontSize: '14px', fontFamily: 'Arial', color: '#FAFAFA',
-    }).setOrigin(0.5);
-
-    this.add.text(w / 2, h * 0.62, reward.description, {
-      fontSize: '12px', fontFamily: 'Arial', color: '#AAAAAA',
-      align: 'center', lineSpacing: 3,
-    }).setOrigin(0.5).setWordWrapWidth(w * 0.75);
-
-    // Bouton Récompense
+    // Boutons
     const btnReward = this.add.text(w / 2, h * 0.74, reward.buttonText, {
-      fontSize: '16px', fontFamily: 'Arial Black', color: '#1A1A2E',
+      fontSize: '15px', fontFamily: 'Arial Black', color: '#1A1A2E',
       backgroundColor: '#FFD700', padding: { x: 20, y: 10 }, align: 'center',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnReward.on('pointerover', () => btnReward.setStyle({ backgroundColor: '#FFA726' }));
+    btnReward.on('pointerover', () => btnReward.setStyle({ backgroundColor: '#FFF59D' }));
     btnReward.on('pointerout', () => btnReward.setStyle({ backgroundColor: '#FFD700' }));
-    btnReward.on('pointerdown', () => window.open(reward.url, '_blank'));
+    btnReward.on('pointerdown', () => window.open(reward.link, '_blank'));
 
-    // Bouton Niveau suivant
-    const btnNext = this.add.text(w / 2, h * 0.84, '▶  Niveau suivant', {
-      fontSize: '14px', fontFamily: 'Arial Black', color: '#FFFFFF',
-      backgroundColor: '#2ECC71', padding: { x: 16, y: 8 }, align: 'center',
+    const btnReplay = this.add.text(w / 4, h * 0.88, '🔄 Rejouer', {
+      fontSize: '13px', fontFamily: 'Arial Black', color: '#FFFFFF',
+      backgroundColor: '#FF8C00', padding: { x: 15, y: 10 }, align: 'center',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnNext.on('pointerover', () => btnNext.setStyle({ backgroundColor: '#27AE60' }));
-    btnNext.on('pointerout', () => btnNext.setStyle({ backgroundColor: '#2ECC71' }));
-    btnNext.on('pointerdown', () => {
-      this.add.text(w / 2, h * 0.92, '🌴 Le prochain niveau arrive bientôt !', {
-        fontSize: '12px', fontFamily: 'Arial', color: '#FFD700',
-      }).setOrigin(0.5);
-    });
+    btnReplay.on('pointerdown', () => this.scene.start('Level1'));
 
-    // Retour
-    const btnBack = this.add.text(w / 2, h * 0.96, '🏠  Retour', {
-      fontSize: '11px', fontFamily: 'Arial', color: '#888888',
+    const btnLeaderboard = this.add.text((w / 4) * 3, h * 0.88, '🏆 Classement', {
+      fontSize: '13px', fontFamily: 'Arial Black', color: '#FFFFFF',
+      backgroundColor: '#E53935', padding: { x: 15, y: 10 }, align: 'center',
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    btnLeaderboard.on('pointerdown', () => window.location.href = './leaderboard.html');
+
+    const btnBack = this.add.text(w / 2, h * 0.96, '🔙 Retour espace membre', {
+      fontSize: '13px', fontFamily: 'Arial', color: '#888888',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     btnBack.on('pointerdown', () => window.location.href = './espace-membre.html');
-
-    this.add.text(w / 2, h * 0.99, '📺  Voir la chaîne YouTube', {
-      fontSize: '10px', fontFamily: 'Arial', color: '#666666',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => window.open('https://www.youtube.com/@El-Ramon-Music', '_blank'));
-
-    this.add.text(w / 2, h - 5, 'Certains liens sont des liens partenaires.', {
-      fontSize: '9px', fontFamily: 'Arial', color: '#444444',
-    }).setOrigin(0.5);
   }
 }
 
