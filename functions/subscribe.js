@@ -13,9 +13,11 @@
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };
+
+import { createSessionCookie } from './utils/session.js';
 
 // Simple validation d'email
 function isValidEmail(email) {
@@ -173,6 +175,18 @@ Date : ${member.created_at}
   }
 
   console.log(`Nouvelle inscription: ${member.email} (${member.pseudo})`);
+  
+  // Générer le cookie de session sécurisé
+  let headers = new Headers(CORS_HEADERS);
+  if (env.SESSION_SECRET) {
+    const cookieHeader = await createSessionCookie(
+      { email: member.email, pseudo: member.pseudo, role: member.role || 'member' },
+      env.SESSION_SECRET
+    );
+    headers.append('Set-Cookie', cookieHeader);
+  } else {
+    console.error('SESSION_SECRET manquant. Le cookie ne sera pas généré.');
+  }
 
   return new Response(JSON.stringify({
     success: true,
@@ -180,7 +194,7 @@ Date : ${member.created_at}
     member: { email: member.email, pseudo: member.pseudo, role: member.role },
   }), {
     status: 200,
-    headers: CORS_HEADERS,
+    headers: headers
   });
 }
 

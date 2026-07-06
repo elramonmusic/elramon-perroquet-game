@@ -10,6 +10,8 @@ const CORS_HEADERS = {
   'Content-Type': 'application/json',
 };
 
+import { createSessionCookie } from './utils/session.js';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -50,7 +52,21 @@ export async function onRequestPost(context) {
 
     if (members && members.length > 0) {
       // Membre trouvé
-      return new Response(JSON.stringify(members[0]), { status: 200, headers: CORS_HEADERS });
+      const member = members[0];
+      
+      // Générer le cookie de session sécurisé
+      let headers = new Headers(CORS_HEADERS);
+      if (env.SESSION_SECRET) {
+        const cookieHeader = await createSessionCookie(
+          { email: member.email, pseudo: member.pseudo, role: member.role || 'member' },
+          env.SESSION_SECRET
+        );
+        headers.append('Set-Cookie', cookieHeader);
+      } else {
+        console.error('SESSION_SECRET manquant. Le cookie ne sera pas généré.');
+      }
+
+      return new Response(JSON.stringify(member), { status: 200, headers });
     } else {
       // Aucun membre avec cet email
       return new Response(JSON.stringify({ error: 'Aucun compte trouvé avec cet email.' }), { status: 404, headers: CORS_HEADERS });
