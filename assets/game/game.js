@@ -35,6 +35,30 @@ const SFX = {
   powerup() { this.play(400, 'sine', 0.5, 0.1, 800); }
 };
 
+function playSound(scene, key, fallbackSfx) {
+  if (scene.cache.audio.exists(key)) {
+    scene.sound.play(key);
+  } else if (fallbackSfx) {
+    fallbackSfx();
+  }
+}
+
+// ============================================================
+// PRELOAD SCENE — Chargement des assets réels (images et audio)
+// ============================================================
+class PreloadScene extends Phaser.Scene {
+  constructor() { super({ key: 'Preload' }); }
+  preload() {
+    this.load.image('real_parrot', '../assets/images/game/parrot.png');
+    this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3');
+    this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3');
+    this.load.audio('voice_fall', '../assets/audio/game/voice_fall.mp3');
+  }
+  create() {
+    this.scene.start('Boot');
+  }
+}
+
 // ============================================================
 // BOOT SCENE — Création des assets temporaires (formes)
 // ============================================================
@@ -259,7 +283,7 @@ class StartScene extends Phaser.Scene {
       align: 'center', lineSpacing: 4,
     }).setOrigin(0.5);
 
-    const parrot = this.add.image(w / 2, h * 0.6, 'parrot').setScale(2);
+    const parrot = this.add.image(w / 2, h * 0.6, 'real_parrot').setDisplaySize(60, 60);
     this.tweens.add({ targets: parrot, y: h * 0.6 - 15, yoyo: true, repeat: -1, duration: 1200, ease: 'Sine.easeInOut' });
 
     const btnPlay = this.add.text(w / 2, h * 0.78, '🎮  Jouer', {
@@ -341,12 +365,13 @@ class Level1Scene extends Phaser.Scene {
     });
 
     // --- Joueur ---
-    this.player = this.physics.add.sprite(100, 350, 'parrot');
+    this.player = this.physics.add.sprite(100, 350, 'real_parrot');
     this.player.setCollideWorldBounds(true);
     this.player.setBounce(0.05);
     this.player.setDepth(10);
-    this.player.body.setSize(28, 28);
-    this.player.body.setOffset(4, 6);
+    this.player.setDisplaySize(40, 40);
+    this.player.body.setSize(30, 30);
+    this.player.body.setOffset(17, 17);
     this.physics.add.collider(this.player, this.platforms);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
@@ -608,6 +633,11 @@ class Level1Scene extends Phaser.Scene {
       this.updateBoss();
     }
 
+    // Chute dans un trou
+    if (this.player.y > 425 && !this.gameOver) {
+      this.playerFall();
+    }
+
     // Visuel joueur
     this.updatePlayerVisual();
 
@@ -643,7 +673,7 @@ class Level1Scene extends Phaser.Scene {
     emitter.explode();
     this.time.delayedCall(1000, () => emitter.destroy());
     
-    SFX.coin();
+    playSound(this, 'voice_eat', () => SFX.coin());
 
     fruit.destroy();
     this.score += 10;
@@ -724,7 +754,7 @@ class Level1Scene extends Phaser.Scene {
     this.lives--;
     this.invincibleUntil = this.time.now + GAME_CONFIG.player.invincibleTime;
     
-    SFX.hit();
+    playSound(this, 'voice_hit', () => SFX.hit());
 
     // Camera shake
     this.cameras.main.shake(200, 0.015);
@@ -736,6 +766,27 @@ class Level1Scene extends Phaser.Scene {
     if (this.lives <= 0) {
       this.gameOver = true;
       this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score }));
+    }
+  }
+
+  // --- Chute dans le vide ---
+  playerFall() {
+    this.lives--;
+    this.invincibleUntil = this.time.now + GAME_CONFIG.player.invincibleTime;
+    
+    playSound(this, 'voice_fall', () => SFX.hit());
+    
+    this.cameras.main.shake(300, 0.02);
+    this.physics.world.isPaused = true;
+    this.time.delayedCall(200, () => { this.physics.world.isPaused = false; });
+    
+    if (this.lives <= 0) {
+      this.gameOver = true;
+      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score }));
+    } else {
+      // Respawn
+      this.player.setPosition(100, 300);
+      this.player.setVelocity(0, 0);
     }
   }
 
@@ -1145,7 +1196,7 @@ const gameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, StartScene, Level1Scene, GameOverScene, VictoryScene],
+  scene: [PreloadScene, BootScene, StartScene, Level1Scene, GameOverScene, VictoryScene],
   pixelArt: false,
   roundPixels: true,
 };
