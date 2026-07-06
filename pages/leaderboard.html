@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Classement Perroquet Tropical - El Ramon Music Club</title>
-  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     /* Styles spécifiques Leaderboard */
@@ -120,20 +120,34 @@
   </style>
 </head>
 <body data-protect="true">
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="header-container">
-      <a href="./espace-membre.html" class="logo">El Ramon Music Club</a>
-      <button class="nav-toggle" aria-label="Ouvrir le menu">
-        <span class="hamburger"></span>
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
+        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
+        <span></span><span></span><span></span>
       </button>
-      <nav class="nav-menu">
-        <ul>
-          <li><a href="./espace-membre.html">Tableau de bord</a></li>
-          <li><a href="#" data-logout="true" class="btn-primary">Déconnexion</a></li>
-        </ul>
-      </nav>
-    </div>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">🏠 Accueil</a>
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
+    </nav>
   </header>
 
   <main style="padding-top: 80px;">
@@ -158,7 +172,10 @@
       const scoreList = document.getElementById('scoreList');
       try {
         const res = await fetch('/functions/game-score');
-        if (!res.ok) throw new Error('Erreur de chargement');
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Erreur serveur (${res.status}): ${errText}`);
+        }
         const scores = await res.json();
 
         scoreList.innerHTML = '';
@@ -190,7 +207,7 @@
 
       } catch (err) {
         console.error(err);
-        scoreList.innerHTML = '<div class="loading-scores">Impossible de charger le classement. Réessaie plus tard.</div>';
+        scoreList.innerHTML = `<div class="loading-scores" style="color:#E53935;">Impossible de charger le classement :<br/><br/>${err.message}</div>`;
       }
     });
   </script>
