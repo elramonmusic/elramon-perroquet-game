@@ -247,18 +247,42 @@
             return;
           }
 
-          // V1 : vérifier si l'email correspond au compte localStorage
-          const member = window.ElRamon.Auth.getMember();
-          if (member && member.email === email) {
-            // Connexion OK
-            const successEl = document.querySelector('.form-success');
-            if (successEl) successEl.classList.add('visible');
-            setTimeout(() => {
-              window.location.href = './espace-membre.html';
-            }, 1000);
-          } else {
-            window.ElRamon.Toast.show('Aucun compte trouvé avec cet email. Inscris-toi d\'abord !', 'warning');
-          }
+          // Appel API de connexion
+          const btn = this.querySelector('button[type="submit"]');
+          if (btn.dataset.submitting === '1') return;
+          btn.dataset.submitting = '1';
+          window.ElRamon.Form.setLoading(btn, true);
+
+          fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          })
+          .then(async res => {
+            if (res.ok) {
+              const memberData = await res.json();
+              // Sauvegarde dans le localStorage pour la session
+              window.ElRamon.Auth.saveMember(memberData);
+              
+              // Connexion OK
+              const successEl = document.querySelector('.form-success');
+              if (successEl) successEl.classList.add('visible');
+              setTimeout(() => {
+                window.location.href = './espace-membre.html';
+              }, 1000);
+            } else if (res.status === 404) {
+              window.ElRamon.Toast.show('Aucun compte trouvé avec cet email. Inscris-toi d\'abord !', 'warning');
+            } else {
+              window.ElRamon.Toast.show('Erreur de connexion. Réessaie.', 'error');
+            }
+          })
+          .catch(err => {
+            window.ElRamon.Toast.show('Erreur de réseau. Réessaie.', 'error');
+          })
+          .finally(() => {
+            btn.dataset.submitting = '0';
+            window.ElRamon.Form.setLoading(btn, false);
+          });
         });
       }
     });
