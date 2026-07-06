@@ -7,6 +7,8 @@
 // ============================================================
 // CONFIG
 // ============================================================
+window.ElRamon = window.ElRamon || {};
+
 const CONFIG = {
   STORAGE_KEY: 'elramon_member',
   SESSION_KEY: 'elramon_session',
@@ -637,5 +639,4 @@ document.addEventListener('DOMContentLoaded', () => {
   if (collabForm) collabForm.addEventListener('submit', handleCollaboration);
 });
 
-// Export pour usage dans d'autres scripts
-window.ElRamon = { Auth, Toast, Form, CONFIG };
+Object.assign(window.ElRamon, { Auth, Toast, Form, CONFIG });

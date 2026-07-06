@@ -8,6 +8,8 @@
 // ============================================================
 // CONFIG
 // ============================================================
+window.ElRamon = window.ElRamon || {};
+
 const CORE_CONFIG = {
   STORAGE_KEY: 'elramon_member',
   SITE_NAME: 'El Ramon Music Club',
@@ -47,11 +49,9 @@ const Auth = {
    */
   protectPage(redirectUrl) {
     const target = redirectUrl || (window.location.pathname.includes('/pages/') ? './inscription.html' : '/pages/inscription.html');
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!Auth.isLoggedIn()) {
-        window.location.href = target;
-      }
-    });
+    if (!Auth.isLoggedIn()) {
+      window.location.href = target;
+    }
   },
 };
 
@@ -128,4 +128,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initLogout();
 });
 
-window.ElRamon = { Auth, Toast, CONFIG: CORE_CONFIG };
+Object.assign(window.ElRamon, { Auth, Toast, CONFIG: CORE_CONFIG });

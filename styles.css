@@ -2235,3 +2235,12 @@ a:focus-visible {
 .visible { display: block !important; }
 .opacity-0 { opacity: 0; }
 .pointer-none { pointer-events: none; }
+
+/* --- Mobile Optimizations --- */
+@media (max-width: 768px) {
+  button, .btn, a.nav-link, a.nav-cta, input, select, textarea {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
