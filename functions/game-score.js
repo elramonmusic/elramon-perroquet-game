@@ -102,7 +102,6 @@ export async function onRequestPost(context) {
     fruits_collected: parseInt(fruits_collected || 0, 10),
     boss_defeated: !!boss_defeated,
     lives_remaining: parseInt(lives_remaining || 0, 10),
-    time_seconds: parseInt(time_seconds || 0, 10),
     badge
   };
 
