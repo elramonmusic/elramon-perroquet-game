@@ -171,7 +171,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const scoreList = document.getElementById('scoreList');
       try {
-        const res = await fetch('/functions/game-score');
+        const res = await fetch('/game-score');
         if (!res.ok) {
           const errText = await res.text();
           throw new Error(`Erreur serveur (${res.status}): ${errText}`);

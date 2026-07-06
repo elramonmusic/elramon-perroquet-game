@@ -1220,7 +1220,7 @@ async function saveGameScore(scene, bossDefeated, data) {
   };
 
   try {
-    const res = await fetch('/functions/game-score', {
+    const res = await fetch('/game-score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(scoreData)
