@@ -50,6 +50,16 @@ class PreloadScene extends Phaser.Scene {
   constructor() { super({ key: 'Preload' }); }
   preload() {
     this.load.image('real_parrot', '../assets/images/game/parrot.png?v=4');
+    
+    // Nouveaux assets HD
+    this.load.image('bg_tropical', '../assets/images/game/bg_tropical.jpg?v=1');
+    this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
+    this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
+    this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
+    this.load.image('enemy_crab', '../assets/images/game/crab.png?v=1');
+    this.load.image('enemy_snake', '../assets/images/game/snake.png?v=1');
+    this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=1');
+
     this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3?v=4');
     this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3?v=4');
     this.load.audio('voice_fall', '../assets/audio/game/voice_fall.mp3?v=4');
@@ -375,8 +385,8 @@ class Level1Scene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.platforms);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
-    // --- Fruits (groupe statique pour overlap) ---
-    const fruitTextures = { banana: 'banana', orange: 'orange_fruit', cherry: 'cherry' };
+    // --- Fruits (sprites réels) ---
+    const fruitTextures = { banana: 'fruit_banana', orange: 'fruit_orange', cherry: 'fruit_cherry' };
     this.fruitSprites = [];
     level.fruits.forEach(f => {
       const sprite = this.physics.add.staticImage(f.x, f.y, fruitTextures[f.type]);
@@ -393,8 +403,9 @@ class Level1Scene extends Phaser.Scene {
     // --- Ennemis ---
     this.enemies = [];
     level.enemies.forEach(e => {
-      const cfgE = cfg.enemyTypes[e.type];
-      const enemy = this.physics.add.sprite(e.x, e.y, e.type);
+      const cfgE = GAME_CONFIG.enemies[e.type];
+      const texMap = { crab: 'enemy_crab', snake: 'enemy_snake', singe: 'enemy_monkey' };
+      const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
       enemy.enemyType = e.type;
       enemy.scoreValue = cfgE.score;
       enemy.alive = true;
@@ -456,39 +467,35 @@ class Level1Scene extends Phaser.Scene {
     const ww = GAME_CONFIG.level1.worldWidth;
     const wh = GAME_CONFIG.level1.worldHeight;
 
-    const sky = this.add.graphics();
-    sky.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xFFD700, 0xFF8C00, 1);
-    sky.fillRect(0, 0, ww, wh);
-    sky.setScrollFactor(0.2);
+    // Fond HD
+    this.add.tileSprite(0, 0, ww, wh, 'bg_tropical')
+      .setOrigin(0, 0)
+      .setScrollFactor(0.2)
+      .setAlpha(0.9); // Léger alpha pour l'ambiance tropicale
 
-    this.add.circle(ww * 0.15, 60, 50, 0xFFD700, 0.4).setScrollFactor(0.2);
+    // Particules environnementales (Lucioles)
+    this.add.particles(0, 0, 'particle_star', {
+      x: { min: 0, max: ww },
+      y: { min: 200, max: wh },
+      lifespan: 4000,
+      speedY: { min: -10, max: -30 },
+      speedX: { min: -20, max: 20 },
+      scale: { start: 0.5, end: 0 },
+      alpha: { start: 0.8, end: 0 },
+      tint: 0x99FF99,
+      blendMode: 'ADD',
+      frequency: 200
+    }).setScrollFactor(0.8);
 
-    for (let i = 0; i < 8; i++) {
-      const cx = 200 + i * 550;
-      const cloud = this.add.graphics();
-      cloud.fillStyle(0xFFFFFF, 0.3);
-      cloud.fillCircle(cx, 40 + (i % 3) * 10, 30);
-      cloud.fillCircle(cx + 25, 35 + (i % 2) * 10, 22);
-      cloud.fillCircle(cx - 20, 38 + (i % 4) * 8, 18);
-      cloud.setScrollFactor(0.3);
-    }
-
-    for (let i = 0; i < 12; i++) {
-      const px = 300 + i * 350;
-      const palm = this.add.graphics();
-      palm.fillStyle(0x5D4037, 1);
-      palm.fillRect(px, 280, 8, 120);
-      palm.fillStyle(0x2E7D32, 1);
-      palm.fillCircle(px + 4, 275, 25);
-      palm.fillCircle(px - 15, 265, 18);
-      palm.fillCircle(px + 22, 268, 16);
-      palm.setScrollFactor(0.4).setAlpha(0.5);
-    }
-
+    // Sable de base
     const sand = this.add.graphics();
-    sand.fillStyle(0xF4D03F, 0.3);
+    sand.fillStyle(0xF4D03F, 0.5);
     sand.fillRect(0, wh - 60, ww, 60);
-    sand.setScrollFactor(0.9);
+
+    // Océan animé (vagues)
+    this.waterY = wh - 30;
+    this.waterGraphics = this.add.graphics();
+    this.waterTime = 0;
   }
 
   // --- Fruit floating (sans tween pour garder le body sync) ---
@@ -637,6 +644,20 @@ class Level1Scene extends Phaser.Scene {
     if (this.player.y > 425 && !this.gameOver) {
       this.playerFall();
     }
+
+    // Animation de l'océan
+    this.waterTime += 0.05;
+    this.waterGraphics.clear();
+    this.waterGraphics.fillStyle(0x00BCD4, 0.6);
+    this.waterGraphics.beginPath();
+    this.waterGraphics.moveTo(0, this.waterY);
+    for (let i = 0; i <= GAME_CONFIG.level1.worldWidth; i += 50) {
+      this.waterGraphics.lineTo(i, this.waterY + Math.sin(this.waterTime + i * 0.01) * 5);
+    }
+    this.waterGraphics.lineTo(GAME_CONFIG.level1.worldWidth, GAME_CONFIG.level1.worldHeight);
+    this.waterGraphics.lineTo(0, GAME_CONFIG.level1.worldHeight);
+    this.waterGraphics.closePath();
+    this.waterGraphics.fillPath();
 
     // Visuel joueur
     this.updatePlayerVisual();
@@ -832,7 +853,8 @@ class Level1Scene extends Phaser.Scene {
 
     this.cameras.main.setBounds(bossCfg.x - 300, 0, 900, GAME_CONFIG.level1.worldHeight);
 
-    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'toucan');
+    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'enemy_monkey');
+    this.boss.setDisplaySize(60, 60);
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
     this.boss.body.allowGravity = false;
     this.boss.body.setSize(48, 44).setOffset(2, 4);
