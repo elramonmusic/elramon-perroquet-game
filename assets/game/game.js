@@ -49,10 +49,10 @@ function playSound(scene, key, fallbackSfx) {
 class PreloadScene extends Phaser.Scene {
   constructor() { super({ key: 'Preload' }); }
   preload() {
-    this.load.image('real_parrot', '../assets/images/game/parrot.png');
-    this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3');
-    this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3');
-    this.load.audio('voice_fall', '../assets/audio/game/voice_fall.mp3');
+    this.load.image('real_parrot', '../assets/images/game/parrot.png?v=4');
+    this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3?v=4');
+    this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3?v=4');
+    this.load.audio('voice_fall', '../assets/audio/game/voice_fall.mp3?v=4');
   }
   create() {
     this.scene.start('Boot');
