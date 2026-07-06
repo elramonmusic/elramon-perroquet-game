@@ -403,7 +403,7 @@ class Level1Scene extends Phaser.Scene {
     // --- Ennemis ---
     this.enemies = [];
     level.enemies.forEach(e => {
-      const cfgE = GAME_CONFIG.enemies[e.type];
+      const cfgE = GAME_CONFIG.enemyTypes[e.type];
       const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake', singe: 'enemy_monkey' };
       const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
       enemy.enemyType = e.type;
