@@ -1199,6 +1199,41 @@ class VictoryScene extends Phaser.Scene {
 // ============================================================
 // INITIALISATION PHASER
 // ============================================================
+
+// ============================================================
+// SAUVEGARDE SCORE API
+// ============================================================
+async function saveGameScore(scene, bossDefeated, data) {
+  if (!window.ElRamon || !window.ElRamon.Auth) return;
+  const member = window.ElRamon.Auth.getMember();
+  if (!member) return;
+
+  const scoreData = {
+    member_email: member.email,
+    pseudo: member.pseudo || member.email.split('@')[0],
+    score: data.score || 0,
+    level: bossDefeated ? 'Level1_Finished' : 'Level1',
+    fruits_collected: data.fruitsCollected || 0,
+    boss_defeated: bossDefeated,
+    lives_remaining: data.lives || 0,
+    time_seconds: 0
+  };
+
+  try {
+    const res = await fetch('/functions/game-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scoreData)
+    });
+    if (res.ok) {
+      const result = await res.json();
+      scene.events.emit('score_saved', result.badge);
+    }
+  } catch (err) {
+    console.error('Score API error:', err);
+  }
+}
+
 const gameConfig = {
   type: Phaser.AUTO,
   parent: 'game-container',
