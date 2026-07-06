@@ -30,7 +30,10 @@ export async function onRequestGet(context) {
       }
     });
 
-    if (!response.ok) throw new Error('Erreur Supabase GET');
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error('Supabase GET failed: ' + errText);
+    }
     let scores = await response.json();
 
     // Dédoublonner par pseudo en gardant le meilleur score (déjà trié par score desc)
@@ -116,7 +119,10 @@ export async function onRequestPost(context) {
         body: JSON.stringify(scoreData),
       });
 
-      if (!insertResp.ok) throw new Error('Erreur insertion Supabase');
+      if (!insertResp.ok) {
+        const errText = await insertResp.text();
+        throw new Error('Supabase POST failed: ' + errText);
+      }
 
       return new Response(JSON.stringify({ success: true, badge, score: scoreData.score }), { status: 200, headers: CORS_HEADERS });
     } catch (err) {
