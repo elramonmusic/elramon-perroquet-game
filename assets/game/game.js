@@ -7,6 +7,35 @@
  */
 
 // ============================================================
+// AUDIO (Synthétiseur rétro 8-bit)
+// ============================================================
+const SFX = {
+  ctx: null,
+  init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+  play(freq, type = 'square', duration = 0.1, vol = 0.1, slideFreq = null) {
+    if (!this.ctx) this.init();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+    if (slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, this.ctx.currentTime + duration);
+    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + duration);
+  },
+  jump() { this.play(150, 'square', 0.2, 0.05, 300); },
+  coin() { this.play(880, 'sine', 0.1, 0.05, 1200); },
+  shoot() { this.play(400, 'square', 0.1, 0.05, 200); },
+  hit() { this.play(100, 'sawtooth', 0.3, 0.1, 50); },
+  bossHit() { this.play(80, 'sawtooth', 0.4, 0.2, 30); },
+  powerup() { this.play(400, 'sine', 0.5, 0.1, 800); }
+};
+
+// ============================================================
 // BOOT SCENE — Création des assets temporaires (formes)
 // ============================================================
 class BootScene extends Phaser.Scene {
@@ -189,6 +218,12 @@ class BootScene extends Phaser.Scene {
     g.fillTriangle(1, 7, 15, 7, 8, 16);
     g.generateTexture('heart_empty', 16, 16);
 
+    // --- Particule d'étoile ---
+    g.clear();
+    g.fillStyle(0xFFFFFF, 1);
+    g.fillCircle(4, 4, 4);
+    g.generateTexture('particle_star', 8, 8);
+
     g.destroy();
   }
 }
@@ -234,7 +269,11 @@ class StartScene extends Phaser.Scene {
 
     btnPlay.on('pointerover', () => btnPlay.setStyle({ backgroundColor: '#FFA726' }));
     btnPlay.on('pointerout', () => btnPlay.setStyle({ backgroundColor: '#FF8C00' }));
-    btnPlay.on('pointerdown', () => this.scene.start('Level1'));
+    btnPlay.on('pointerdown', () => {
+      SFX.init(); // Init audio context on user gesture
+      SFX.coin();
+      this.scene.start('Level1');
+    });
 
     const btnBack = this.add.text(w / 2, h * 0.9, '🏠  Retour espace membre', {
       fontSize: '13px', fontFamily: 'Arial, sans-serif', color: '#888888',
@@ -270,6 +309,11 @@ class Level1Scene extends Phaser.Scene {
     this.bossStunUntil = 0;
     this.lastBossShot = 0;
     this.bossSpeed = level.boss.speed;
+
+    // --- Variables Game Feel ---
+    this.lastOnGround = 0;
+    this.lastJumpPressed = 0;
+    this.prevMobileJump = false;
 
     // --- Monde ---
     this.physics.world.setBounds(0, 0, level.worldWidth, level.worldHeight);
@@ -528,10 +572,24 @@ class Level1Scene extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    // Saut
-    const jump = this.cursors.up.isDown || this.wasd.up.isDown || window._gameControls.up;
-    if (jump && onGround) {
+    // --- Game Feel : Coyote Time & Jump Buffer ---
+    if (onGround) {
+      this.lastOnGround = this.time.now;
+    }
+    
+    const jumpDown = Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.wasd.up);
+    const mobileJumpDown = window._gameControls.up && !this.prevMobileJump;
+    this.prevMobileJump = window._gameControls.up;
+
+    if (jumpDown || mobileJumpDown) {
+      this.lastJumpPressed = this.time.now;
+    }
+
+    if (this.time.now - this.lastJumpPressed < 150 && this.time.now - this.lastOnGround < 150) {
       this.player.setVelocityY(physCfg.playerJump);
+      this.lastJumpPressed = 0;
+      this.lastOnGround = 0;
+      SFX.jump();
     }
 
     // Tir
@@ -539,6 +597,7 @@ class Level1Scene extends Phaser.Scene {
     if (fire && this.fruits > 0) {
       this.fireBullet();
       window._gameControls.fire = false;
+      SFX.shoot();
     }
 
     // IA ennemis
@@ -569,18 +628,37 @@ class Level1Scene extends Phaser.Scene {
   // --- Collecter fruit ---
   collectFruit(player, fruit) {
     if (!fruit.active) return;
+    
+    // Particules
+    const emitter = this.add.particles(fruit.x, fruit.y, 'particle_star', {
+      speed: { min: 50, max: 150 },
+      scale: { start: 1, end: 0 },
+      alpha: { start: 1, end: 0 },
+      tint: 0xFFD700,
+      lifespan: 600,
+      quantity: 10,
+      gravityY: 200,
+      emitting: false
+    }).setDepth(60);
+    emitter.explode();
+    this.time.delayedCall(1000, () => emitter.destroy());
+    
+    SFX.coin();
+
     fruit.destroy();
     this.score += 10;
     this.fruits++;
     const txt = this.add.text(fruit.x, fruit.y - 10, '+10', {
-      fontSize: '14px', fontFamily: 'Arial Black', color: '#FFD700',
+      fontSize: '16px', fontFamily: 'Arial Black', color: '#FFD700',
+      stroke: '#000000', strokeThickness: 3
     }).setOrigin(0.5).setDepth(50);
-    this.tweens.add({ targets: txt, y: txt.y - 30, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
+    this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
   }
 
   // --- Collecter potion ---
   collectPotion(player, potion) {
     potion.destroy();
+    SFX.powerup();
     this.potionActiveUntil = this.time.now + GAME_CONFIG.player.potionDuration;
     this.hudPotionIndicator.setVisible(true);
   }
@@ -616,17 +694,45 @@ class Level1Scene extends Phaser.Scene {
   defeatEnemy(enemy) {
     enemy.alive = false;
     this.score += enemy.scoreValue;
+    
+    // Particules
+    const emitter = this.add.particles(enemy.x, enemy.y, 'particle_star', {
+      speed: { min: 80, max: 200 },
+      scale: { start: 1.5, end: 0 },
+      alpha: { start: 1, end: 0 },
+      tint: 0x2ECC71,
+      lifespan: 800,
+      quantity: 15,
+      gravityY: 300,
+      emitting: false
+    }).setDepth(60);
+    emitter.explode();
+    this.time.delayedCall(1000, () => emitter.destroy());
+    
+    SFX.hit();
+
     const txt = this.add.text(enemy.x, enemy.y - 15, '+' + enemy.scoreValue, {
-      fontSize: '14px', fontFamily: 'Arial Black', color: '#2ECC71',
+      fontSize: '16px', fontFamily: 'Arial Black', color: '#2ECC71',
+      stroke: '#000000', strokeThickness: 3
     }).setOrigin(0.5).setDepth(50);
-    this.tweens.add({ targets: enemy, alpha: 0, scaleX: 0, scaleY: 0, duration: 300, onComplete: () => { if (enemy.active) enemy.destroy(); } });
-    this.tweens.add({ targets: txt, y: txt.y - 30, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
+    this.tweens.add({ targets: enemy, alpha: 0, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.easeIn', onComplete: () => { if (enemy.active) enemy.destroy(); } });
+    this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
   }
 
   // --- Joueur touché ---
   playerHit() {
     this.lives--;
     this.invincibleUntil = this.time.now + GAME_CONFIG.player.invincibleTime;
+    
+    SFX.hit();
+
+    // Camera shake
+    this.cameras.main.shake(200, 0.015);
+    
+    // Hit-Stop (Freeze 100ms)
+    this.physics.world.isPaused = true;
+    this.time.delayedCall(100, () => { this.physics.world.isPaused = false; });
+
     if (this.lives <= 0) {
       this.gameOver = true;
       this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score }));
@@ -731,9 +837,16 @@ class Level1Scene extends Phaser.Scene {
         this.bossStunUntil = now + bossCfg.stunDuration;
         player.setVelocityY(-300);
         this.bossSpeed += 20;
+        
+        SFX.bossHit();
 
-        const txt = this.add.text(boss.x, boss.y - 30, '💥', { fontSize: '24px' }).setOrigin(0.5).setDepth(50);
-        this.tweens.add({ targets: txt, y: txt.y - 40, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
+        // Camera Shake & Hit-Stop
+        this.cameras.main.shake(150, 0.01);
+        this.physics.world.isPaused = true;
+        this.time.delayedCall(80, () => { this.physics.world.isPaused = false; });
+
+        const txt = this.add.text(boss.x, boss.y - 30, '💥', { fontSize: '28px' }).setOrigin(0.5).setDepth(50);
+        this.tweens.add({ targets: txt, y: txt.y - 50, scale: 1.5, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
 
         if (this.bossHP <= 0) this.defeatBoss();
       }
@@ -757,8 +870,25 @@ class Level1Scene extends Phaser.Scene {
     if (this.bossAITimer) this.bossAITimer.destroy();
 
     this.score += 100;
+    
+    // Grosse secousse pour la mort du boss
+    this.cameras.main.shake(500, 0.02);
+
+    // Explosion de particules continue pendant l'animation
+    const emitter = this.add.particles(this.boss.x, this.boss.y, 'particle_star', {
+      speed: { min: 100, max: 400 },
+      scale: { start: 3, end: 0 },
+      tint: [0xFFD700, 0xFF8C00, 0xE53935],
+      lifespan: 1000,
+      gravityY: 400,
+      frequency: 50,
+      blendMode: 'ADD'
+    }).setDepth(60);
+    emitter.startFollow(this.boss);
+    this.time.delayedCall(1500, () => emitter.destroy());
+
     this.tweens.add({
-      targets: this.boss, y: -100, alpha: 0, duration: 1500, ease: 'Cubic.easeIn',
+      targets: this.boss, y: -100, alpha: 0, scale: 1.5, angle: 360, duration: 1500, ease: 'Cubic.easeIn',
       onComplete: () => { this.boss.destroy(); this.showPerch(); },
     });
 
