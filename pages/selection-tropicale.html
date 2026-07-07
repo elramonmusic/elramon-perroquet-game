@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A1A2E" />
+  <title>Sélection Tropicale El Ramon — Produits Amazon pour musique, fête et ambiance tropicale</title>
+  <meta name="description" content="Découvre la sélection tropicale El Ramon Music Club : chemises à fleurs, accessoires festifs, instruments, décoration et objets créatifs recommandés via Amazon." />
+  <link rel="canonical" href="https://elramon-music-club.pages.dev/pages/selection-tropicale.html" />
+  <meta property="og:title" content="Sélection Tropicale El Ramon — Produits Amazon pour musique, fête et ambiance tropicale" />
+  <meta property="og:description" content="Découvre la sélection tropicale El Ramon Music Club : chemises à fleurs, accessoires festifs, instruments, décoration et objets créatifs recommandés via Amazon." />
+  <link rel="icon" href="../assets/images/logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .selection-hero {
+      min-height: 40vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-xl);
+      background: linear-gradient(135deg, var(--deep-purple) 0%, rgba(30,27,75,1) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .selection-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 10%, rgba(255,215,0,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(0,255,127,0.05) 0%, transparent 40%);
+      pointer-events: none;
+    }
+    .selection-hero-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: var(--space-sm);
+      animation: float-parrot 3s ease-in-out infinite;
+    }
+    .selection-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      margin-bottom: var(--space-xs);
+    }
+    .amazon-notice {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      max-width: 800px;
+      margin: var(--space-xl) auto;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-xl);
+      margin-top: var(--space-2xl);
+    }
+    .product-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255,215,0,0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .product-image-wrapper {
+      position: relative;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: var(--dark-bg);
+    }
+    .product-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .product-card:hover .product-image-wrapper img {
+      transform: scale(1.05);
+    }
+    .product-category-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .product-content {
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .product-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: var(--space-sm);
+      color: var(--white);
+    }
+    .product-description {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: var(--space-md);
+      flex-grow: 1;
+      line-height: 1.5;
+    }
+    .product-selection-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--yellow-sun);
+      margin-bottom: var(--space-md);
+    }
+    .product-partner-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .btn-amazon {
+      width: 100%;
+      background: linear-gradient(135deg, #FF8C00 0%, #FFD700 100%);
+      color: #000;
+      font-weight: 800;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      text-align: center;
+      display: block;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .btn-amazon:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,140,0,0.4);
+    }
+    .price-label {
+      text-align: center;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
+        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./selection-tropicale.html" class="nav-link text-gradient-warm">🛍️ Sélection Tropicale</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">🏠 Accueil</a>
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./selection-tropicale.html" class="nav-link text-gradient-warm">🛍️ Sélection Tropicale</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+    </nav>
+  </header>
+
+<main id="main-content">
+
+  <section class="selection-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="selection-hero-icon">🛍️</span>
+      <h1 class="text-gradient-tropical">La Sélection Tropicale El Ramon</h1>
+      <p style="font-size:1.15rem; color:rgba(255,255,255,0.8); max-width:600px; margin:0 auto var(--space-md); font-family: 'Pacifico', cursive; color: var(--yellow-sun);">
+        Des accessoires, instruments et objets festifs pour créer ton ambiance tropicale à la maison.
+      </p>
+      <p style="font-size:1rem; color:rgba(255,255,255,0.7); max-width:650px; margin:0 auto;">
+        Chemises à fleurs, percussions, guitares, décoration de fête et accessoires créatifs sélectionnés pour l'univers El Ramon Music Club.
+      </p>
+      <p style="font-size:0.95rem; color:rgba(255,255,255,0.5); max-width:650px; margin:var(--space-md) auto 0; font-style: italic;">
+        La musique. Le soleil. La famille. Et maintenant, l'ambiance tropicale jusque dans ton quotidien.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      
+      <div class="amazon-notice reveal">
+        <strong>Information Transparence :</strong> Certains liens de cette page sont des liens partenaires Amazon. Le prix reste strictement le même pour toi, mais ils peuvent contribuer à soutenir El Ramon Music Club. <em>En tant que Partenaire Amazon, je réalise un bénéfice sur les achats remplissant les conditions requises.</em>
+      </div>
+
+      <div class="products-grid reveal">
+        
+        <!-- Produit 1 -->
+        <article class="product-card">
+          <div class="product-image-wrapper">
+            <span class="product-category-badge">🌺 Look Tropical</span>
+            <img src="../assets/images/selection-tropicale/look-tropical.webp" alt="Ambiance Look Tropical" loading="lazy" />
+          </div>
+          <div class="product-content">
+            <h3 class="product-title">Chemise tropicale hawaïenne HISDERN</h3>
+            <p class="product-description">Une chemise à fleurs parfaite pour une ambiance soleil, musique tropicale, plage et fête.</p>
+            
+            <div class="product-selection-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              Sélection El Ramon
+            </div>
+            
+            <span class="product-partner-label">Lien partenaire</span>
+            
+            <a href="https://amzn.to/4f489io" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+              Voir sur Amazon
+            </a>
+            <div class="price-label">Voir le prix sur Amazon</div>
+          </div>
+        </article>
+        
+        <!-- Placeholder futures catégories -->
+        <article class="product-card" style="opacity: 0.6;">
+          <div class="product-image-wrapper">
+            <span class="product-category-badge">🥁 Ambiance Musique</span>
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); font-size:3rem;">🎵</div>
+          </div>
+          <div class="product-content">
+            <h3 class="product-title">Sélection d'instruments</h3>
+            <p class="product-description">Djembés, guitares, et percussions pour jouer des rythmes tropicaux.</p>
+            <div style="margin-top:auto; text-align:center; padding:1rem; border:1px dashed rgba(255,255,255,0.2); border-radius:var(--radius-sm); color:rgba(255,255,255,0.5);">
+              Bientôt disponible
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" style="opacity: 0.6;">
+          <div class="product-image-wrapper">
+            <span class="product-category-badge">🎉 Fête & Décoration</span>
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); font-size:3rem;">🍹</div>
+          </div>
+          <div class="product-content">
+            <h3 class="product-title">Ambiance de Fête</h3>
+            <p class="product-description">Décorations tropicales, accessoires de fête et ambiance plage.</p>
+            <div style="margin-top:auto; text-align:center; padding:1rem; border:1px dashed rgba(255,255,255,0.2); border-radius:var(--radius-sm); color:rgba(255,255,255,0.5);">
+              Bientôt disponible
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/images/parrot-mascot.webp" alt="Mascotte El Ramon" loading="lazy" />
+            <span>El Ramon Music Club</span>
+          </div>
+          <p class="footer-tagline">
+            El Ramon Music — les chansons tropicales qui donnent le sourire. 🌞<br />
+            Afrobeat • Tropical Soul • Zouk • Compas • Guitare • Djembé
+          </p>
+          <div class="footer-social">
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube El Ramon Music">▶</a>
+            <a href="contact.html" class="footer-social-btn" title="Contact">✉️</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-col-title">Le Club</p>
+          <ul class="footer-links">
+            <li><a href="./inscription.html" class="footer-link">Rejoindre le Club</a></li>
+            <li><a href="./espace-membre.html" class="footer-link">Espace Membre</a></li>
+            <li><a href="./discographie.html" class="footer-link">Discographie</a></li>
+            <li><a href="./prompts.html" class="footer-link">Prompts IA</a></li>
+            <li><a href="./jeu.html" class="footer-link">Mini-Jeu</a></li>
+            <li><a href="./selection-tropicale.html" class="footer-link">Sélection Tropicale</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-col-title">Info</p>
+          <ul class="footer-links">
+            <li><a href="./partenaires.html" class="footer-link">Partenaires</a></li>
+            <li><a href="./contact.html" class="footer-link">Contact</a></li>
+            <li><a href="./confidentialite.html" class="footer-link">Confidentialité</a></li>
+            <li><a href="./mentions-legales.html" class="footer-link">Mentions Légales</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2026 El Ramon Music Club. Fait avec soleil et passion.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../app.js" defer></script>
+</body>
+</html>
