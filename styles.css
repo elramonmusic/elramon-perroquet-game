@@ -2615,4 +2615,8 @@ a:focus-visible {
   .mascot-promo-content .mobile-help {
     display: block;
   }
+  .mascot-promo-visual {
+    max-width: 600px;
+    margin: var(--space-xl) auto 0;
+  }
 }
