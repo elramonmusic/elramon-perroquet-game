@@ -2526,11 +2526,27 @@ a:focus-visible {
   border: 1px solid rgba(255,215,0,0.1);
 }
 
+.mascot-promo-content .eyebrow {
+  display: inline-block;
+  color: var(--yellow-sun);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-sm);
+  background: rgba(255,215,0,0.1);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,215,0,0.3);
+}
+
 .mascot-promo-content h2 {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 900;
   margin-bottom: var(--space-md);
-  color: var(--white);
+  background: linear-gradient(to right, #fff, rgba(255,255,255,0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   line-height: 1.1;
 }
 
