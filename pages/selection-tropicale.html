@@ -221,6 +221,54 @@
       margin-top: 0.8rem;
     }
     
+    /* --- Styles pour le partage --- */
+    .product-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: auto;
+    }
+    .btn-share-product {
+      background: transparent;
+      border: 1px solid rgba(255,215,0,0.3);
+      color: rgba(255,255,255,0.8);
+      padding: 0.6rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .btn-share-product:hover {
+      background: rgba(255,215,0,0.1);
+      border-color: rgba(255,215,0,0.6);
+      color: var(--white);
+    }
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      color: var(--white);
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      border: 1px solid rgba(255,215,0,0.3);
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
     .coming-soon-card {
       background: rgba(255,255,255,0.01);
       border: 1px dashed rgba(255,255,255,0.1);
@@ -337,9 +385,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4f489io" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4f489io" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="HISDERN Hommes Funky Hawaïenne Chemises A Manches Courtes Poche Avant Vacances Ete Aloha Imprimé Plage Casual Hawaii Chemise S-2XL"
+                  data-url="https://amzn.to/4f489io"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>
@@ -361,9 +420,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4gpWmNY" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4gpWmNY" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="Enlision Chemise cotton Hawaïenne Homme Manches Courtes Chemises à Fleurs Casual Été Imprimé Hawaii de Plage Vacances avec Poche S-4XL"
+                  data-url="https://amzn.to/4gpWmNY"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>          
@@ -405,9 +475,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4vR6Z16" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4vR6Z16" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="Djembe drum Bongo drum Hand drum Bush drum Percussion Kinder Fair Trade 30cm"
+                  data-url="https://amzn.to/4vR6Z16"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>
@@ -429,9 +510,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4wuBdH5" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4wuBdH5" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="Eastar ETR-380 Standard Student Trumpet,Gold，Bb"
+                  data-url="https://amzn.to/4wuBdH5"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>          
@@ -473,9 +565,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4pdlpWU" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4pdlpWU" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="9 pièces Oiseaux tropicaux Découpages en nid d'abeille"
+                  data-url="https://amzn.to/4pdlpWU"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>
@@ -497,9 +600,20 @@
               
               <span class="product-partner-label">Lien partenaire</span>
               
-              <a href="https://amzn.to/4wyrcJ2" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-                Voir sur Amazon
-              </a>
+              <div class="product-actions">
+                <a href="https://amzn.to/4wyrcJ2" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                  Voir sur Amazon
+                </a>
+                <button
+                  class="btn-share-product"
+                  type="button"
+                  aria-label="Partager ce produit"
+                  data-title="32 Pièces Leis Hawaïens Décorations de Fête"
+                  data-url="https://amzn.to/4wyrcJ2"
+                >
+                  🔗 Partager
+                </button>
+              </div>
               <div class="price-label">Voir le prix sur Amazon</div>
             </div>
           </article>
@@ -562,5 +676,56 @@
   </footer>
 
   <script src="../app.js" defer></script>
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="toast-notification">Lien copié 🌴</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const shareButtons = document.querySelectorAll('.btn-share-product');
+      const toast = document.getElementById('toast-container');
+      
+      let toastTimeout;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2000);
+      }
+
+      shareButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+          // Empêche le clic de se propager ou de scroller
+          e.preventDefault();
+          
+          const title = button.getAttribute('data-title') || 'Produit de la Sélection Tropicale';
+          const url = button.getAttribute('data-url');
+          
+          const shareData = {
+            title: title,
+            text: `${title} — Sélection El Ramon Music Club. Lien partenaire Amazon.`,
+            url: url
+          };
+
+          try {
+            if (navigator.share) {
+              await navigator.share(shareData);
+            } else {
+              await navigator.clipboard.writeText(url);
+              showToast("Lien copié 🌴");
+            }
+          } catch (error) {
+            console.warn("Partage annulé ou impossible", error);
+            // Fallback si navigator.share échoue (par exemple si annulé par l'utilisateur)
+          }
+        });
+      });
+    });
+  </script>
 </body>
+
 </html>
