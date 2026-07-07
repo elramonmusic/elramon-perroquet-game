@@ -56,24 +56,77 @@
       max-width: 800px;
       margin: var(--space-xl) auto;
     }
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-xl);
-      margin-top: var(--space-2xl);
+
+    /* --- Nouvelle structure par section --- */
+    .affiliate-category {
+      margin-bottom: var(--space-3xl);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: var(--space-2xl);
     }
+
+    .category-hero {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2xl);
+      background: rgba(255,255,255,0.02);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .category-hero img {
+      width: 50%;
+      height: 350px;
+      object-fit: cover;
+    }
+    .category-content {
+      padding: var(--space-xl);
+      width: 50%;
+    }
+    .category-label {
+      display: inline-block;
+      background: rgba(255,215,0,0.1);
+      color: var(--yellow-sun);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: var(--space-sm);
+      border: 1px solid rgba(255,215,0,0.3);
+    }
+    .category-content h2 {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 900;
+      margin-bottom: var(--space-sm);
+      background: linear-gradient(to right, #fff, rgba(255,255,255,0.7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+    .category-content p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-xl);
+    }
+
     .product-card {
       background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: var(--radius-xl);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.3s ease, border-color 0.3s ease;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .product-card:hover {
       transform: translateY(-5px);
-      border-color: rgba(255,215,0,0.3);
+      border-color: rgba(255,215,0,0.4);
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .product-image-wrapper {
@@ -111,7 +164,7 @@
       flex-grow: 1;
     }
     .product-title {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 800;
       margin-bottom: var(--space-sm);
       color: var(--white);
@@ -119,15 +172,21 @@
     .product-description {
       font-size: 0.95rem;
       color: rgba(255,255,255,0.7);
-      margin-bottom: var(--space-md);
-      flex-grow: 1;
+      margin-bottom: var(--space-sm);
       line-height: 1.5;
+    }
+    .product-ideal {
+      font-size: 0.9rem;
+      color: var(--turquoise);
+      margin-bottom: var(--space-md);
+      font-style: italic;
+      flex-grow: 1;
     }
     .product-selection-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--yellow-sun);
       margin-bottom: var(--space-md);
@@ -160,6 +219,35 @@
       font-size: 0.8rem;
       color: rgba(255,255,255,0.5);
       margin-top: 0.8rem;
+    }
+    
+    .coming-soon-card {
+      background: rgba(255,255,255,0.01);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+      color: rgba(255,255,255,0.4);
+      font-style: italic;
+      min-height: 250px;
+    }
+
+    @media (max-width: 900px) {
+      .category-hero {
+        flex-direction: column;
+      }
+      .category-hero img {
+        width: 100%;
+        height: 250px;
+      }
+      .category-content {
+        width: 100%;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -219,82 +307,141 @@
         <strong>Information Transparence :</strong> Certains liens de cette page sont des liens partenaires Amazon. Le prix reste strictement le même pour toi, mais ils peuvent contribuer à soutenir El Ramon Music Club. <em>En tant que Partenaire Amazon, je réalise un bénéfice sur les achats remplissant les conditions requises.</em>
       </div>
 
-      <div class="products-grid reveal">
-        
-        <!-- Produit 1 -->
-        <article class="product-card">
-          <div class="product-image-wrapper">
-            <span class="product-category-badge">🌺 Look Tropical</span>
-            <img src="../assets/images/selection-tropicale/look-tropical.webp" alt="Ambiance Look Tropical" loading="lazy" />
+      <!-- SECTION LOOK TROPICAL -->
+      <section class="affiliate-category reveal">
+        <div class="category-hero">
+          <img src="../assets/images/selection-tropicale/look-tropical.webp" alt="Look tropical El Ramon" loading="lazy">
+          <div class="category-content">
+            <span class="category-label">🌺 Look Tropical</span>
+            <h2>Habille-toi comme si le soleil jouait avec toi</h2>
+            <p>Chemises fleuries, lunettes, chapeaux et accessoires pour créer une vraie ambiance plage, musique et soleil.</p>
           </div>
-          <div class="product-content">
-            <h3 class="product-title">Chemise tropicale hawaïenne HISDERN</h3>
-            <p class="product-description">Une chemise à fleurs parfaite pour une ambiance soleil, musique tropicale, plage et fête.</p>
-            
-            <div class="product-selection-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              Sélection El Ramon
-            </div>
-            
-            <span class="product-partner-label">Lien partenaire</span>
-            
-            <a href="https://amzn.to/4f489io" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-              Voir sur Amazon
-            </a>
-            <div class="price-label">Voir le prix sur Amazon</div>
-          </div>
-        </article>
-        
-        <!-- Placeholder futures catégories -->
-        <!-- Produit 2 -->
-        <article class="product-card">
-          <div class="product-image-wrapper">
-            <span class="product-category-badge">🥁 Ambiance Musique</span>
-            <img src="../assets/images/selection-tropicale/ambiance-musique.webp" alt="Ambiance musique tropicale avec guitare, djembé, maracas et perroquet El Ramon" loading="lazy" />
-          </div>
-          <div class="product-content">
-            <h3 class="product-title">Instrument tropical sélection El Ramon</h3>
-            <p class="product-description">Un accessoire musical parfait pour créer une ambiance tropicale, festive et chaleureuse à la maison.</p>
-            
-            <div class="product-selection-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              Sélection El Ramon
-            </div>
-            
-            <span class="product-partner-label">Lien partenaire</span>
-            
-            <a href="https://amzn.to/4vR6Z16" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-              Voir sur Amazon
-            </a>
-            <div class="price-label">Voir le prix sur Amazon</div>
-          </div>
-        </article>
+        </div>
 
-        <!-- Produit 3 -->
-        <article class="product-card">
-          <div class="product-image-wrapper">
-            <span class="product-category-badge">🎉 Ambiance de Fête</span>
-            <img src="../assets/images/selection-tropicale/ambiance-fete.webp" alt="Décorations tropicales, accessoires de fête, perroquets colorés et ambiance plage El Ramon" loading="lazy" />
-          </div>
-          <div class="product-content">
-            <h3 class="product-title">Décorations tropicales perroquets pour fête</h3>
-            <p class="product-description">Décorations tropicales colorées pour créer une ambiance plage, luau, jungle et fête d’été.</p>
-            
-            <div class="product-selection-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              Sélection El Ramon
+        <div class="product-grid">
+          
+          <article class="product-card">
+            <div class="product-image-wrapper">
+              <span class="product-category-badge">🌺 Look Tropical</span>
+              <img src="../assets/images/selection-tropicale/look-tropical.webp" alt="Chemise tropicale hawaïenne HISDERN" loading="lazy" />
             </div>
-            
-            <span class="product-partner-label">Lien partenaire</span>
-            
-            <a href="https://amzn.to/4pdlpWU" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
-              Voir sur Amazon
-            </a>
-            <div class="price-label">Voir le prix sur Amazon</div>
+            <div class="product-content">
+              <h3 class="product-title">Chemise tropicale hawaïenne HISDERN</h3>
+              <p class="product-description">Une chemise à fleurs parfaite pour une ambiance soleil, musique tropicale, plage et fête.</p>
+              <p class="product-ideal">Idéal pour : soirées d’été, clips, photos, ambiance plage.</p>
+              
+              <div class="product-selection-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                Sélection El Ramon
+              </div>
+              
+              <span class="product-partner-label">Lien partenaire</span>
+              
+              <a href="https://amzn.to/4f489io" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                Voir sur Amazon
+              </a>
+              <div class="price-label">Voir le prix sur Amazon</div>
+            </div>
+          </article>
+          
+          <div class="coming-soon-card">
+            <span style="font-size:2rem; margin-bottom:1rem;">⏳</span>
+            <p>De nouvelles idées (lunettes, chapeaux...) arrivent bientôt dans cette catégorie.</p>
           </div>
-        </article>
 
-      </div>
+        </div>
+      </section>
+
+      <!-- SECTION AMBIANCE MUSIQUE -->
+      <section class="affiliate-category reveal">
+        <div class="category-hero">
+          <img src="../assets/images/selection-tropicale/ambiance-musique.webp" alt="Ambiance Musique El Ramon" loading="lazy">
+          <div class="category-content">
+            <span class="category-label">🥁 Ambiance Musique</span>
+            <h2>Fais vibrer ta fête !</h2>
+            <p>Percussions, guitares, maracas et accessoires pour créer une ambiance musicale tropicale à la maison.</p>
+          </div>
+        </div>
+
+        <div class="product-grid">
+          
+          <article class="product-card">
+            <div class="product-image-wrapper">
+              <span class="product-category-badge">🥁 Ambiance Musique</span>
+              <img src="../assets/images/selection-tropicale/ambiance-musique.webp" alt="Instrument tropical sélection El Ramon" loading="lazy" />
+            </div>
+            <div class="product-content">
+              <h3 class="product-title">Instrument tropical sélection El Ramon</h3>
+              <p class="product-description">Un accessoire musical parfait pour créer une ambiance tropicale, festive et chaleureuse à la maison.</p>
+              <p class="product-ideal">Idéal pour : apéros musicaux, sessions acoustiques, fêtes tropicales.</p>
+              
+              <div class="product-selection-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                Sélection El Ramon
+              </div>
+              
+              <span class="product-partner-label">Lien partenaire</span>
+              
+              <a href="https://amzn.to/4vR6Z16" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                Voir sur Amazon
+              </a>
+              <div class="price-label">Voir le prix sur Amazon</div>
+            </div>
+          </article>
+          
+          <div class="coming-soon-card">
+            <span style="font-size:2rem; margin-bottom:1rem;">⏳</span>
+            <p>De nouvelles idées (maracas, ukulélés...) arrivent bientôt dans cette catégorie.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION AMBIANCE DE FÊTE -->
+      <section class="affiliate-category reveal">
+        <div class="category-hero">
+          <img src="../assets/images/selection-tropicale/ambiance-fete.webp" alt="Ambiance de Fête El Ramon" loading="lazy">
+          <div class="category-content">
+            <span class="category-label">🎉 Ambiance de Fête</span>
+            <h2>Mets le soleil dans ta fête !</h2>
+            <p>Décorations tropicales, accessoires de fête, perroquets colorés et ambiance plage pour transformer une soirée en moment tropical.</p>
+          </div>
+        </div>
+
+        <div class="product-grid">
+          
+          <article class="product-card">
+            <div class="product-image-wrapper">
+              <span class="product-category-badge">🎉 Ambiance de Fête</span>
+              <img src="../assets/images/selection-tropicale/ambiance-fete.webp" alt="Décorations tropicales perroquets pour fête" loading="lazy" />
+            </div>
+            <div class="product-content">
+              <h3 class="product-title">Décorations tropicales perroquets pour fête</h3>
+              <p class="product-description">Décorations tropicales colorées pour créer une ambiance plage, luau, jungle et fête d’été.</p>
+              <p class="product-ideal">Idéal pour : anniversaires, soirées luau, déco jungle et ambiance plage.</p>
+              
+              <div class="product-selection-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                Sélection El Ramon
+              </div>
+              
+              <span class="product-partner-label">Lien partenaire</span>
+              
+              <a href="https://amzn.to/4pdlpWU" target="_blank" rel="nofollow sponsored noopener" class="btn-amazon">
+                Voir sur Amazon
+              </a>
+              <div class="price-label">Voir le prix sur Amazon</div>
+            </div>
+          </article>
+          
+          <div class="coming-soon-card">
+            <span style="font-size:2rem; margin-bottom:1rem;">⏳</span>
+            <p>De nouvelles idées (guirlandes lumineuses, déco...) arrivent bientôt dans cette catégorie.</p>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   </section>
 
