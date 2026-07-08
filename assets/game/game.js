@@ -56,6 +56,7 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
+    this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=2', { frameWidth: 120, frameHeight: 180 });
     this.load.image('enemy_crab', '../assets/images/game/crab.png?v=1');
     this.load.image('enemy_snake', '../assets/images/game/snake.png?v=1');
     this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=1');
@@ -421,11 +422,37 @@ class Level1Scene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.platforms);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
-    // --- Fruits (sprites réels) ---
-    const fruitTextures = { banana: 'fruit_banana', orange: 'fruit_orange', cherry: 'fruit_cherry' };
+    // --- Fruits (sprites animés) ---
+    const fruitAnimKeys = ['fruit_mango', 'fruit_pineapple', 'fruit_banana_anim', 'fruit_coconut', 'fruit_watermelon', 'fruit_grapes'];
+    
+    // Création des animations de clignement des yeux
+    const animStarts = [0, 2, 4, 6, 8, 10];
+    animStarts.forEach((startFrame, index) => {
+      const key = fruitAnimKeys[index];
+      if (!this.anims.exists(key)) {
+        this.anims.create({
+          key: key,
+          frames: this.anims.generateFrameNumbers('fruits_sheet', { frames: [startFrame, startFrame + 1, startFrame] }),
+          frameRate: 15, // Clignement très rapide
+          repeat: -1,
+          repeatDelay: Phaser.Math.Between(2000, 5000) // Délai aléatoire entre chaque clignement
+        });
+      }
+    });
+
     this.fruitSprites = [];
     level.fruits.forEach(f => {
-      const sprite = this.physics.add.staticImage(f.x, f.y, fruitTextures[f.type]);
+      const sprite = this.physics.add.sprite(f.x, f.y, 'fruits_sheet');
+      sprite.body.allowGravity = false;
+      sprite.setImmovable(true);
+      
+      const anim = Phaser.Math.RND.pick(fruitAnimKeys);
+      sprite.play(anim);
+      
+      // Ajustement de la taille
+      sprite.setDisplaySize(36, 54);
+      sprite.body.setSize(120, 180);
+
       sprite.fruitType = f.type;
       sprite.fruitBaseY = f.y;
       this.fruitSprites.push(sprite);
