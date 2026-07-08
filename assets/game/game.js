@@ -52,12 +52,12 @@ class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('real_parrot', '../assets/images/game/parrot.png?v=5', { frameWidth: 250, frameHeight: 250 });
     
     // Nouveaux assets HD
-    this.load.image('bg_tropical', '../assets/images/game/bg_tropical.jpg?v=1');
+    this.load.image('bg_tropical', '../assets/images/game/bg_tropical.jpg?v=51');
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
-    this.load.image('platform_tex', '../assets/images/game/platform.png?v=50');
-    this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=50', { frameWidth: 120, frameHeight: 180 });
+    this.load.image('platform_tex', '../assets/images/game/platform.png?v=51');
+    this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=51', { frameWidth: 120, frameHeight: 180 });
     this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=50', { frameWidth: 250, frameHeight: 250 });
     this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=50', { frameWidth: 250, frameHeight: 250 });
     
@@ -554,9 +554,9 @@ class Level1Scene extends Phaser.Scene {
     const wh = GAME_CONFIG.level1.worldHeight;
 
     // Fond HD
-    this.add.tileSprite(0, 0, ww, wh, 'bg_tropical')
+    this.bgTropical = this.add.tileSprite(0, 0, 800, wh, 'bg_tropical')
       .setOrigin(0, 0)
-      .setScrollFactor(0.2)
+      .setScrollFactor(0) // On le fixe à la caméra
       .setAlpha(0.9); // Léger alpha pour l'ambiance tropicale
 
     // Particules environnementales (Lucioles)
@@ -674,11 +674,31 @@ class Level1Scene extends Phaser.Scene {
     this.wasd = this.input.keyboard.addKeys({ up: 'W', left: 'A', right: 'D' });
     this.keyFire = this.input.keyboard.addKey('F');
     this.keyCtrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+    if (typeof DEBUG_MODE !== 'undefined' && DEBUG_MODE) {
+      this.debugText = this.add.text(10, 50, '', { font: '16px Courier', fill: '#00ff00', backgroundColor: '#000000' }).setScrollFactor(0).setDepth(100);
+    }
   }
 
   // --- UPDATE ---
-  update() {
+  update(time, delta) {
     if (this.gameOver || this._paused) return;
+
+    if (this.debugText) {
+      const fps = Math.round(1000 / delta);
+      const activeEnemies = this.enemies.filter(e => e.alive).length;
+      this.debugText.setText(
+        `FPS: ${fps}\n` +
+        `Player: (${Math.round(this.player.x)}, ${Math.round(this.player.y)})\n` +
+        `Boss: ${this.boss ? '(' + Math.round(this.boss.x) + ', ' + Math.round(this.boss.y) + ') HP:' + this.bossHP : 'N/A'}\n` +
+        `Enemies: ${activeEnemies}\n`
+      );
+    }
+
+    // Parallax background
+    if (this.bgTropical) {
+      this.bgTropical.tilePositionX = this.cameras.main.scrollX * 0.2;
+    }
 
     const physCfg = GAME_CONFIG.physics;
     const onGround = this.player.body.touching.down || this.player.body.blocked.down;
@@ -984,13 +1004,19 @@ class Level1Scene extends Phaser.Scene {
     zone.destroy();
 
     const bossCfg = GAME_CONFIG.level1.boss;
-
-    this.cameras.main.setBounds(bossCfg.x - 300, 0, 900, GAME_CONFIG.level1.worldHeight);
+    const worldH = GAME_CONFIG.level1.worldHeight;
+    const worldW = GAME_CONFIG.level1.worldWidth;
+    
+    // Verrouiller la caméra et le monde sur l'arène (les 800 derniers pixels)
+    this.cameras.main.setBounds(worldW - 800, 0, 800, worldH);
+    this.physics.world.setBounds(worldW - 800, 0, 800, worldH);
 
     this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'boss_toucan');
     this.boss.setDisplaySize(130, 130);
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
     this.boss.body.allowGravity = false;
+    
+    // Hitbox ajustée (150x150 centrée sur la frame originale de 250x250)
     this.boss.body.setSize(150, 150).setOffset(50, 50);
     
     if (!this.anims.exists('boss_drum')) {
@@ -1277,7 +1303,7 @@ const gameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: GAME_CONFIG.physics.gravity },
-      debug: false,
+      debug: typeof DEBUG_MODE !== 'undefined' ? DEBUG_MODE : false,
     },
   },
   scale: {

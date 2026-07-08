@@ -6,6 +6,9 @@
  * Structure prête pour V2 (niveaux 2, 3, etc.)
  */
 
+// Activer ou désactiver le mode debug (hitboxes, coordonnées, fps)
+const DEBUG_MODE = true;
+
 const GAME_CONFIG = {
 
   // --- LIENS CENTRALISÉS ---
@@ -58,10 +61,7 @@ const GAME_CONFIG = {
       { x: 1400, y: 220, w: 120, h: 16, type: 'platform' },
       { x: 1700, y: 190, w: 110, h: 16, type: 'platform' },
       { x: 2000, y: 230, w: 110, h: 16, type: 'platform' },
-      { x: 2300, y: 200, w: 120, h: 16, type: 'platform' },
-
-      // Zone boss
-      { x: 3200, y: 400, w: 800, h: 50, type: 'boss' },
+      { x: 2300, y: 200, w: 120, h: 16, type: 'platform' }
     ],
 
     // Fruits : { x, y, type: 'banana'|'orange'|'cherry' }
@@ -73,8 +73,9 @@ const GAME_CONFIG = {
       { x: 1550, y: 370, type: 'orange' },
       { x: 2300, y: 370, type: 'orange' },
       { x: 2800, y: 370, type: 'banana' },
-      { x: 2950, y: 370, type: 'orange' },
-      { x: 3100, y: 370, type: 'cherry' },
+      { x: 2900, y: 370, type: 'banana' },
+      { x: 3000, y: 370, type: 'banana' },
+      { x: 3100, y: 370, type: 'orange' },
       // Sur plateformes (20px au-dessus du haut)
       { x: 365, y: 220, type: 'orange' },
       { x: 605, y: 170, type: 'cherry' },
