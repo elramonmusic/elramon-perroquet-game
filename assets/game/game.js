@@ -51,8 +51,11 @@ class PreloadScene extends Phaser.Scene {
   preload() {
     this.load.spritesheet('real_parrot', '../assets/images/game/parrot.png?v=5', { frameWidth: 250, frameHeight: 250 });
     
-    // Nouveaux assets HD
-    this.load.image('bg_tropical', '../assets/images/game/bg_tropical.jpg?v=51');
+    // Fonds Parallax HD
+    this.load.image('parallax_ciel', '../assets/images/game/parallax/ciel.png?v=1');
+    this.load.image('parallax_montagnes', '../assets/images/game/parallax/montagnes.png?v=1');
+    this.load.image('parallax_plage', '../assets/images/game/parallax/plage.png?v=1');
+    this.load.image('parallax_feuilles', '../assets/images/game/parallax/feuilles.png?v=1');
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
@@ -558,37 +561,40 @@ class Level1Scene extends Phaser.Scene {
   // --- Background ---
   createBackground() {
     const ww = GAME_CONFIG.level1.worldWidth;
-    const wh = GAME_CONFIG.level1.worldHeight;
+    // --- Décor et Parallax ---
+    const scaleY = 450 / 375; // 1.2 pour adapter la hauteur 375 à l'écran 450
+    // On met une largeur de 800 pour couvrir l'écran (le TileSprite se répètera si on avance)
+    
+    // 1. Ciel (le plus lent, tout au fond)
+    this.bgCiel = this.add.tileSprite(0, 0, 800 / scaleY + 10, 375, 'parallax_ciel').setOrigin(0, 0).setScale(scaleY).setScrollFactor(0).setDepth(-10);
+    // 2. Montagnes et mer (moyen)
+    this.bgMontagnes = this.add.tileSprite(0, 0, 800 / scaleY + 10, 375, 'parallax_montagnes').setOrigin(0, 0).setScale(scaleY).setScrollFactor(0).setDepth(-9);
+    // 3. Plage et palmiers arrière (plus rapide)
+    this.bgPlage = this.add.tileSprite(0, 0, 800 / scaleY + 10, 375, 'parallax_plage').setOrigin(0, 0).setScale(scaleY).setScrollFactor(0).setDepth(-8);
+    // 4. Feuilles (au premier plan absolu, bouge très vite)
+    this.bgFeuilles = this.add.tileSprite(0, 0, 800 / scaleY + 10, 375, 'parallax_feuilles').setOrigin(0, 0).setScale(scaleY).setScrollFactor(0).setDepth(100);
 
-    // Fond HD
-    this.bgTropical = this.add.tileSprite(0, 0, 800, wh, 'bg_tropical')
-      .setOrigin(0, 0)
-      .setScrollFactor(0) // On le fixe à la caméra
-      .setAlpha(0.9); // Léger alpha pour l'ambiance tropicale
-
-    // Particules environnementales (Lucioles)
-    this.add.particles(0, 0, 'particle_star', {
-      x: { min: 0, max: ww },
-      y: { min: 200, max: wh },
-      lifespan: 4000,
-      speedY: { min: -10, max: -30 },
+    // Particules ambiantes (Lucioles/Pollen)
+    this.pollenEmitter = this.add.particles(0, 0, 'particle_star', {
+      x: { min: 0, max: GAME_CONFIG.level1.worldWidth },
+      y: { min: 0, max: 450 },
+      lifespan: { min: 3000, max: 6000 },
+      speedY: { min: -5, max: -15 },
       speedX: { min: -20, max: 20 },
-      scale: { start: 0.5, end: 0 },
-      alpha: { start: 0.8, end: 0 },
-      tint: 0x99FF99,
+      scale: { start: 0.6, end: 0 },
+      alpha: { start: 0, end: 0.6 },
+      tint: 0xFFD700,
       blendMode: 'ADD',
-      frequency: 200
-    }).setScrollFactor(0.8);
+      frequency: 300
+    }).setDepth(50);
 
     // Sable de base
     const sand = this.add.graphics();
     sand.fillStyle(0xF4D03F, 0.5);
-    sand.fillRect(0, wh - 60, ww, 60);
+    sand.fillRect(0, 450 - 60, ww, 60);
 
-    // Océan animé (vagues)
-    this.waterY = wh - 30;
-    this.waterGraphics = this.add.graphics();
-    this.waterTime = 0;
+    // L'océan est maintenant géré par le parallax, donc plus besoin de Graphics
+    // (Ancien code d'eau commenté)
   }
 
   // --- Fruit floating (sans tween pour garder le body sync) ---
@@ -702,9 +708,13 @@ class Level1Scene extends Phaser.Scene {
       );
     }
 
-    // Parallax background
-    if (this.bgTropical) {
-      this.bgTropical.tilePositionX = this.cameras.main.scrollX * 0.2;
+    // Effet Parallax
+    if (this.bgCiel) {
+      const sx = this.cameras.main.scrollX;
+      this.bgCiel.tilePositionX = sx * 0.05;
+      this.bgMontagnes.tilePositionX = sx * 0.2;
+      this.bgPlage.tilePositionX = sx * 0.5;
+      this.bgFeuilles.tilePositionX = sx * 1.3; // Plus rapide que la caméra !
     }
 
     const physCfg = GAME_CONFIG.physics;
@@ -776,19 +786,8 @@ class Level1Scene extends Phaser.Scene {
       this.playerFall();
     }
 
-    // Animation de l'océan
-    this.waterTime += 0.05;
-    this.waterGraphics.clear();
-    this.waterGraphics.fillStyle(0x00BCD4, 0.6);
-    this.waterGraphics.beginPath();
-    this.waterGraphics.moveTo(0, this.waterY);
-    for (let i = 0; i <= GAME_CONFIG.level1.worldWidth; i += 50) {
-      this.waterGraphics.lineTo(i, this.waterY + Math.sin(this.waterTime + i * 0.01) * 5);
-    }
-    this.waterGraphics.lineTo(GAME_CONFIG.level1.worldWidth, GAME_CONFIG.level1.worldHeight);
-    this.waterGraphics.lineTo(0, GAME_CONFIG.level1.worldHeight);
-    this.waterGraphics.closePath();
-    this.waterGraphics.fillPath();
+    // L'océan parallax gère déjà l'eau
+    // Ancien code d'animation d'eau commenté
 
     // Visuel joueur
     this.updatePlayerVisual();
