@@ -56,13 +56,13 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
-    this.load.image('platform_tex', '../assets/images/game/platform.png?v=2');
-    this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=2', { frameWidth: 120, frameHeight: 180 });
-    this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=2', { frameWidth: 250, frameHeight: 250 });
-    this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=2', { frameWidth: 250, frameHeight: 250 });
-    this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=1');
+    this.load.image('platform_tex', '../assets/images/game/platform.png?v=50');
+    this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=50', { frameWidth: 120, frameHeight: 180 });
+    this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=50', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=50', { frameWidth: 250, frameHeight: 250 });
+    this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=50');
     
-    this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=1', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=50', { frameWidth: 250, frameHeight: 250 });
 
     this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3?v=4');
     this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3?v=4');
@@ -388,6 +388,9 @@ class Level1Scene extends Phaser.Scene {
 
     // --- Plateformes ---
     level.platforms.forEach(p => {
+      // Ombre / Bordure pour détacher la plateforme du décor
+      this.add.rectangle(p.x, p.y, p.w, p.h, 0x000000, 0.5).setOrigin(-0.02, -0.1);
+      
       this.add.tileSprite(p.x, p.y, p.w, p.h, 'platform_tex').setOrigin(0, 0);
 
       this.platforms.create(p.x + p.w / 2, p.y + p.h / 2, 'platform_hitbox')
