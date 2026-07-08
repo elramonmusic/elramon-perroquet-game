@@ -56,9 +56,10 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
+    this.load.image('platform_tex', '../assets/images/game/platform.png?v=2');
     this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=2', { frameWidth: 120, frameHeight: 180 });
-    this.load.image('enemy_crab', '../assets/images/game/crab.png?v=1');
-    this.load.image('enemy_snake', '../assets/images/game/snake.png?v=1');
+    this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=2', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=2', { frameWidth: 250, frameHeight: 250 });
     this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=1');
     
     this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=1', { frameWidth: 250, frameHeight: 250 });
@@ -378,17 +379,17 @@ class Level1Scene extends Phaser.Scene {
     // --- Background ---
     this.createBackground();
 
-    // --- Plateformes ---
+    // --- Sol / Plateformes ---
     this.platforms = this.physics.add.staticGroup();
+    // Le sol principal
+    const ground = this.add.tileSprite(0, level.worldHeight, level.worldWidth * 2, 80, 'platform_tex').setOrigin(0, 1);
+    this.physics.add.existing(ground, true);
+    this.platforms.add(ground);
+
+    // --- Plateformes ---
     level.platforms.forEach(p => {
-      const color = p.type === 'ground' ? 0x8B6914 : p.type === 'boss' ? 0x5D4037 : 0x2E7D32;
-      const gfx = this.add.graphics();
-      gfx.fillStyle(color, 1);
-      gfx.fillRoundedRect(p.x, p.y, p.w, p.h, 4);
-      if (p.type === 'ground') {
-        gfx.fillStyle(0x4CAF50, 1);
-        gfx.fillRect(p.x, p.y, p.w, 6);
-      }
+      this.add.tileSprite(p.x, p.y, p.w, p.h, 'platform_tex').setOrigin(0, 0);
+
       this.platforms.create(p.x + p.w / 2, p.y + p.h / 2, 'platform_hitbox')
         .setDisplaySize(p.w, p.h)
         .setAlpha(0)
@@ -475,12 +476,32 @@ class Level1Scene extends Phaser.Scene {
     this.potion = this.physics.add.staticImage(level.potion.x, level.potion.y, 'potion');
     this.physics.add.overlap(this.player, this.potion, this.collectPotion, null, this);
 
+    // Animations Ennemis
+    if (!this.anims.exists('crab_walk')) {
+      this.anims.create({ key: 'crab_walk', frames: this.anims.generateFrameNumbers('enemy_crab', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+    }
+    if (!this.anims.exists('snake_walk')) {
+      this.anims.create({ key: 'snake_walk', frames: this.anims.generateFrameNumbers('enemy_snake', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+    }
+
     // --- Ennemis ---
     this.enemies = [];
     level.enemies.forEach(e => {
       const cfgE = GAME_CONFIG.enemyTypes[e.type];
       const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake', singe: 'enemy_monkey' };
       const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
+      
+      if (e.type === 'crabe' || e.type === 'serpent') {
+        enemy.setDisplaySize(40, 40);
+        enemy.body.setSize(150, 150);
+        enemy.body.setOffset(50, 50);
+        if (e.type === 'crabe') enemy.play('crab_walk');
+        if (e.type === 'serpent') enemy.play('snake_walk');
+      } else {
+        enemy.body.setSize(cfgE.size.w, cfgE.size.h);
+        enemy.body.setOffset(2, 2);
+      }
+      
       enemy.enemyType = e.type;
       enemy.scoreValue = cfgE.score;
       enemy.alive = true;
@@ -488,8 +509,7 @@ class Level1Scene extends Phaser.Scene {
       enemy.patrolRange = e.range;
       enemy.patrolSpeed = e.speed;
       enemy.facingRight = true;
-      enemy.body.setSize(cfgE.size.w, cfgE.size.h);
-      enemy.body.setOffset(2, 2);
+      
       if (e.type !== 'singe') {
         enemy.setImmovable(true);
       }
