@@ -60,7 +60,6 @@ class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=50', { frameWidth: 120, frameHeight: 180 });
     this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=50', { frameWidth: 250, frameHeight: 250 });
     this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=50', { frameWidth: 250, frameHeight: 250 });
-    this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=50');
     
     this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=50', { frameWidth: 250, frameHeight: 250 });
 
@@ -491,19 +490,15 @@ class Level1Scene extends Phaser.Scene {
     this.enemies = [];
     level.enemies.forEach(e => {
       const cfgE = GAME_CONFIG.enemyTypes[e.type];
-      const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake', singe: 'enemy_monkey' };
+      const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake' };
       const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
       
-      if (e.type === 'crabe' || e.type === 'serpent') {
-        enemy.setDisplaySize(50, 50); // Taille visuelle 50x50
-        enemy.body.setSize(250, 250); // Taille de collision basée sur la texture originale non-mise à l'échelle
-        enemy.body.setOffset(0, 0);
-        if (e.type === 'crabe') enemy.play('crab_walk');
-        if (e.type === 'serpent') enemy.play('snake_walk');
-      } else {
-        enemy.body.setSize(cfgE.size.w, cfgE.size.h);
-        enemy.body.setOffset(2, 2);
-      }
+      enemy.setDisplaySize(50, 50); // Taille visuelle 50x50
+      enemy.body.setSize(250, 250); // Taille de collision originale
+      enemy.body.setOffset(0, 0);
+      
+      if (e.type === 'crabe') enemy.play('crab_walk');
+      if (e.type === 'serpent') enemy.play('snake_walk');
       
       enemy.enemyType = e.type;
       enemy.scoreValue = cfgE.score;
@@ -513,16 +508,10 @@ class Level1Scene extends Phaser.Scene {
       enemy.patrolSpeed = e.speed;
       enemy.facingRight = true;
       
-      if (e.type !== 'singe') {
-        enemy.setImmovable(true);
-      }
+      enemy.setImmovable(true);
       this.physics.add.collider(enemy, this.platforms);
       this.physics.add.overlap(this.player, enemy, this.hitEnemy, null, this);
 
-      if (e.type === 'singe') {
-        enemy.body.allowGravity = false;
-        enemy.lastShot = 0;
-      }
       this.enemies.push(enemy);
     });
 
