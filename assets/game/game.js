@@ -90,24 +90,6 @@ class BootScene extends Phaser.Scene {
     g.fillRect(0, 0, 1, 1);
     g.generateTexture('platform_hitbox', 1, 1);
 
-    // --- Perroquet invincible (aura dorée) ---
-    g.clear();
-    g.fillStyle(0xFFD700, 0.3);
-    g.fillRoundedRect(0, 2, 40, 32, 10);
-    g.fillStyle(0xFFD700, 1);
-    g.fillRoundedRect(4, 8, 24, 22, 6);
-    g.fillStyle(0xFFA500, 1);
-    g.fillRoundedRect(6, 12, 8, 14, 4);
-    g.fillStyle(0xFFD700, 1);
-    g.fillTriangle(28, 16, 32, 20, 28, 22);
-    g.fillStyle(0xFFFFFF, 1);
-    g.fillCircle(22, 14, 4);
-    g.fillStyle(0x1A1A2E, 1);
-    g.fillCircle(23, 14, 2);
-    g.fillStyle(0xFF6B6B, 1);
-    g.fillRect(14, 6, 6, 4);
-    g.generateTexture('parrot_invincible', 40, 36);
-
     // --- Crabe (28x20) ---
     g.clear();
     g.fillStyle(0xE53935, 1);
@@ -318,8 +300,19 @@ class StartScene extends Phaser.Scene {
       align: 'center', lineSpacing: 4,
     }).setOrigin(0.5);
 
-    const parrot = this.add.image(w / 2, h * 0.6, 'real_parrot').setDisplaySize(60, 60);
-    this.tweens.add({ targets: parrot, y: h * 0.6 - 15, yoyo: true, repeat: -1, duration: 1200, ease: 'Sine.easeInOut' });
+    const parrot = this.add.sprite(w / 2, h * 0.55, 'real_parrot').setDisplaySize(80, 80);
+    
+    if (!this.anims.exists('parrot_fly')) {
+      this.anims.create({
+        key: 'parrot_fly',
+        frames: this.anims.generateFrameNumbers('real_parrot', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    parrot.play('parrot_fly');
+    
+    this.tweens.add({ targets: parrot, y: h * 0.55 - 15, yoyo: true, repeat: -1, duration: 1200, ease: 'Sine.easeInOut' });
 
     const btnPlay = this.add.text(w / 2, h * 0.78, '🎮  Jouer', {
       fontSize: '22px', fontFamily: 'Arial Black, Arial, sans-serif',
