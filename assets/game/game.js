@@ -59,6 +59,8 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('enemy_crab', '../assets/images/game/crab.png?v=1');
     this.load.image('enemy_snake', '../assets/images/game/snake.png?v=1');
     this.load.image('enemy_monkey', '../assets/images/game/monkey.png?v=1');
+    
+    this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=1', { frameWidth: 250, frameHeight: 250 });
 
     this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3?v=4');
     this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3?v=4');
@@ -947,11 +949,21 @@ class Level1Scene extends Phaser.Scene {
 
     this.cameras.main.setBounds(bossCfg.x - 300, 0, 900, GAME_CONFIG.level1.worldHeight);
 
-    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'enemy_monkey');
-    this.boss.setDisplaySize(60, 60);
+    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'boss_toucan');
+    this.boss.setDisplaySize(130, 130);
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
     this.boss.body.allowGravity = false;
-    this.boss.body.setSize(48, 44).setOffset(2, 4);
+    this.boss.body.setSize(150, 150).setOffset(50, 50);
+    
+    if (!this.anims.exists('boss_drum')) {
+      this.anims.create({
+        key: 'boss_drum',
+        frames: this.anims.generateFrameNumbers('boss_toucan', { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+    this.boss.play('boss_drum');
     this.boss.facingRight = false;
     this.physics.add.collider(this.boss, this.platforms);
     this.physics.add.overlap(this.player, this.boss, this.hitBoss, null, this);
