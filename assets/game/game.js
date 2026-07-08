@@ -496,8 +496,16 @@ class Level1Scene extends Phaser.Scene {
       enemy.setDisplaySize(80, 80); // Taille visuelle 80x80
       enemy.setDepth(10); // S'assure qu'ils sont dessinés au premier plan
       
-      if (e.type === 'crabe') enemy.play('crab_walk');
-      if (e.type === 'serpent') enemy.play('snake_walk');
+      if (e.type === 'crabe') {
+        enemy.play('crab_walk');
+        // Les pieds du crabe sont à y=190 sur la frame de 250
+        enemy.body.setSize(200, 125).setOffset(25, 65);
+      }
+      if (e.type === 'serpent') {
+        enemy.play('snake_walk');
+        // Les pieds du serpent sont à y=223 sur la frame de 250
+        enemy.body.setSize(200, 156).setOffset(25, 67);
+      }
       
       enemy.enemyType = e.type;
       enemy.scoreValue = cfgE.score;
@@ -1015,8 +1023,8 @@ class Level1Scene extends Phaser.Scene {
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
     this.boss.body.allowGravity = false;
     
-    // Hitbox ajustée (150x150 centrée sur la frame originale de 250x250)
-    this.boss.body.setSize(150, 150).setOffset(50, 50);
+    // Hitbox ajustée pour que les pieds (y=224) touchent le sol sans s'enfoncer
+    this.boss.body.setSize(150, 174).setOffset(50, 50);
     
     if (!this.anims.exists('boss_drum')) {
       this.anims.create({
