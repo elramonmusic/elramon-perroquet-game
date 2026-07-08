@@ -821,7 +821,7 @@ class Level1Scene extends Phaser.Scene {
       gravityY: 200,
       emitting: false
     }).setDepth(60);
-    emitter.explode();
+    emitter.explode(10, fruit.x, fruit.y);
     this.time.delayedCall(1000, () => emitter.destroy());
     
     playSound(this, 'voice_eat', () => SFX.coin());
@@ -853,10 +853,10 @@ class Level1Scene extends Phaser.Scene {
       tint: item.collectibleType === 'note' ? 0x9C27B0 : 0xFFD700,
       lifespan: 800,
       quantity: 12,
-      gravityY: 100,
+      gravityY: 300,
       emitting: false
     }).setDepth(60);
-    emitter.explode();
+    emitter.explode(15, item.x, item.y);
     this.time.delayedCall(1000, () => emitter.destroy());
 
     const txt = this.add.text(item.x, item.y - 15, '+' + pts, {
@@ -896,8 +896,11 @@ class Level1Scene extends Phaser.Scene {
 
   // --- Bullet hit enemy ---
   bulletHitEnemy(bullet, enemy) {
-    bullet.destroy();
-    if (!enemy.alive) return;
+    if (!bullet.active) return;
+    bullet.disableBody(true, true); // Désactive au lieu de détruire immédiatement pour éviter les crashs de physique
+    this.time.delayedCall(50, () => { if (bullet) bullet.destroy(); });
+
+    if (!enemy.active || !enemy.alive) return;
     this.defeatEnemy(enemy);
   }
 
@@ -917,7 +920,7 @@ class Level1Scene extends Phaser.Scene {
       gravityY: 300,
       emitting: false
     }).setDepth(60);
-    emitter.explode();
+    emitter.explode(15, enemy.x, enemy.y);
     this.time.delayedCall(1000, () => emitter.destroy());
     
     SFX.hit();
@@ -1108,7 +1111,10 @@ class Level1Scene extends Phaser.Scene {
 
   // --- Bullet hit boss ---
   bulletHitBoss(bullet, boss) {
-    bullet.destroy();
+    if (!bullet.active) return;
+    bullet.disableBody(true, true);
+    this.time.delayedCall(50, () => { if (bullet) bullet.destroy(); });
+    
     this.bossStunUntil = this.time.now + GAME_CONFIG.level1.boss.stunDuration;
   }
 
