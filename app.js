@@ -61,6 +61,7 @@ const Auth = {
       joined_at: new Date().toISOString(),
     };
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(member));
+    localStorage.setItem('elramonClubMember', 'true');
     return member;
   },
 
@@ -76,6 +77,7 @@ const Auth = {
    */
   logout() {
     localStorage.removeItem(CONFIG.STORAGE_KEY);
+    localStorage.removeItem('elramonClubMember');
     window.location.href = '/';
   },
 

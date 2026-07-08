@@ -228,6 +228,35 @@
     <small>Paysage recommandé 🌴</small>
   </div>
 
+  <!-- Protection Membre -->
+  <div id="member-gate" style="display: none; position: absolute; inset: 0; background: #1A1A2E; z-index: 2000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
+    <span style="font-size: 4rem; margin-bottom: 1rem;">🦜☀️</span>
+    <h1 style="color: #FFD700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem;">Jeu réservé aux membres</h1>
+    <p style="color: rgba(255,255,255,0.7); max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">Le mini-jeu tropical est exclusif aux membres du Club. Rejoins-nous gratuitement pour jouer, battre ton score et débloquer ton Coffre Tropical !</p>
+    <a href="inscription.html" style="background: #FF8C00; color: #FFF; text-decoration: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-family: 'Outfit', sans-serif; margin-bottom: 1rem;">✨ Rejoindre le Club gratuitement</a>
+    <a href="inscription.html" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem;">Déjà membre ? Accéder au jeu</a>
+  </div>
+
+  <!-- Coffre Tropical Overlay -->
+  <div id="coffre-overlay" style="display: none; position: absolute; inset: 0; background: rgba(26,26,46,0.95); z-index: 1500; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; overflow-y: auto;">
+    <div style="margin: auto 0;">
+      <h1 style="color: #FFD700; font-family: 'Outfit', sans-serif; margin-bottom: 0.5rem; margin-top: 2rem;" id="coffre-title">Ton Coffre Tropical est débloqué 🦜☀️</h1>
+      <p style="color: rgba(255,255,255,0.8); max-width: 500px; margin: 0 auto 2rem;">Bravo ! Tu as fait chanter le soleil. Tu peux récupérer un bonus du Club, partager ton score ou rejouer pour tenter de faire mieux.</p>
+      
+      <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; margin: 0 auto 2rem; width: 100%; max-width: 400px;">
+        <h2 style="color: #FFF; font-size: 2rem; margin-bottom: 0.5rem;" id="coffre-score">Score: 0</h2>
+        <p style="color: #2ECC71; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.2rem;" id="coffre-rank">Rang: Débutant</p>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;" id="coffre-best">Meilleur: 0</p>
+      </div>
+
+      <div id="coffre-buttons" style="display: flex; flex-direction: column; gap: 0.8rem; width: 100%; max-width: 400px; margin: 0 auto;">
+        <!-- Boutons dynamiques insérés ici par JS -->
+      </div>
+
+      <p style="color: rgba(255,255,255,0.4); font-size: 0.75rem; max-width: 400px; margin: 2rem auto;">Certains bonus peuvent contenir des liens partenaires ou de parrainage. Le choix reste libre, et ces liens peuvent aider à soutenir El Ramon Music Club et les projets Gard Eau Arbres.</p>
+    </div>
+  </div>
+
   <!-- Jeu -->
   <div id="game-wrapper">
     <div id="game-container" style="position:relative;">
@@ -258,10 +287,20 @@
   <script src="../assets/game/config.js?v=11"></script>
   <script src="../assets/game/game.js?v=11"></script>
 
-  <!-- Contrôles mobile + loading -->
+  <!-- Contrôles mobile + loading + Check Membre -->
   <script>
+    // Vérification Membre
+    const isMember = localStorage.getItem('elramonClubMember') === 'true';
+    if (!isMember) {
+      document.getElementById('game-wrapper').style.display = 'none';
+      document.getElementById('member-gate').style.display = 'flex';
+      // Stopper Phaser si besoin en bloquant le onload
+      window.stopPhaser = true;
+    }
+
     // Supprimer le loading une fois Phaser prêt
     window.addEventListener('load', () => {
+      if (window.stopPhaser) return;
       setTimeout(() => {
         const loading = document.getElementById('game-loading');
         if (loading) loading.style.display = 'none';

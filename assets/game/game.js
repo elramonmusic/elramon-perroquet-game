@@ -258,6 +258,47 @@ class BootScene extends Phaser.Scene {
     g.fillCircle(4, 4, 4);
     g.generateTexture('particle_star', 8, 8);
 
+    // --- Note de Musique (16x16) ---
+    g.clear();
+    g.fillStyle(0x9C27B0, 1);
+    g.fillCircle(4, 12, 4);
+    g.fillCircle(12, 10, 4);
+    g.fillRect(6, 2, 2, 10);
+    g.fillRect(14, 0, 2, 10);
+    g.fillRect(6, 2, 10, 3);
+    g.generateTexture('note', 16, 16);
+
+    // --- Soleil Bonus (24x24) ---
+    g.clear();
+    g.fillStyle(0xFFD700, 1);
+    g.fillCircle(12, 12, 8);
+    // Rayons
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      g.fillTriangle(
+        12 + Math.cos(angle - 0.2) * 8, 12 + Math.sin(angle - 0.2) * 8,
+        12 + Math.cos(angle + 0.2) * 8, 12 + Math.sin(angle + 0.2) * 8,
+        12 + Math.cos(angle) * 12, 12 + Math.sin(angle) * 12
+      );
+    }
+    g.generateTexture('sun', 24, 24);
+
+    // --- Plume (Vie) (12x24) ---
+    g.clear();
+    g.fillStyle(0xFFFFFF, 1);
+    g.fillEllipse(6, 12, 6, 12);
+    g.fillStyle(0xFF8C00, 1);
+    g.fillEllipse(6, 12, 4, 8);
+    g.fillStyle(0x2ECC71, 1);
+    g.fillRect(5, 20, 2, 4);
+    g.generateTexture('plume', 12, 24);
+
+    // --- Plume Vide (12x24) ---
+    g.clear();
+    g.fillStyle(0x333333, 0.4);
+    g.fillEllipse(6, 12, 6, 12);
+    g.generateTexture('plume_empty', 12, 24);
+
     g.destroy();
   }
 }
@@ -396,6 +437,18 @@ class Level1Scene extends Phaser.Scene {
       this.physics.add.overlap(this.player, sprite, this.collectFruit, null, this);
     });
 
+    // --- Collectibles (Notes & Soleils) ---
+    this.collectibleSprites = [];
+    if (level.collectibles) {
+      level.collectibles.forEach(c => {
+        const sprite = this.physics.add.staticImage(c.x, c.y, c.type);
+        sprite.collectibleType = c.type;
+        sprite.baseY = c.y;
+        this.collectibleSprites.push(sprite);
+        this.physics.add.overlap(this.player, sprite, this.collectSpecial, null, this);
+      });
+    }
+
     // --- Potion ---
     this.potion = this.physics.add.staticImage(level.potion.x, level.potion.y, 'potion');
     this.physics.add.overlap(this.player, this.potion, this.collectPotion, null, this);
@@ -521,9 +574,16 @@ class Level1Scene extends Phaser.Scene {
     this.hudLivesValue = this.add.text(50, 26, String(this.lives), {
       fontSize: '16px', fontFamily: 'Arial Black, Arial', color: '#FFD700',
     });
+    
+    // UI Plumes
+    this.hudPlumes = [];
+    for (let i = 0; i < 3; i++) {
+      const plume = this.add.image(24 + i * 16, 26, 'plume').setScale(0.8);
+      this.hudPlumes.push(plume);
+      this.hudContainer.add(plume);
+    }
+    
     this.hudContainer.add([
-      this.add.text(24, 26, '🪶', { fontSize: '16px' }),
-      this.hudLivesValue,
       this.add.text(90, 26, '🍌', { fontSize: '16px' }),
       this.add.text(116, 26, '0', { fontSize: '16px', fontFamily: 'Arial Black, Arial', color: '#FFA726' }),
       this.add.text(156, 26, '⭐', { fontSize: '16px' }),
@@ -531,8 +591,8 @@ class Level1Scene extends Phaser.Scene {
     ]);
 
     // HUD fruits + score refs
-    this.hudFruitsText = this.hudContainer.list[3];
-    this.hudScoreText = this.hudContainer.list[5];
+    this.hudFruitsText = this.hudContainer.list.slice(-3)[0]; // The '0' text for fruits
+    this.hudScoreText = this.hudContainer.list.slice(-1)[0];  // The '0' text for score
 
     // Boss HP (caché)
     this.hudBossContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(100).setVisible(false);
@@ -559,7 +619,9 @@ class Level1Scene extends Phaser.Scene {
   }
 
   updateHUD() {
-    this.hudLivesValue.setText(String(this.lives));
+    this.hudPlumes.forEach((plume, i) => {
+      plume.setTexture(i < this.lives ? 'plume' : 'plume_empty');
+    });
     this.hudFruitsText.setText(String(this.fruits));
     this.hudScoreText.setText(String(this.score));
 
@@ -626,10 +688,19 @@ class Level1Scene extends Phaser.Scene {
 
     // Tir
     const fire = Phaser.Input.Keyboard.JustDown(this.keyFire) || Phaser.Input.Keyboard.JustDown(this.keyCtrl) || window._gameControls.fire;
-    if (fire && this.fruits > 0) {
-      this.fireBullet();
-      window._gameControls.fire = false;
-      SFX.shoot();
+    if (fire) {
+      if (this.fruits > 0) {
+        this.fireBullet();
+        window._gameControls.fire = false;
+        SFX.shoot();
+      } else {
+        // Feedback plus de munitions
+        window._gameControls.fire = false;
+        const msg = this.add.text(this.player.x, this.player.y - 40, 'Plus de fruits !\nSaute !', {
+          fontSize: '12px', fontFamily: 'Arial Black', color: '#FF6B6B', align: 'center', stroke: '#000', strokeThickness: 2
+        }).setOrigin(0.5).setDepth(150);
+        this.tweens.add({ targets: msg, y: msg.y - 30, alpha: 0, duration: 1000, onComplete: () => msg.destroy() });
+      }
     }
 
     // IA ennemis
@@ -701,6 +772,36 @@ class Level1Scene extends Phaser.Scene {
     this.fruits++;
     const txt = this.add.text(fruit.x, fruit.y - 10, '+10', {
       fontSize: '16px', fontFamily: 'Arial Black', color: '#FFD700',
+      stroke: '#000000', strokeThickness: 3
+    }).setOrigin(0.5).setDepth(50);
+    this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
+  }
+  
+  // --- Collecter Spécial (Note ou Soleil) ---
+  collectSpecial(player, item) {
+    if (!item.active) return;
+    item.destroy();
+    SFX.powerup(); // ou son specifique
+    
+    let pts = item.collectibleType === 'note' ? 25 : 50;
+    this.score += pts;
+    
+    // Particules
+    const emitter = this.add.particles(item.x, item.y, 'particle_star', {
+      speed: { min: 80, max: 200 },
+      scale: { start: 1.5, end: 0 },
+      alpha: { start: 1, end: 0 },
+      tint: item.collectibleType === 'note' ? 0x9C27B0 : 0xFFD700,
+      lifespan: 800,
+      quantity: 12,
+      gravityY: 100,
+      emitting: false
+    }).setDepth(60);
+    emitter.explode();
+    this.time.delayedCall(1000, () => emitter.destroy());
+
+    const txt = this.add.text(item.x, item.y - 15, '+' + pts, {
+      fontSize: '18px', fontFamily: 'Arial Black', color: item.collectibleType === 'note' ? '#9C27B0' : '#FFD700',
       stroke: '#000000', strokeThickness: 3
     }).setOrigin(0.5).setDepth(50);
     this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
@@ -1065,51 +1166,9 @@ class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOver' }); }
 
   create(data) {
-    const score = data?.score || 0;
-    const w = this.cameras.main.width;
-    const h = this.cameras.main.height;
-
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x1A1A2E, 0x1A1A2E, 0x4A0000, 0x4A0000, 1);
-    bg.fillRect(0, 0, w, h);
-
-    this.add.text(w / 2, h * 0.20, '☠️ Oh non !', {
-      fontSize: '36px', fontFamily: 'Arial Black', color: '#E53935', align: 'center',
-    }).setOrigin(0.5);
-
-    this.add.text(w / 2, h * 0.35, 'Le perroquet a perdu toutes ses plumes !', {
-      fontSize: '15px', fontFamily: 'Arial', color: '#CCCCCC', align: 'center',
-    }).setOrigin(0.5);
-
-    this.add.text(w / 2, h * 0.45, 'Score : ' + score, {
-      fontSize: '22px', fontFamily: 'Arial Black', color: '#FFD700',
-    }).setOrigin(0.5);
-
-    const badgeText = this.add.text(w / 2, h * 0.55, 'Sauvegarde du score...', {
-      fontSize: '14px', fontFamily: 'Arial', color: '#AAAAAA'
-    }).setOrigin(0.5);
-
-    this.events.once('score_saved', (badge) => {
-      badgeText.setText('Badge débloqué : ' + badge).setColor('#2ECC71').setFontFamily('Arial Black');
-    });
     saveGameScore(this, false, data);
-
-    const btnReplay = this.add.text(w / 2, h * 0.70, '🔄  Rejouer', {
-      fontSize: '18px', fontFamily: 'Arial Black', color: '#FFFFFF',
-      backgroundColor: '#FF8C00', padding: { x: 20, y: 10 }, align: 'center',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnReplay.on('pointerdown', () => this.scene.start('Level1'));
-
-    const btnLeaderboard = this.add.text(w / 2, h * 0.82, '🏆 Voir le classement', {
-      fontSize: '15px', fontFamily: 'Arial Black', color: '#FFFFFF',
-      backgroundColor: '#0F3460', padding: { x: 20, y: 10 }, align: 'center',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnLeaderboard.on('pointerdown', () => window.location.href = './leaderboard.html');
-
-    const btnBack = this.add.text(w / 2, h * 0.92, '🔙  Retour espace membre', {
-      fontSize: '13px', fontFamily: 'Arial', color: '#888888',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnBack.on('pointerdown', () => window.location.href = './espace-membre.html');
+    this.scene.pause();
+    window.showCoffreTropical(data.score || 0, false);
   }
 }
 
@@ -1120,79 +1179,9 @@ class VictoryScene extends Phaser.Scene {
   constructor() { super({ key: 'Victory' }); }
 
   create(data) {
-    const score = data?.score || 0;
-    const fruits = data?.fruitsCollected || 0;
-    const reward = GAME_CONFIG.rewards.level1;
-    const w = this.cameras.main.width;
-    const h = this.cameras.main.height;
-
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x1A1A2E, 0x1A1A2E, 0x0F3460, 0x0F3460, 1);
-    bg.fillRect(0, 0, w, h);
-
-    // Confettis
-    const colors = [0xFFD700, 0x2ECC71, 0xFF8C00, 0xE53935, 0x00CED1];
-    for (let i = 0; i < 20; i++) {
-      const p = this.add.circle(Math.random() * w, Math.random() * h,
-        Phaser.Math.Between(2, 5), Phaser.Utils.Array.GetRandom(colors), 0.6);
-      this.tweens.add({
-        targets: p, y: p.y - 200 - Math.random() * 100, alpha: 0,
-        duration: 2000 + Math.random() * 2000, repeat: -1, delay: Math.random() * 2000,
-        onRepeat: () => { p.y = h + 20; p.alpha = 0.6; },
-      });
-    }
-
-    this.add.text(w / 2, h * 0.12, '🎉 Bravo !', {
-      fontSize: '38px', fontFamily: 'Arial Black', color: '#FFD700', align: 'center',
-    }).setOrigin(0.5);
-
-    this.add.text(w / 2, h * 0.23, 'Tu as battu le Toucan Tambour ! 🦜', {
-      fontSize: '16px', fontFamily: 'Arial', color: '#FAFAFA', align: 'center',
-    }).setOrigin(0.5);
-
-    // Badge dynamique
-    const badgeBg = this.add.graphics();
-    badgeBg.fillStyle(0xFFD700, 0.15).fillRoundedRect(w / 2 - 140, h * 0.31, 280, 50, 12);
-    badgeBg.lineStyle(2, 0xFFD700, 0.5).strokeRoundedRect(w / 2 - 140, h * 0.31, 280, 50, 12);
-
-    const badgeText = this.add.text(w / 2, h * 0.365, '🏆 Sauvegarde du score...', {
-      fontSize: '13px', fontFamily: 'Arial Black', color: '#FFD700', align: 'center',
-    }).setOrigin(0.5);
-
-    this.events.once('score_saved', (badge) => {
-      badgeText.setText('Badge obtenu : ' + badge);
-    });
     saveGameScore(this, true, data);
-
-    this.add.text(w / 2, h * 0.47, '⭐ ' + score + ' points  |  🥭 ' + fruits + ' fruits', {
-      fontSize: '16px', fontFamily: 'Arial Black', color: '#AAAAAA',
-    }).setOrigin(0.5);
-
-    // Boutons
-    const btnReward = this.add.text(w / 2, h * 0.74, reward.buttonText, {
-      fontSize: '15px', fontFamily: 'Arial Black', color: '#1A1A2E',
-      backgroundColor: '#FFD700', padding: { x: 20, y: 10 }, align: 'center',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnReward.on('pointerover', () => btnReward.setStyle({ backgroundColor: '#FFF59D' }));
-    btnReward.on('pointerout', () => btnReward.setStyle({ backgroundColor: '#FFD700' }));
-    btnReward.on('pointerdown', () => window.open(reward.link, '_blank'));
-
-    const btnReplay = this.add.text(w / 4, h * 0.88, '🔄 Rejouer', {
-      fontSize: '13px', fontFamily: 'Arial Black', color: '#FFFFFF',
-      backgroundColor: '#FF8C00', padding: { x: 15, y: 10 }, align: 'center',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnReplay.on('pointerdown', () => this.scene.start('Level1'));
-
-    const btnLeaderboard = this.add.text((w / 4) * 3, h * 0.88, '🏆 Classement', {
-      fontSize: '13px', fontFamily: 'Arial Black', color: '#FFFFFF',
-      backgroundColor: '#E53935', padding: { x: 15, y: 10 }, align: 'center',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnLeaderboard.on('pointerdown', () => window.location.href = './leaderboard.html');
-
-    const btnBack = this.add.text(w / 2, h * 0.96, '🔙 Retour espace membre', {
-      fontSize: '13px', fontFamily: 'Arial', color: '#888888',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    btnBack.on('pointerdown', () => window.location.href = './espace-membre.html');
+    this.scene.pause();
+    window.showCoffreTropical(data.score || 0, true);
   }
 }
 
@@ -1257,3 +1246,90 @@ const gameConfig = {
 };
 
 const game = new Phaser.Game(gameConfig);
+
+window.showCoffreTropical = function(score, isVictory) {
+  const overlay = document.getElementById('coffre-overlay');
+  if (!overlay) return;
+
+  const title = document.getElementById('coffre-title');
+  const scoreEl = document.getElementById('coffre-score');
+  const rankEl = document.getElementById('coffre-rank');
+  const bestEl = document.getElementById('coffre-best');
+  const buttonsEl = document.getElementById('coffre-buttons');
+  const gameWrapper = document.getElementById('game-wrapper');
+
+  // Cacher le jeu, afficher l'overlay
+  if (gameWrapper) gameWrapper.style.display = 'none';
+  overlay.style.display = 'flex';
+
+  // Calcul du rang
+  let currentRank = GAME_CONFIG.ranks[0].name;
+  for (let r of GAME_CONFIG.ranks) {
+    if (score >= r.min) currentRank = r.name;
+  }
+
+  // Meilleur score
+  const keys = GAME_CONFIG.storageKeys;
+  const bestScore = parseInt(localStorage.getItem(keys.bestScore) || '0');
+
+  // Textes
+  title.innerText = isVictory ? "Ton Coffre Tropical est débloqué 🦜☀️" : "Plus de plumes ! 🦜💥";
+  title.style.color = isVictory ? '#FFD700' : '#E53935';
+  scoreEl.innerText = `Score: ${score}`;
+  rankEl.innerText = `Rang: ${currentRank}`;
+  bestEl.innerText = `Meilleur: ${Math.max(score, bestScore)}`;
+
+  // Boutons dynamiques
+  buttonsEl.innerHTML = '';
+
+  const createBtn = (text, bgColor, textColor, onClick) => {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.style.background = bgColor;
+    a.style.color = textColor;
+    a.style.textDecoration = 'none';
+    a.style.padding = '12px 24px';
+    a.style.borderRadius = '50px';
+    a.style.fontWeight = 'bold';
+    a.style.fontFamily = "'Outfit', sans-serif";
+    a.style.display = 'block';
+    a.innerText = text;
+    a.onclick = (e) => { e.preventDefault(); onClick(); };
+    buttonsEl.appendChild(a);
+  };
+
+  if (isVictory) {
+    createBtn('🎁 Bonus 1 (Suno)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.suno, '_blank'));
+    createBtn('🎁 Bonus 2 (Kling)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.kling, '_blank'));
+    createBtn('🎁 Bonus 3 (Flow)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.flow, '_blank'));
+  }
+
+  createBtn('🔄 Rejouer', '#FF8C00', '#FFF', () => {
+    overlay.style.display = 'none';
+    if (gameWrapper) gameWrapper.style.display = 'block';
+    game.scene.getScenes(true).forEach(s => s.scene.stop());
+    game.scene.start('Level1');
+  });
+
+  // Share API
+  if (navigator.share) {
+    createBtn('📲 Partager mon score', '#00BCD4', '#FFF', async () => {
+      try {
+        await navigator.share({
+          title: 'El Ramon Music Club',
+          text: `J'ai atteint le rang "${currentRank}" avec ${score} points au mini-jeu Tropical ! Rejoins-nous ! 🦜☀️`,
+          url: window.location.origin
+        });
+      } catch(e) {}
+    });
+  } else {
+    createBtn('📋 Copier mon score', '#00BCD4', '#FFF', () => {
+      navigator.clipboard.writeText(`J'ai atteint le rang "${currentRank}" avec ${score} points au mini-jeu Tropical ! Rejoins-nous ! 🦜☀️ ${window.location.origin}`);
+      alert('Score copié dans le presse-papiers !');
+    });
+  }
+
+  createBtn('🏠 Retour Dashboard', 'rgba(255,255,255,0.1)', '#FFF', () => {
+    window.location.href = './espace-membre.html';
+  });
+};

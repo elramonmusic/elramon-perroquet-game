@@ -8,6 +8,16 @@
 
 const GAME_CONFIG = {
 
+  // --- LIENS CENTRALISÉS ---
+  bonusLinks: {
+    suno: "https://suno.com/invite/@ia_records",
+    kling: "https://kling.ai/app/invitation?code=7BMNVTGNJYR4",
+    flow: "https://www.flowmusic.app/invite/VDMJX7",
+    club: "../pages/inscription.html",
+    selection: "../pages/selection-tropicale.html",
+    youtube: "https://www.youtube.com/@El-Ramon-Music"
+  },
+
   // --- PHYSIQUE ---
   physics: {
     gravity: 700,
@@ -74,6 +84,17 @@ const GAME_CONFIG = {
       { x: 1755, y: 260, type: 'cherry' },    // plateforme x:1700 y:280
       { x: 2055, y: 300, type: 'banana' },    // plateforme x:2000 y:320
       { x: 2360, y: 270, type: 'cherry' },    // plateforme x:2300 y:290
+    ],
+
+    // Notes de musique (+25) et Soleils (+50)
+    collectibles: [
+      { x: 400, y: 350, type: 'note' },
+      { x: 700, y: 250, type: 'note' },
+      { x: 1000, y: 350, type: 'note' },
+      { x: 1300, y: 250, type: 'sun' },
+      { x: 1900, y: 250, type: 'note' },
+      { x: 2500, y: 350, type: 'sun' },
+      { x: 2750, y: 250, type: 'note' },
     ],
 
     // Potion invincibilité
@@ -155,6 +176,14 @@ const GAME_CONFIG = {
       type: 'partner',
     },
   },
+
+  // --- RANGS TROPICAUX ---
+  ranks: [
+    { min: 0, name: 'Perroquet débutant' },
+    { min: 200, name: 'Danseur de plage' },
+    { min: 500, name: 'Ambianceur tropical' },
+    { min: 1000, name: 'Légende du soleil' }
+  ],
 
   // --- BADGES ---
   badges: {
