@@ -909,6 +909,13 @@ class Level1Scene extends Phaser.Scene {
     enemy.alive = false;
     this.score += enemy.scoreValue;
     
+    // Désactiver le corps physique immédiatement pour éviter les crashs de collision
+    if (enemy.body) enemy.body.enable = false;
+    
+    // Retirer de la liste des ennemis
+    const idx = this.enemies.indexOf(enemy);
+    if (idx !== -1) this.enemies.splice(idx, 1);
+    
     // Particules
     const emitter = this.add.particles(enemy.x, enemy.y, 'particle_star', {
       speed: { min: 80, max: 200 },
@@ -1112,8 +1119,25 @@ class Level1Scene extends Phaser.Scene {
   // --- Bullet hit boss ---
   bulletHitBoss(bullet, boss) {
     if (!bullet.active) return;
-    bullet.disableBody(true, true);
+    if (bullet.body) bullet.body.enable = false;
+    bullet.active = false;
+    bullet.visible = false;
     this.time.delayedCall(50, () => { if (bullet) bullet.destroy(); });
+    
+    // Le boss prend des dégâts aussi par les balles maintenant !
+    if (this.bossStunUntil < this.time.now) {
+       this.bossHP--;
+       this.bossSpeed += 10;
+       SFX.bossHit();
+       
+       const txt = this.add.text(boss.x, boss.y - 30, '💥', { fontSize: '28px' }).setOrigin(0.5).setDepth(50);
+       this.tweens.add({ targets: txt, y: txt.y - 50, scale: 1.5, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
+
+       if (this.bossHP <= 0) {
+         this.defeatBoss();
+         return;
+       }
+    }
     
     this.bossStunUntil = this.time.now + GAME_CONFIG.level1.boss.stunDuration;
   }
@@ -1133,18 +1157,22 @@ class Level1Scene extends Phaser.Scene {
     const emitter = this.add.particles(this.boss.x, this.boss.y, 'particle_star', {
       speed: { min: 100, max: 400 },
       scale: { start: 3, end: 0 },
-      tint: [0xFFD700, 0xFF8C00, 0xE53935],
+      tint: 0xFFD700,
       lifespan: 1000,
       gravityY: 400,
       frequency: 50,
       blendMode: 'ADD'
     }).setDepth(60);
     emitter.startFollow(this.boss);
-    this.time.delayedCall(1500, () => emitter.destroy());
 
-    this.tweens.add({
-      targets: this.boss, y: -100, alpha: 0, scale: 1.5, angle: 360, duration: 1500, ease: 'Cubic.easeIn',
-      onComplete: () => { this.boss.destroy(); this.showPerch(); },
+    this.tweens.add({ 
+      targets: this.boss, y: this.boss.y - 150, alpha: 0, scale: 1.5, angle: 360, duration: 1500, ease: 'Cubic.easeIn',
+      onComplete: () => {
+        emitter.stopFollow();
+        emitter.stop();
+        if (this.boss.active) this.boss.destroy();
+        this.showPerch();
+      }
     });
 
     const msg = this.add.text(this.cameras.main.midX, 120, "🐦 Le Toucan Tambour s'envole !", {
