@@ -58,8 +58,8 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
     this.load.image('platform_tex', '../assets/images/game/platform.png?v=51');
     this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=51', { frameWidth: 120, frameHeight: 180 });
-    this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=50', { frameWidth: 250, frameHeight: 250 });
-    this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=50', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('enemy_crab', '../assets/images/game/crab.png?v=52', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('enemy_snake', '../assets/images/game/snake.png?v=52', { frameWidth: 250, frameHeight: 250 });
     
     this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=50', { frameWidth: 250, frameHeight: 250 });
 

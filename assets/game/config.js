@@ -103,15 +103,12 @@ const GAME_CONFIG = {
 
     // Ennemis : { x, y, type, range, speed }
     enemies: [
-      { x: 500, y: 372, type: 'crabe', range: 150, speed: 60 },
-      { x: 1100, y: 372, type: 'crabe', range: 120, speed: 80 },
-      { x: 1700, y: 372, type: 'serpent', range: 180, speed: 100 },
-      { x: 2100, y: 372, type: 'crabe', range: 100, speed: 70 },
-      { x: 2500, y: 372, type: 'serpent', range: 130, speed: 110 },
-      { x: 2900, y: 372, type: 'crabe', range: 160, speed: 90 },
-      // Singe lanceur (stationnaire, sur plateformes)
-      { x: 1460, y: 294, type: 'singe', range: 0, speed: 0 },
-      { x: 2055, y: 304, type: 'singe', range: 0, speed: 0 },
+      { x: 500, y: 300, type: 'crabe', range: 150, speed: 60 },
+      { x: 1100, y: 300, type: 'crabe', range: 120, speed: 80 },
+      { x: 1700, y: 300, type: 'serpent', range: 180, speed: 100 },
+      { x: 2100, y: 300, type: 'crabe', range: 100, speed: 70 },
+      { x: 2500, y: 300, type: 'serpent', range: 130, speed: 110 },
+      { x: 2900, y: 300, type: 'crabe', range: 160, speed: 90 }
     ],
 
     // Boss
@@ -141,16 +138,7 @@ const GAME_CONFIG = {
       color: 0x2ECC71,
       size: { w: 30, h: 16 },
       score: 25,
-    },
-    singe: {
-      color: 0x8D6E63,
-      size: { w: 28, h: 32 },
-      score: 50,
-      shoots: true,
-      shootInterval: 3000,
-      projectileSpeed: 200,
-      projectileColor: 0x795548,
-    },
+    }
   },
 
   // --- RÉCOMPENSES (extensible V2/V3) ---
