@@ -220,9 +220,8 @@
     <ul class="nav-links">
       <li><a href="#univers" class="nav-link">Univers</a></li>
       <li><a href="pages/club.html" class="nav-link">Le Club</a></li>
-      <li><a href="pages/selection-tropicale.html" class="nav-link text-gradient-warm">🛍️ Sélection</a></li>
-      <li><a href="pages/discographie.html" class="nav-link">Discographie</a></li>
-      <li><a href="pages/collaborations.html" class="nav-link">Collabs</a></li>
+      <li><a href="pages/selection-tropicale.html" class="nav-link text-gradient-warm" title="Les objets tropicaux sélectionnés par El Ramon Music pour prolonger l’ambiance du Club à la maison.">🛍️ Sélection Tropicale</a></li>
+      <li><a href="pages/jeu.html" class="nav-link">Mini-jeu</a></li>
       <li><a href="pages/partenaires.html" class="nav-link">Partenaires</a></li>
       <li><a href="pages/contact.html" class="nav-link">Contact</a></li>
       <li data-auth-show style="display:none"><a href="pages/espace-membre.html" class="nav-link text-yellow">Mon Espace 🦜</a></li>
@@ -238,14 +237,12 @@
   <div class="nav-mobile" id="nav-mobile">
     <a href="#univers" class="nav-link">🌴 Univers</a>
     <a href="pages/club.html" class="nav-link">🥥 Le Club</a>
-    <a href="pages/selection-tropicale.html" class="nav-link text-gradient-warm">🛍️ Sélection</a>
-    <a href="pages/discographie.html" class="nav-link">💿 Discographie</a>
-    <a href="pages/inscription.html" class="nav-link">✨ Rejoindre</a>
+    <a href="pages/selection-tropicale.html" class="nav-link text-gradient-warm">🛍️ Sélection Tropicale</a>
+    <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; padding: 0 1.5rem; margin-top: -0.5rem; margin-bottom: 0.5rem; font-style: italic;">Les objets tropicaux sélectionnés pour prolonger l'ambiance du Club.</p>
     <a href="pages/jeu.html" class="nav-link">🎮 Mini-Jeu</a>
-    <a href="pages/guides-suno.html" class="nav-link">📚 Guides Suno</a>
-    <a href="pages/collaborations.html" class="nav-link">🤝 Collabs</a>
     <a href="pages/partenaires.html" class="nav-link">🌿 Partenaires</a>
     <a href="pages/contact.html" class="nav-link">✉️ Contact</a>
+    <a href="pages/inscription.html" class="nav-link" data-guest-show>✨ Rejoindre</a>
     <a href="pages/espace-membre.html" class="nav-link" data-auth-show style="display:none">🦜 Mon Espace</a>
   </div>
 </header>
@@ -263,14 +260,13 @@
     <h1 class="hero-title">Bienvenue sur El Ramon Music Club</h1>
     <p class="hero-subtitle">La musique. Le soleil. La famille.</p>
     <p class="hero-description">
-      Rejoins le club pour accéder aux prompts IA, au mini-jeu du Perroquet Tropical,
-      au classement, à la discographie et aux contenus réservés aux membres.
+      Les chansons tropicales qui donnent le sourire ! Rejoins le Club gratuitement pour vibrer sur notre musique, découvrir la Sélection Tropicale et profiter des contenus exclusifs.
     </p>
 
     <div class="hero-actions">
-      <a href="pages/inscription.html" class="btn btn-primary">🌴 Rejoindre le Club</a>
-      <a href="pages/discographie.html" class="btn btn-secondary">🎶 Discographie</a>
-      <a href="pages/jeu.html" class="btn btn-secondary">🎮 Mini-jeu</a>
+      <a href="pages/inscription.html" class="btn btn-primary">✨ Rejoindre le Club gratuitement</a>
+      <a href="pages/selection-tropicale.html" class="btn btn-secondary">🛍️ Voir la Sélection Tropicale</a>
+      <a href="#videos" class="btn btn-secondary">▶ Voir le clip qui fait chanter le soleil</a>
     </div>
   </div>
 
@@ -327,17 +323,85 @@
     </p>
   </div>
 
-  <div class="mascot-promo-visual">
+  <div class="mascot-promo-visual" id="mascot-interactive-area" style="cursor: pointer; position: relative;">
+    <div id="mascot-bubble" class="mascot-bubble" style="display: none;">Tu l'as vu ? Il est là 🦜</div>
     <img
-      src="/assets/images/home/perroquet-qr-promo.webp"
+      src="assets/images/home/perroquet-qr-promo.webp"
       alt="Peluche perroquet officielle El Ramon Music Club avec QR code à scanner"
       loading="lazy"
       width="1600"
       height="900"
+      id="mascot-img"
     >
   </div>
 </section>
 
+<!-- ===== SÉLECTION TROPICALE DU MOMENT ===== -->
+<section class="section section-tropical" id="selection-du-moment">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">🛍️ Les coups de cœur</span>
+      <h2 class="section-title">La Sélection Tropicale <span class="text-gradient">du Moment</span></h2>
+      <p class="section-subtitle">
+        Objets fun, musique, soleil, perroquet, ambiance plage : les coups de cœur du Club.
+      </p>
+    </div>
+
+    <div class="selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-xl); margin-bottom: var(--space-xl);">
+      
+      <!-- Mascotte -->
+      <article class="product-card reveal reveal-delay-1" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); padding: var(--space-md); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <span style="display: inline-block; background: var(--yellow-sun); color: var(--night-blue); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-bottom: 1rem;">⭐ Coup de cœur du Club</span>
+        <img src="assets/images/home/perroquet-qr-promo.webp" alt="Mascotte Perroquet" loading="lazy" width="400" height="225" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 1rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--white);">La mascotte perroquet</h3>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">L’objet fun pour entrer dans l’ambiance du Club.</p>
+        <a href="https://amzlink.to/az0WAg2bqcneI" target="_blank" rel="nofollow sponsored noopener" class="btn btn-sm btn-primary w-full">Je découvre</a>
+      </article>
+
+      <!-- Look -->
+      <article class="product-card reveal reveal-delay-2" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); padding: var(--space-md); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <span style="display: inline-block; background: var(--yellow-sun); color: var(--night-blue); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-bottom: 1rem;">⭐ Coup de cœur du Club</span>
+        <img src="assets/images/selection-tropicale/chemise-fleurs-homme.webp" alt="Look tropical" loading="lazy" width="400" height="225" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 1rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--white);">Look tropical</h3>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Chemises, couleurs et accessoires pour garder le soleil avec toi.</p>
+        <a href="pages/selection-tropicale.html" class="btn btn-sm btn-primary w-full">Voir le look</a>
+      </article>
+
+      <!-- Musique -->
+      <article class="product-card reveal reveal-delay-3" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); padding: var(--space-md); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <span style="display: inline-block; background: var(--yellow-sun); color: var(--night-blue); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-bottom: 1rem;">⭐ Coup de cœur du Club</span>
+        <img src="assets/images/selection-tropicale/ukulele.webp" alt="Ambiance musique" loading="lazy" width="400" height="225" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 1rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--white);">Ambiance musique</h3>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Des idées pour créer ton coin tropical à la maison.</p>
+        <a href="pages/selection-tropicale.html" class="btn btn-sm btn-primary w-full">Voir la sélection</a>
+      </article>
+
+    </div>
+    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center;">
+      Certains liens sont des liens partenaires. Le prix reste le même pour toi, et chaque achat peut aider à faire grandir El Ramon Music Club et les projets Gard Eau Arbres.
+    </p>
+  </div>
+</section>
+
+<!-- ===== ACHAT PLAISIR ===== -->
+<section class="section section-dark" id="achat-plaisir">
+  <div class="container text-center">
+    <div class="achat-plaisir-box reveal" style="max-width: 700px; margin: 0 auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); border-radius: var(--radius-xl); padding: var(--space-2xl) var(--space-xl);">
+      <h2 class="section-title" style="font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 1rem;">Quel objet tropical est fait pour toi ?</h2>
+      <p style="color: rgba(255,255,255,0.7); margin-bottom: var(--space-xl);">Choisis ton envie du moment et découvre notre recommandation surprise.</p>
+      
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <button class="btn btn-secondary achat-btn" data-choice="mascotte">Je veux la mascotte</button>
+        <button class="btn btn-secondary achat-btn" data-choice="look">Je veux le look tropical</button>
+        <button class="btn btn-secondary achat-btn" data-choice="musique">Je veux créer de la musique</button>
+      </div>
+
+      <div id="achat-result" style="display: none; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: var(--radius-md); border-left: 4px solid var(--yellow-sun); text-align: left; animation: fadeIn 0.5s ease;">
+        <!-- Injecté via JS -->
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ===== UNIVERS ===== -->
 <section class="section video-section-bg" id="univers">
@@ -374,30 +438,35 @@
 <section class="section section-dark" id="videos">
   <div class="container">
     <div class="section-header reveal">
-      <div class="video-featured-badge">🟥 Clip officiel</div>
+      <div class="video-featured-badge">🟥 Clip tropical officiel</div>
       <h2 class="section-title">
-        🌞 Ça fait chanter <span class="text-gradient-warm">le soleil</span>
+        Le clip qui a lancé le <span class="text-gradient-warm">soleil</span> sur la chaîne ☀️
       </h2>
       <p class="section-subtitle">
-        Découvre le clip tropical d'El Ramon Music — la chanson qui donne le sourire !<br/>
-        Abonne-toi à la chaîne pour ne rater aucun nouveau clip.
+        Découvre "Ça fait chanter le soleil", la chanson tropicale qui donne le sourire et qui représente l’esprit El Ramon Music.
       </p>
     </div>
 
-    <div class="video-hero-wrap reveal" style="max-width: 900px; margin: 0 auto;">
+    <div class="video-hero-wrap reveal" style="max-width: 900px; margin: 0 auto; position: relative;">
       <iframe
         src="https://www.youtube.com/embed/rgA6sLPfglY?rel=0&modestbranding=1"
         title="El Ramon Music — Ça fait chanter le soleil"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
-        loading="lazy">
+        loading="lazy"
+        width="100%"
+        height="500"
+        style="border-radius: var(--radius-xl); border: none;"
+      >
       </iframe>
     </div>
 
-    <div class="text-center" style="margin-top: var(--space-lg);">
+    <div class="text-center reveal" style="margin-top: var(--space-xl);">
+      <p style="font-size: 1.1rem; color: var(--white); margin-bottom: 1rem; font-weight: bold;">Tu as aimé ? Rejoins le Club gratuit et reçois les bonus tropicaux !</p>
+      <a href="pages/inscription.html" class="btn btn-primary" style="margin-right: 1rem;">🌴 Rejoindre le Club</a>
       <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="yt-cta-btn">
         <svg viewBox="0 0 24 24"><path d="M23.5 6.2c-.3-1-1-1.7-2-2C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.5.7c-1 .3-1.7 1-2 2C0 8.2 0 12 0 12s0 3.8.5 5.8c.3 1 1 1.7 2 2 2 .7 9.5.7 9.5.7s7.5 0 9.5-.7c1-.3 1.7-1 2-2 .5-2 .5-5.8.5-5.8s0-3.8-.5-5.8zM9.5 15.6V8.4l6.4 3.6-6.4 3.6z"/></svg>
-        Abonne-toi à la chaîne YouTube
+        S'abonner à la chaîne
       </a>
     </div>
 
@@ -467,32 +536,32 @@
     </div>
 
     <div class="bonus-grid">
-      <div class="bonus-card reveal reveal-delay-1">
+      <div class="bonus-card reveal reveal-delay-1" data-locked="true" style="cursor: pointer;">
         <span class="bonus-icon">🎮</span>
         <h3 class="bonus-title">Mini-Jeu Tropical</h3>
         <p class="bonus-desc">Un jeu de plateforme rétro avec ton perroquet. Collecte des fruits, évite les ennemis, affronte le boss final !</p>
-        <span class="lock-badge">🔒 Membres uniquement</span>
+        <span class="lock-badge">🔒 Débloqué après inscription</span>
       </div>
 
-      <div class="bonus-card reveal reveal-delay-2">
+      <div class="bonus-card reveal reveal-delay-2" data-locked="true" style="cursor: pointer;">
         <span class="bonus-icon">🎵</span>
         <h3 class="bonus-title">Guides Suno IA</h3>
         <p class="bonus-desc">Apprends à créer des chansons tropicales avec l'IA Suno. Guides complets, exemples et astuces.</p>
-        <span class="lock-badge">🔒 Membres uniquement</span>
+        <span class="lock-badge">🔒 Débloqué après inscription</span>
       </div>
 
-      <div class="bonus-card reveal reveal-delay-3">
+      <div class="bonus-card reveal reveal-delay-3" data-locked="true" style="cursor: pointer;">
         <span class="bonus-icon">🤖</span>
         <h3 class="bonus-title">Prompts IA Musique</h3>
         <p class="bonus-desc">Bibliothèque de prompts prêts à copier-coller pour créer de l'Afrobeat, du zouk, du compas avec l'IA.</p>
-        <span class="lock-badge">🔒 Membres uniquement</span>
+        <span class="lock-badge">🔒 Débloqué après inscription</span>
       </div>
 
-      <div class="bonus-card reveal reveal-delay-1">
+      <div class="bonus-card reveal reveal-delay-1" data-locked="true" style="cursor: pointer;">
         <span class="bonus-icon">🎸</span>
         <h3 class="bonus-title">Tablatures Guitare</h3>
         <p class="bonus-desc">Accords et tablatures pour jouer les sons tropicaux. Guitare acoustique, djembé, percussions.</p>
-        <span class="lock-badge">🔒 Membres uniquement</span>
+        <span class="lock-badge">🔒 Débloqué après inscription</span>
       </div>
 
       <div class="bonus-card reveal reveal-delay-2">
@@ -620,6 +689,7 @@
     </div>
 
     <div class="inscription-form-wrap reveal">
+      <p class="inscription-trust" style="text-align: center; margin-bottom: 1.5rem; font-weight: bold; color: var(--yellow-sun);">✅ Gratuit · 🎁 Bonus immédiat · 🛡️ Pas de spam</p>
       <form id="inscription-form" novalidate>
         <div class="form-group">
           <label class="form-label" for="email">Email <span class="required">*</span></label>
@@ -672,7 +742,8 @@
       </form>
 
       <div class="form-success">
-        <p>🎉 <strong>Bienvenue dans le Club !</strong> Redirection en cours...</p>
+        <div id="confetti-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; border-radius: var(--radius-xl);"></div>
+        <p>🎉 <strong style="font-size: 1.2rem;">Bienvenue dans le Club 🌴 Tes bonus arrivent !</strong></p>
       </div>
     </div>
   </div>
@@ -687,7 +758,7 @@
         Soutenir <span class="text-gradient">la musique &amp; la nature</span>
       </h2>
       <p class="cagnotte-subtitle">
-        Chaque contribution fait vibrer la chaîne El Ramon Music et plante des arbres avec l'association Gard Eau Arbres. Ensemble, créons quelque chose de beau.
+        Soutenir El Ramon Music, c’est aider une chaîne musicale joyeuse à grandir tout en accompagnant les projets vivants de Gard Eau Arbres : eau, arbres, biodiversité et création positive.
       </p>
       <div class="cagnotte-partners">
         <span class="partner-logo">🦜 El Ramon Music</span>
@@ -696,7 +767,7 @@
       </div>
       <a href="https://gofund.me/a915eaf1e" target="_blank" rel="noopener" class="cagnotte-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        Contribuer à la cagnotte
+        💛 Soutenir la musique &amp; la nature
       </a>
       <p class="cagnotte-note">Tu peux aussi soutenir gratuitement en t'abonnant à la <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" style="color:var(--coral-red); text-decoration:underline;">chaîne YouTube</a>.</p>
     </div>

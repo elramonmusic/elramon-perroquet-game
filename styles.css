@@ -2636,3 +2636,98 @@ a:focus-visible {
     margin: var(--space-xl) auto 0;
   }
 }
+
+/* --- Sticky Mobile Button --- */
+.mobile-sticky-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  background: var(--grad-warm);
+  color: var(--night-blue);
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.mobile-sticky-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+}
+@media (min-width: 769px) {
+  .mobile-sticky-btn {
+    display: none !important;
+  }
+}
+
+/* --- Mascot Interactive Bubble --- */
+.mascot-bubble {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  background: var(--white);
+  color: var(--night-blue);
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 10;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  pointer-events: none;
+}
+.mascot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: var(--white) transparent transparent transparent;
+}
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Hover Mascot --- */
+.mascot-promo-visual img {
+  transition: transform 0.3s ease;
+}
+.mascot-promo-visual:hover img {
+  transform: rotate(2deg) scale(1.02);
+}
+
+/* --- Pulse Button --- */
+@keyframes softPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+.btn-primary {
+  animation: softPulse 6s infinite;
+}
+
+/* --- Prefers Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .mascot-promo-visual:hover img {
+    transform: none;
+  }
+  .mobile-sticky-btn:hover {
+    transform: none;
+  }
+  .btn-primary {
+    animation: none;
+  }
+}

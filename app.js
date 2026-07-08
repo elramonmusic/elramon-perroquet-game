@@ -411,10 +411,20 @@ async function handleInscription(event) {
     // Toujours sauvegarder en localStorage (session)
     const member = Auth.saveMember({ email, pseudo, prenom });
 
-    // Redirection vers page merci
-    const isSubPage = window.location.pathname.includes('/pages/');
-    const merciUrl = isSubPage ? 'merci.html' : 'pages/merci.html';
-    window.location.href = merciUrl + '?email=' + encodeURIComponent(email);
+    // Afficher le message de succès chaleureux et les confettis
+    const successEl = form.querySelector('.form-success');
+    if (successEl) {
+      form.style.display = 'none';
+      successEl.classList.add('visible');
+      if (typeof fireConfetti === 'function') fireConfetti();
+    }
+
+    // Redirection vers page merci après délai
+    setTimeout(() => {
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const merciUrl = isSubPage ? 'merci.html' : 'pages/merci.html';
+      window.location.href = merciUrl + '?email=' + encodeURIComponent(email);
+    }, 3500);
 
   } catch (err) {
     console.error('Inscription error:', err);
@@ -623,6 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initScrollReveal();
   initParticles();
+  initHomeFeatures();
   initCookieBanner();
   initSmoothScroll();
   initLogout();
@@ -638,5 +649,126 @@ document.addEventListener('DOMContentLoaded', () => {
   const collabForm = document.querySelector('#collaboration-form');
   if (collabForm) collabForm.addEventListener('submit', handleCollaboration);
 });
+
+// ============================================================
+// NEW HOME FEATURES
+// ============================================================
+function initHomeFeatures() {
+  // Mascot Interactivity
+  const mascotArea = document.getElementById('mascot-interactive-area');
+  const mascotBubble = document.getElementById('mascot-bubble');
+  if (mascotArea && mascotBubble) {
+    mascotArea.addEventListener('click', () => {
+      mascotBubble.style.display = 'block';
+      setTimeout(() => {
+        mascotBubble.style.display = 'none';
+      }, 3000);
+    });
+  }
+
+  // Achat Plaisir Module
+  const achatBtns = document.querySelectorAll('.achat-btn');
+  const achatResult = document.getElementById('achat-result');
+  if (achatBtns.length > 0 && achatResult) {
+    const recommendations = {
+      mascotte: '<h4 style="color:var(--yellow-sun);margin-bottom:0.5rem;">🦜 La Peluche Officielle !</h4><p>C\'est notre best-seller. L\'objet parfait pour mettre du soleil dans ton salon ou ta chambre.</p><a href="https://amzlink.to/az0WAg2bqcneI" target="_blank" rel="nofollow" class="btn btn-sm btn-primary" style="margin-top:1rem;">Voir la peluche</a>',
+      look: '<h4 style="color:var(--yellow-sun);margin-bottom:0.5rem;">👕 La Chemise à Fleurs</h4><p>Le look indispensable pour entrer dans la vibe El Ramon Music. Idéal pour la plage et l\'été.</p><a href="pages/selection-tropicale.html" class="btn btn-sm btn-primary" style="margin-top:1rem;">Voir le look</a>',
+      musique: '<h4 style="color:var(--yellow-sun);margin-bottom:0.5rem;">🎸 Le Ukulélé Débutant</h4><p>Petit, facile à apprendre et parfait pour jouer "Ça fait chanter le soleil" au bord de l\'eau.</p><a href="pages/selection-tropicale.html" class="btn btn-sm btn-primary" style="margin-top:1rem;">Voir le Ukulélé</a>'
+    };
+
+    achatBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        achatBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const choice = btn.dataset.choice;
+        achatResult.innerHTML = recommendations[choice];
+        achatResult.style.display = 'block';
+      });
+    });
+  }
+
+  // Sticky Mobile Button (IntersectionObserver)
+  const stickyBtn = document.getElementById('mobile-sticky-btn');
+  if (stickyBtn) {
+    const sections = [
+      { id: 'club', text: '✨ Rejoindre le Club', href: 'pages/inscription.html' },
+      { id: 'mini-jeu', text: '🎮 Jouer', href: 'pages/jeu.html' },
+      { id: 'selection-du-moment', text: '🛍️ Voir la sélection', href: 'pages/selection-tropicale.html' },
+      { id: 'videos', text: '▶ Voir YouTube', href: '#videos' },
+      { id: 'inscription', text: '✨ S\'inscrire', href: 'pages/inscription.html' },
+      { id: 'hero', text: 'hide', href: '#' }
+    ];
+
+    const observer = new IntersectionObserver((entries) => {
+      let mostVisible = null;
+      let maxRatio = 0;
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+          maxRatio = entry.intersectionRatio;
+          mostVisible = entry.target.id;
+        }
+      });
+
+      if (mostVisible) {
+        if (mostVisible === 'hero') {
+          stickyBtn.style.display = 'none';
+        } else {
+          const config = sections.find(s => s.id === mostVisible);
+          if (config) {
+            stickyBtn.style.display = 'flex';
+            stickyBtn.innerHTML = config.text;
+            stickyBtn.href = config.href;
+          } else {
+            stickyBtn.style.display = 'flex';
+            stickyBtn.innerHTML = '🛍️ Sélection';
+            stickyBtn.href = 'pages/selection-tropicale.html';
+          }
+        }
+      }
+    }, { threshold: [0.1, 0.5, 0.9] });
+
+    const heroEl = document.getElementById('hero');
+    if (heroEl) observer.observe(heroEl);
+    
+    sections.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+  }
+
+  // Locked Cards Toast
+  const lockedCards = document.querySelectorAll('[data-locked="true"]');
+  lockedCards.forEach(card => {
+    card.addEventListener('click', () => {
+      Toast.show('Entre ton email et débloque ce bonus gratuitement 🎁', 'info');
+      setTimeout(() => {
+        const isSubPage = window.location.pathname.includes('/pages/');
+        window.location.href = isSubPage ? 'inscription.html' : 'pages/inscription.html';
+      }, 1500);
+    });
+  });
+}
+
+function fireConfetti() {
+  const container = document.getElementById('confetti-container');
+  if (!container) return;
+  const emojis = ['🎉', '🌴', '🥥', '🦜', '☀️'];
+  for(let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.position = 'absolute';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = '-20px';
+    el.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+    el.style.transition = 'transform 2s ease-out, opacity 2s ease-out, top 2s ease-in';
+    container.appendChild(el);
+    
+    setTimeout(() => {
+      el.style.top = '100%';
+      el.style.transform = `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 100 - 50}px)`;
+      el.style.opacity = '0';
+    }, 50);
+  }
+}
 
 Object.assign(window.ElRamon, { Auth, Toast, Form, CONFIG });
