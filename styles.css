@@ -2731,3 +2731,34 @@ a:focus-visible {
     animation: none;
   }
 }
+
+/* --- Mobile Alignments Fixes --- */
+@media (max-width: 992px) {
+  .mascot-promo-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mascot-actions {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+  .mascot-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hero-actions .btn,
+  .premium-hero .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
