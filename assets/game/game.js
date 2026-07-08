@@ -507,7 +507,6 @@ class Level1Scene extends Phaser.Scene {
       enemy.patrolSpeed = e.speed;
       enemy.facingRight = true;
       
-      enemy.setImmovable(true);
       this.physics.add.collider(enemy, this.platforms);
       this.physics.add.overlap(this.player, enemy, this.hitEnemy, null, this);
 
