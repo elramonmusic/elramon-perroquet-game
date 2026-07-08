@@ -51,14 +51,14 @@ const GAME_CONFIG = {
       { x: 2700, y: 400, w: 1300, h: 50, type: 'ground' },
 
       // Plateformes en hauteur (accessibles avec saut -460)
-      { x: 300, y: 330, w: 130, h: 16, type: 'platform' },
-      { x: 550, y: 280, w: 110, h: 16, type: 'platform' },
-      { x: 850, y: 310, w: 120, h: 16, type: 'platform' },
-      { x: 1100, y: 280, w: 110, h: 16, type: 'platform' },
-      { x: 1400, y: 310, w: 120, h: 16, type: 'platform' },
-      { x: 1700, y: 280, w: 110, h: 16, type: 'platform' },
-      { x: 2000, y: 320, w: 110, h: 16, type: 'platform' },
-      { x: 2300, y: 290, w: 120, h: 16, type: 'platform' },
+      { x: 300, y: 240, w: 130, h: 16, type: 'platform' },
+      { x: 550, y: 190, w: 110, h: 16, type: 'platform' },
+      { x: 850, y: 220, w: 120, h: 16, type: 'platform' },
+      { x: 1100, y: 190, w: 110, h: 16, type: 'platform' },
+      { x: 1400, y: 220, w: 120, h: 16, type: 'platform' },
+      { x: 1700, y: 190, w: 110, h: 16, type: 'platform' },
+      { x: 2000, y: 230, w: 110, h: 16, type: 'platform' },
+      { x: 2300, y: 200, w: 120, h: 16, type: 'platform' },
 
       // Zone boss
       { x: 3200, y: 400, w: 800, h: 50, type: 'boss' },
@@ -76,14 +76,14 @@ const GAME_CONFIG = {
       { x: 2950, y: 370, type: 'orange' },
       { x: 3100, y: 370, type: 'cherry' },
       // Sur plateformes (20px au-dessus du haut)
-      { x: 365, y: 310, type: 'orange' },    // plateforme x:300 y:330
-      { x: 605, y: 260, type: 'cherry' },     // plateforme x:550 y:280
-      { x: 910, y: 290, type: 'banana' },     // plateforme x:850 y:310
-      { x: 1155, y: 260, type: 'orange' },    // plateforme x:1100 y:280
-      { x: 1460, y: 290, type: 'banana' },    // plateforme x:1400 y:310
-      { x: 1755, y: 260, type: 'cherry' },    // plateforme x:1700 y:280
-      { x: 2055, y: 300, type: 'banana' },    // plateforme x:2000 y:320
-      { x: 2360, y: 270, type: 'cherry' },    // plateforme x:2300 y:290
+      { x: 365, y: 220, type: 'orange' },
+      { x: 605, y: 170, type: 'cherry' },
+      { x: 910, y: 200, type: 'banana' },
+      { x: 1155, y: 170, type: 'orange' },
+      { x: 1460, y: 200, type: 'banana' },
+      { x: 1755, y: 170, type: 'cherry' },
+      { x: 2055, y: 210, type: 'banana' },
+      { x: 2360, y: 180, type: 'cherry' },
     ],
 
     // Notes de musique (+25) et Soleils (+50)

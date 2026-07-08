@@ -495,9 +495,9 @@ class Level1Scene extends Phaser.Scene {
       const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
       
       if (e.type === 'crabe' || e.type === 'serpent') {
-        enemy.setDisplaySize(40, 40);
-        enemy.body.setSize(150, 150);
-        enemy.body.setOffset(50, 50);
+        enemy.setDisplaySize(50, 50); // Taille visuelle 50x50
+        enemy.body.setSize(250, 250); // Taille de collision basée sur la texture originale non-mise à l'échelle
+        enemy.body.setOffset(0, 0);
         if (e.type === 'crabe') enemy.play('crab_walk');
         if (e.type === 'serpent') enemy.play('snake_walk');
       } else {
