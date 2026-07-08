@@ -342,9 +342,12 @@
         return;
       }
 
-      // Fallback
-      const fallbackMember = localStorage.getItem("elramonClubMember") === "true";
-      if (fallbackMember) {
+      // Fallback via Auth.isLoggedIn() (qui check 'elramon_member') ou l'ancienne clé
+      const hasAuth = window.ElRamon && window.ElRamon.Auth && window.ElRamon.Auth.isLoggedIn();
+      const hasV1Key = localStorage.getItem("elramon_member") !== null;
+      const hasClubMemberKey = localStorage.getItem("elramonClubMember") === "true";
+      
+      if (hasAuth || hasV1Key || hasClubMemberKey) {
         showGame();
         return;
       }
