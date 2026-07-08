@@ -769,7 +769,10 @@ function initHomeFeatures() {
       // Attach events
       document.querySelectorAll('.quiz-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          scores[e.target.dataset.score]++;
+          const scoreKey = e.currentTarget.dataset.score;
+          if (scores[scoreKey] !== undefined) {
+            scores[scoreKey]++;
+          }
           currentQuestion++;
           renderQuestion();
         });
@@ -806,9 +809,18 @@ function initHomeFeatures() {
         <div class="quiz-result-card">
           <h3 style="color:var(--yellow-sun); margin-bottom:0.5rem; font-size:1.4rem;">${res.title}</h3>
           <p style="margin-bottom:1.5rem; color:rgba(255,255,255,0.8);">${res.desc}</p>
-          <a href="${res.url}" class="btn btn-primary">${res.btnText}</a>
+          <a href="${res.url}" class="btn btn-primary" style="margin-bottom: 1rem;">${res.btnText}</a>
+          <div style="margin-top: 1rem;">
+            <button id="restart-quiz" style="background:none; border:none; color:rgba(255,255,255,0.6); text-decoration:underline; cursor:pointer;">Refaire le quiz</button>
+          </div>
         </div>
       `;
+
+      document.getElementById('restart-quiz').addEventListener('click', () => {
+        currentQuestion = 0;
+        scores = { mascotte: 0, musique: 0, look: 0 };
+        renderQuestion();
+      });
     };
 
     // Start
