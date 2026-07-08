@@ -49,7 +49,7 @@ function playSound(scene, key, fallbackSfx) {
 class PreloadScene extends Phaser.Scene {
   constructor() { super({ key: 'Preload' }); }
   preload() {
-    this.load.image('real_parrot', '../assets/images/game/parrot.png?v=4');
+    this.load.spritesheet('real_parrot', '../assets/images/game/parrot.png?v=5', { frameWidth: 250, frameHeight: 250 });
     
     // Nouveaux assets HD
     this.load.image('bg_tropical', '../assets/images/game/bg_tropical.jpg?v=1');
@@ -89,22 +89,6 @@ class BootScene extends Phaser.Scene {
     g.fillStyle(0x000000, 0);
     g.fillRect(0, 0, 1, 1);
     g.generateTexture('platform_hitbox', 1, 1);
-
-    // --- Perroquet (32x32) ---
-    g.clear();
-    g.fillStyle(0x2ECC71, 1);
-    g.fillRoundedRect(4, 8, 24, 22, 6);
-    g.fillStyle(0x27AE60, 1);
-    g.fillRoundedRect(6, 12, 8, 14, 4);
-    g.fillStyle(0xFF8C00, 1);
-    g.fillTriangle(28, 16, 32, 20, 28, 22);
-    g.fillStyle(0xFFFFFF, 1);
-    g.fillCircle(22, 14, 4);
-    g.fillStyle(0x1A1A2E, 1);
-    g.fillCircle(23, 14, 2);
-    g.fillStyle(0xFF6B6B, 1);
-    g.fillRect(14, 6, 6, 4);
-    g.generateTexture('parrot', 36, 34);
 
     // --- Perroquet invincible (aura dorée) ---
     g.clear();
@@ -420,9 +404,25 @@ class Level1Scene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.setBounce(0.05);
     this.player.setDepth(10);
-    this.player.setDisplaySize(40, 40);
-    this.player.body.setSize(30, 30);
-    this.player.body.setOffset(17, 17);
+    // Le sprite original fait 250x250. On le réduit visuellement.
+    this.player.setDisplaySize(50, 50);
+    
+    // Hitbox sur la taille originale (250x250)
+    // On centre la hitbox sur le perroquet (ex: 150x150, offset 50x50)
+    this.player.body.setSize(150, 150);
+    this.player.body.setOffset(50, 50);
+
+    // Animation
+    if (!this.anims.exists('parrot_fly')) {
+      this.anims.create({
+        key: 'parrot_fly',
+        frames: this.anims.generateFrameNumbers('real_parrot', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    this.player.play('parrot_fly');
+
     this.physics.add.collider(this.player, this.platforms);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
@@ -1088,21 +1088,22 @@ class Level1Scene extends Phaser.Scene {
 
   // --- Visuel invincibilité ---
   updatePlayerVisual() {
-    const now = this.time.now;
-    if (this.potionActiveUntil > now) {
-      this.player.setTexture('parrot_invincible');
-      const remaining = Math.ceil((this.potionActiveUntil - now) / 1000);
-      this.hudPotionIndicator.setText('✨ ' + remaining + 's');
-      return;
-    }
-    this.hudPotionIndicator.setVisible(false);
-
-    if (this.invincibleUntil > now) {
-      this.player.setTexture('parrot');
-      this.player.setAlpha(this.time.now % 200 < 100 ? 0.3 : 1);
+    // Retirer l'ancien mécanisme de changement de texture pour 'real_parrot'
+    // car on utilise maintenant une animation spritesheet.
+    
+    // Gérer juste le clignotement d'invincibilité
+    if (this.invincibleUntil > this.time.now) {
+      this.player.setAlpha(Math.sin(this.time.now / 50) > 0 ? 0.5 : 1);
     } else {
-      this.player.setTexture('parrot');
       this.player.setAlpha(1);
+    }
+    
+    if (this.potionActiveUntil > this.time.now) {
+      const remaining = Math.ceil((this.potionActiveUntil - this.time.now) / 1000);
+      this.hudPotionIndicator.setText('✨ ' + remaining + 's');
+      this.hudPotionIndicator.setVisible(true);
+    } else {
+      this.hudPotionIndicator.setVisible(false);
     }
   }
 
