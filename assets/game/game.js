@@ -1262,10 +1262,8 @@ window.showCoffreTropical = function(score, isVictory) {
   const rankEl = document.getElementById('coffre-rank');
   const bestEl = document.getElementById('coffre-best');
   const buttonsEl = document.getElementById('coffre-buttons');
-  const gameWrapper = document.getElementById('game-wrapper');
 
-  // Cacher le jeu, afficher l'overlay
-  if (gameWrapper) gameWrapper.style.display = 'none';
+  // Afficher l'overlay
   overlay.style.display = 'flex';
 
   // Calcul du rang
@@ -1316,7 +1314,6 @@ window.showCoffreTropical = function(score, isVictory) {
 
   createBtn('🔄 Rejouer', '#FF8C00', '#FFF', () => {
     overlay.style.display = 'none';
-    if (gameWrapper) gameWrapper.style.display = 'block';
     game.scene.getScenes(true).forEach(s => s.scene.stop());
     game.scene.start('Level1');
   });
