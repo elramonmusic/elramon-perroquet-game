@@ -289,21 +289,92 @@
 
   <!-- Contrôles mobile + loading + Check Membre -->
   <script>
-    // Vérification Membre
-    const isMember = localStorage.getItem('elramonClubMember') === 'true';
-    if (!isMember) {
-      document.getElementById('game-wrapper').style.display = 'none';
-      document.getElementById('member-gate').style.display = 'flex';
-      // Stopper Phaser si besoin en bloquant le onload
+    // Elements
+    const gameWrapper = document.getElementById('game-wrapper');
+    const memberGate = document.getElementById('member-gate');
+    const loadingText = document.querySelector('#game-loading p');
+    const gameLoading = document.getElementById('game-loading');
+
+    function showAccessLoading() {
+      gameWrapper.style.display = 'block';
+      memberGate.style.display = 'none';
+      if (loadingText) loadingText.innerText = "Vérification de ton accès membre...";
+    }
+
+    function showGame() {
+      gameWrapper.style.display = 'block';
+      memberGate.style.display = 'none';
+      if (loadingText) loadingText.innerText = "Chargement du Perroquet Tropical...";
+      window.stopPhaser = false;
+      
+      // On déclenche manuellement la suppression du loading si Phaser a déjà loadé, 
+      // ou on laisse le timeout original faire son travail.
+      if (document.readyState === 'complete') {
+        setTimeout(() => {
+          if (gameLoading) gameLoading.style.display = 'none';
+        }, 2000);
+      }
+    }
+
+    function showMemberOnlyScreen() {
+      gameWrapper.style.display = 'none';
+      memberGate.style.display = 'flex';
       window.stopPhaser = true;
     }
 
-    // Supprimer le loading une fois Phaser prêt
+    async function checkGameAccess() {
+      showAccessLoading();
+
+      let session = null;
+
+      // Vérification Supabase V2 si dispo
+      if (window.supabase) {
+        const { data, error } = await window.supabase.auth.getSession();
+        if (error) {
+          console.error("Erreur vérification session Supabase:", error);
+        }
+        session = data?.session;
+      }
+
+      if (session?.user) {
+        localStorage.setItem("elramonClubMember", "true");
+        showGame();
+        return;
+      }
+
+      // Fallback
+      const fallbackMember = localStorage.getItem("elramonClubMember") === "true";
+      if (fallbackMember) {
+        showGame();
+        return;
+      }
+
+      showMemberOnlyScreen();
+    }
+
+    // Écoute Supabase
+    if (window.supabase) {
+      window.supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {
+          localStorage.setItem("elramonClubMember", "true");
+          showGame();
+        }
+
+        if (event === "SIGNED_OUT") {
+          localStorage.removeItem("elramonClubMember");
+          showMemberOnlyScreen();
+        }
+      });
+    }
+
+    // Lancer la vérif
+    checkGameAccess();
+
+    // Supprimer le loading une fois Phaser prêt (fallback global)
     window.addEventListener('load', () => {
       if (window.stopPhaser) return;
       setTimeout(() => {
-        const loading = document.getElementById('game-loading');
-        if (loading) loading.style.display = 'none';
+        if (gameLoading) gameLoading.style.display = 'none';
       }, 2000);
     });
 
