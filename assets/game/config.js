@@ -7,7 +7,8 @@
  */
 
 // Activer ou désactiver le mode debug (hitboxes, coordonnées, fps)
-const DEBUG_MODE = true;
+// IMPORTANT : Mettre à false avant la mise en production
+const DEBUG_MODE = false;
 
 const GAME_CONFIG = {
 
