@@ -1293,9 +1293,13 @@ window.showCoffreTropical = function(score, isVictory) {
   };
 
   if (isVictory) {
-    createBtn('🎁 Bonus 1 (Suno)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.suno, '_blank'));
-    createBtn('🎁 Bonus 2 (Kling)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.kling, '_blank'));
-    createBtn('🎁 Bonus 3 (Flow)', '#2ECC71', '#FFF', () => window.open(GAME_CONFIG.bonusLinks.flow, '_blank'));
+    const bonuses = [
+      { text: '🎁 Bonus surprise (Suno)', link: GAME_CONFIG.bonusLinks.suno },
+      { text: '🎁 Bonus surprise (Kling)', link: GAME_CONFIG.bonusLinks.kling },
+      { text: '🎁 Bonus surprise (Flow)', link: GAME_CONFIG.bonusLinks.flow }
+    ];
+    const randomBonus = bonuses[Math.floor(Math.random() * bonuses.length)];
+    createBtn(randomBonus.text, '#2ECC71', '#FFF', () => window.open(randomBonus.link, '_blank'));
   }
 
   createBtn('🔄 Rejouer', '#FF8C00', '#FFF', () => {
