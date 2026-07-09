@@ -4,351 +4,345 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1A1A2E" />
-  <title>Mon Dashboard — El Ramon Music Club</title>
+  <title>Mon Espace Membre — El Ramon Music Club</title>
+  <meta name="description" content="Tableau de bord membre El Ramon Music Club. Accède au mini-jeu, guides Suno, prompts IA, tablatures et contenus exclusifs." />
   <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Mon Espace — El Ramon Music Club" />
+  <meta property="og:description" content="Bienvenue dans ton espace membre. Tous tes contenus exclusifs sont là." />
   <link rel="icon" href="../assets/images/logo.webp" type="image/webp" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../styles.css" />
   <style>
-    /* Inline styles for specific dashboard tweaks */
-    @media (max-width: 600px) {
-      .profile-widget { flex-direction: column; text-align: center; }
-      .profile-info { display: flex; flex-direction: column; align-items: center; }
-      .profile-action { margin-top: 1rem; width: 100%; }
-      .profile-action .btn { display: block; width: 100%; text-align: center; }
+    .dash-hero {
+      min-height: 35vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-xl);
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    .dash-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.2) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 70%, rgba(0,206,209,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .dash-hero-mascot {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: var(--space-sm);
+      animation: float-parrot 3s ease-in-out infinite;
+    }
+    .dash-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      margin-bottom: var(--space-xs);
+    }
+    .dash-welcome-name {
+      font-size: 1.2rem;
+      color: var(--yellow-sun);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    .dash-hero p {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .dash-welcome-meta {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: var(--space-xs);
+    }
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-lg);
+    }
+    .dash-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      transition: all var(--transition-mid);
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+    }
+    .dash-card:hover {
+      border-color: rgba(255,215,0,0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(255,215,0,0.1);
+    }
+    .dash-card-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: var(--space-md);
+    }
+    .dash-card h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--white-light);
+      margin-bottom: 0.4rem;
+    }
+    .dash-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+      margin-bottom: var(--space-md);
+    }
+    .dash-card-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.8rem;
+      border-radius: var(--radius-full);
+    }
+    .badge-member { background: rgba(255,215,0,0.15); color: var(--yellow-sun); border: 1px solid rgba(255,215,0,0.3); }
+    .badge-soon { background: rgba(255,140,0,0.1); color: var(--orange-tropical); border: 1px solid rgba(255,140,0,0.3); }
+    .badge-live { background: rgba(46,204,113,0.15); color: var(--palm-green); border: 1px solid rgba(46,204,113,0.3); }
+    .badge-new { background: rgba(0,206,209,0.15); color: var(--turquoise); border: 1px solid rgba(0,206,209,0.3); }
+    .dash-card-locked {
+      opacity: 0.5;
+      border-style: dashed;
+    }
+    .dash-card-locked:hover {
+      opacity: 0.75;
+    }
+    .member-info {
+      background: rgba(0,206,209,0.06);
+      border: 1px solid rgba(0,206,209,0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    .member-info-icon { font-size: 1.5rem; }
+    .member-info-text { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+    .member-info-text strong { color: var(--turquoise); }
+    .dash-footer-actions {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--space-2xl);
     }
   </style>
 </head>
 <body data-protect>
-  <div class="dash-bg"></div>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
-  <div class="dashboard-layout">
-    
-    <!-- SIDEBAR DESKTOP -->
-    <aside class="dash-sidebar">
-      <a href="../index.html" class="dash-sidebar-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte" />
-        <span>El Ramon</span>
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <span>El Ramon Music Club</span>
       </a>
-      
-      <nav class="dash-nav">
-        <a href="./espace-membre.html" class="dash-nav-link active">
-          <span class="dash-nav-link-icon">🏠</span> Accueil
-        </a>
-        <a href="./jeu.html" class="dash-nav-link">
-          <span class="dash-nav-link-icon">🎮</span> Le Jeu
-        </a>
-        <a href="./leaderboard.html" class="dash-nav-link">
-          <span class="dash-nav-link-icon">🏆</span> Mes Scores
-        </a>
-        <a href="./bonus.html" class="dash-nav-link">
-          <span class="dash-nav-link-icon">🎧</span> Playlists
-        </a>
-        <a href="./prompts.html" class="dash-nav-link">
-          <span class="dash-nav-link-icon">🤖</span> Prompts IA
-        </a>
-        <a href="./selection-tropicale.html" class="dash-nav-link">
-          <span class="dash-nav-link-icon">🛍️</span> Boutique
-        </a>
-      </nav>
-      
-      <div class="dash-sidebar-bottom">
-        <a href="#" class="dash-nav-link" data-logout style="color:var(--coral-red);">
-          <span class="dash-nav-link-icon">🚪</span> Déconnexion
-        </a>
-      </div>
-    </aside>
-
-    <!-- MOBILE NAV -->
-    <nav class="dash-mobile-nav">
-      <a href="./espace-membre.html" class="dash-mobile-link active">
-        <span class="dash-nav-link-icon">🏠</span> Accueil
-      </a>
-      <a href="./jeu.html" class="dash-mobile-link">
-        <span class="dash-nav-link-icon">🎮</span> Le Jeu
-      </a>
-      <a href="./bonus.html" class="dash-mobile-link">
-        <span class="dash-nav-link-icon">🎧</span> Playlists
-      </a>
-      <a href="#" class="dash-mobile-link" data-logout>
-        <span class="dash-nav-link-icon">🚪</span> Quitter
-      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
+        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
+        <li><a href="./espace-membre.html" class="nav-link text-turquoise" style="color:var(--turquoise);">🎵 Dashboard</a></li>
+        <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">🏠 Accueil</a>
+      <a href="./espace-membre.html" class="nav-link text-turquoise">🎵 Dashboard</a>
+      <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
+    </nav>
+  </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="dash-main">
-      
-      <!-- WIDGET PROFIL (Phase 2 & 4) -->
-      <div class="profile-widget glass-card" style="display:flex; gap: 2rem; align-items: center; margin-bottom: 3rem;">
-        <div class="profile-avatar" style="width: 90px; height: 90px; border-radius: 50%; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; border: 2px solid var(--turquoise); flex-shrink: 0;">
-          🦜
-        </div>
-        <div class="profile-info" style="flex: 1;">
-          <h1 id="member-name" style="margin-bottom: 0.2rem; font-size: 1.8rem; color: #FFF;">Membre du Club</h1>
-          <p id="member-since" style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Chargement du profil...</p>
-          <div style="display:flex; gap: 0.8rem; flex-wrap: wrap;">
-            <div style="background: rgba(255,215,0,0.1); padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid rgba(255,215,0,0.3); color: var(--yellow-sun); font-size: 0.9rem; font-weight: 600;">
-              Rang : <span id="member-rank">Nouveau Membre</span>
-            </div>
-            <div style="background: rgba(0,206,209,0.1); padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid rgba(0,206,209,0.3); color: var(--turquoise); font-size: 0.9rem; font-weight: 600;">
-              Meilleur Score : <span id="member-score">0</span>
-            </div>
-            <div style="background: rgba(46,204,113,0.1); padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid rgba(46,204,113,0.3); color: var(--palm-green); font-size: 0.9rem; font-weight: 600;">
-              Boss Vaincus : <span id="member-bosses">0</span>
-            </div>
-          </div>
-        </div>
-        <div class="profile-action">
-          <a href="./jeu.html" class="btn" style="background: var(--orange-tropical); color: #fff; padding: 1rem 1.5rem; border-radius: 50px; font-weight: bold; text-decoration: none; display: inline-block; box-shadow: var(--shadow-glow-orange);">
-            🎮 Jouer maintenant
-          </a>
+<main id="main-content">
+
+  <section class="dash-hero">
+    <div style="position:relative; z-index:2;">
+      <span class="dash-hero-mascot">🦜</span>
+      <h1 class="text-gradient-warm">Bienvenue dans le Club</h1>
+      <p class="dash-welcome-name" id="member-name"></p>
+      <p>Ici, on chante, on danse, on apprend, on crée et on partage de la bonne humeur.</p>
+      <p class="dash-welcome-meta" id="member-since"></p>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="member-info">
+        <span class="member-info-icon">🏆</span>
+        <div class="member-info-text">
+          <strong>Statut : Membre</strong> — Tu as accès à tous les contenus exclusifs du Club.
         </div>
       </div>
 
-      <!-- CATALOGUE CLUB (Phase 3) -->
-      <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: #FFF; font-weight: 800;">Catalogue & Outils</h2>
-      
-      <div class="dash-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
-        
-        <!-- Carte Jeu -->
-        <a href="./jeu.html" class="glass-card" style="text-decoration: none; color: inherit;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">🌴</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Jeu Tropical</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">L'aventure du perroquet ! Saute sur les plateformes et bats les boss.</p>
-          <span style="background: rgba(46,204,113,0.15); color: var(--palm-green); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(46,204,113,0.3); font-weight:600;">Jouer</span>
+      <!-- CONTENUS DISPONIBLES -->
+      <div class="dash-section-label">🎵 Contenus disponibles</div>
+
+      <div class="dash-grid">
+
+        <a href="./jeu.html" class="dash-card">
+          <span class="dash-card-icon">🎮</span>
+          <h3>Mini-Jeu Tropical</h3>
+          <p>Le jeu de plateforme du perroquet tropical ! Fruits, potions, ennemis et boss final t'attendent.</p>
+          <span class="dash-card-badge badge-live">Jouer</span>
         </a>
 
-        <!-- Carte Playlists -->
-        <a href="./bonus.html" class="glass-card" style="text-decoration: none; color: inherit;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">🎧</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Playlists El Ramon</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Les meilleures ambiances tropicales pour tes soirées.</p>
-          <span style="background: rgba(0,206,209,0.15); color: var(--turquoise); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(0,206,209,0.3); font-weight:600;">Écouter</span>
+        <a href="./leaderboard.html" class="dash-card">
+          <span class="dash-card-icon">🏆</span>
+          <h3>Classement Perroquet</h3>
+          <p>Compare ton score avec les autres membres du Club et débloque des badges tropicaux exclusifs.</p>
+          <span class="dash-card-badge badge-new">Nouveau 🏆</span>
         </a>
 
-        <!-- Carte Prompts IA -->
-        <a href="./prompts.html" class="glass-card" style="text-decoration: none; color: inherit;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Prompts IA (Suno/Kling)</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Copie-colle nos prompts secrets pour créer tes propres musiques.</p>
-          <span style="background: rgba(255,215,0,0.15); color: var(--yellow-sun); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(255,215,0,0.3); font-weight:600;">Découvrir</span>
+        <a href="./bonus.html" class="dash-card">
+          <span class="dash-card-icon">🎧</span>
+          <h3>Playlists & Recommandations</h3>
+          <p>Les playlists officielles d'El Ramon Music et nos recommandations tropicales pour passer de bonnes soirées.</p>
+          <span class="dash-card-badge badge-new">Nouveau 🎧</span>
         </a>
 
-        <!-- Carte Boutique -->
-        <a href="./selection-tropicale.html" class="glass-card" style="text-decoration: none; color: inherit;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">🛍️</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Sélection Tropicale</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Accessoires et instruments recommandés par le Club.</p>
-          <span style="background: rgba(255,255,255,0.1); color: #FFF; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); font-weight:600;">Voir la boutique</span>
-        </a>
-        
-        <!-- Carte YouTube -->
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="glass-card" style="text-decoration: none; color: inherit;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">▶️</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Chaîne YouTube</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Rejoins-nous sur YouTube pour les derniers clips et shorts.</p>
-          <span style="background: rgba(229,57,53,0.15); color: var(--coral-red); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(229,57,53,0.3); font-weight:600;">S'abonner</span>
+        <a href="./discographie.html" class="dash-card">
+          <span class="dash-card-icon">🎶</span>
+          <h3>Discographie El Ramon</h3>
+          <p>Écoute les albums, singles et ambiances tropicales officielles d'El Ramon Music.</p>
+          <span class="dash-card-badge badge-new">Nouveau 🎶</span>
         </a>
 
-        <!-- Carte Teasing Bananes (Phase 6) -->
-        <div class="glass-card" style="opacity: 0.6; cursor: default;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">🍌</div>
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFF;">Bananes du Club</h3>
-          <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Monnaie virtuelle pour débloquer des cadeaux exclusifs.</p>
-          <span style="background: rgba(255,140,0,0.15); color: var(--orange-tropical); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(255,140,0,0.3); font-weight:600;">Bientôt disponible</span>
-        </div>
+        <a href="./guides-suno.html" class="dash-card">
+          <span class="dash-card-icon">📖</span>
+          <h3>Guides Suno IA</h3>
+          <p>Maîtrise la création musicale avec l'intelligence artificielle Suno. Guide complet membre.</p>
+          <span class="dash-card-badge badge-live">Disponible</span>
+        </a>
+
+        <a href="./prompts.html" class="dash-card">
+          <span class="dash-card-icon">🤖</span>
+          <h3>Prompts IA Musique</h3>
+          <p>Bibliothèque de prompts testés et prêts à copier-coller pour créer tes chansons tropicales.</p>
+          <span class="dash-card-badge badge-live">Disponible</span>
+        </a>
+
+        <a href="./selection-tropicale.html" class="dash-card">
+          <span class="dash-card-icon">🛍️</span>
+          <h3>Sélection Tropicale</h3>
+          <p>Découvre les accessoires, instruments et objets festifs sélectionnés pour l'univers El Ramon Music.</p>
+          <span class="dash-card-badge badge-live">Voir</span>
+        </a>
+
+        <a href="./partenaires.html" class="dash-card">
+          <span class="dash-card-icon">🤝</span>
+          <h3>Offres Partenaires</h3>
+          <p>Accède aux offres exclusives de nos partenaires : Suno, Flow Music, Kling AI et plus.</p>
+          <span class="dash-card-badge badge-live">Voir</span>
+        </a>
+
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="dash-card">
+          <span class="dash-card-icon">▶</span>
+          <h3>Chaîne YouTube</h3>
+          <p>Retourne sur la chaîne El Ramon Music pour les derniers clips, Shorts et playlists stratégiques.</p>
+          <span class="dash-card-badge badge-live">YouTube</span>
+        </a>
+
+        <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA" target="_blank" rel="noopener" class="dash-card">
+          <span class="dash-card-icon">🎶</span>
+          <h3>Playlist Stratégique</h3>
+          <p>La playlist officielle d'El Ramon Music. Les meilleures chansons tropicales à écouter en boucle.</p>
+          <span class="dash-card-badge badge-live">Écouter</span>
+        </a>
+
+        <a href="./tablatures.html" class="dash-card">
+          <span class="dash-card-icon">🎸</span>
+          <h3>Tablatures Guitare</h3>
+          <p>Apprends à jouer les morceaux d'El Ramon Music. Ressources pour tous les niveaux.</p>
+          <span class="dash-card-action">Découvrir <span class="arrow">→</span></span>
+        </a>
+
+        <a href="https://gofund.me/a915eaf1e" target="_blank" rel="noopener" class="cagnotte-card">
+          <span class="cagnotte-card-icon">💚</span>
+          <h3>Soutenir le projet</h3>
+          <p>Chaîne El Ramon Music + association Gard Eau Arbres. Chaque geste compte.</p>
+          <span class="cagnotte-card-badge">🌿 Cagnotte solidaire</span>
+        </a>
 
       </div>
 
-    </main>
+      <!-- CONTENUS À VENIR -->
+      <div class="dash-section-label" style="margin-top: var(--space-2xl);">⏳ À venir</div>
 
-  </div>
+      <div class="dash-grid">
+
+        <a href="#" class="dash-card dash-card-locked" onclick="event.preventDefault(); window.ElRamon.Toast.show('Les bonus exclusifs arrivent bientôt ! 🎵', 'info');">
+          <span class="dash-card-icon">🎬</span>
+          <h3>Bonus & Avant-premières</h3>
+          <p>Clips exclusifs, contenus inédits et avant-premières réservées aux membres du Club.</p>
+          <span class="dash-card-badge badge-soon">Bientôt disponible</span>
+        </a>
+
+      </div>
+
+      <div class="dash-footer-actions">
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="yt-cta-btn">
+          <svg viewBox="0 0 24 24"><path d="M23.5 6.2c-.3-1-1-1.7-2-2C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.5.7c-1 .3-1.7 1-2 2C0 8.2 0 12 0 12s0 3.8.5 5.8c.3 1 1 1.7 2 2 2 .7 9.5.7 9.5.7s7.5 0 9.5-.7c1-.3 1.7-1 2-2 .5-2 .5-5.8.5-5.8s0-3.8-.5-5.8zM9.5 15.6V8.4l6.4 3.6-6.4 3.6z"/></svg>
+          Chaîne YouTube
+        </a>
+        <a href="./club.html" class="btn btn-secondary btn-lg">🌴 À propos du Club</a>
+        <a href="./contact.html" class="btn btn-turquoise btn-lg">✉️ Nous contacter</a>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+<footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
+    <div class="container">
+      <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:var(--space-md);">Les chansons tropicales qui donnent le sourire 🌴</p>
+      <div style="display:flex; justify-content:center; gap:var(--space-lg); flex-wrap:wrap; font-size:0.88rem;">
+        <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
+        <a href="./bonus.html" class="nav-link" style="color:var(--turquoise);">🎧 Playlists</a>
+        <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      </div>
+      <p style="color:rgba(255,255,255,0.55); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.6);">elramonmusic@gmail.com</a></p>
+    </div>
+  </footer>
 
   <script src="../app.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Phase 2 : Récupération Supabase / Profil
+    document.addEventListener('DOMContentLoaded', () => {
       const member = window.ElRamon ? window.ElRamon.Auth.getMember() : null;
-      if (!member) return;
-
-      const nameEl = document.getElementById('member-name');
-      if (nameEl) nameEl.textContent = member.prenom || member.pseudo || 'Membre du Club';
-      
-      const sinceEl = document.getElementById('member-since');
-      if (sinceEl && member.joined_at) {
-        const date = new Date(member.joined_at);
-        sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
-      }
-
-      // Fallback variables
-      let bestScore = parseInt(localStorage.getItem('er_game_best_score') || '0');
-      let bossDefeatedCount = localStorage.getItem('er_game_boss_defeated') === 'true' ? 1 : 0; // Local fallback
-      
-      // Essai de lecture depuis Supabase
-      if (window.ElRamon.supabase) {
-        try {
-          const { data: scores, error } = await window.ElRamon.supabase
-            .from('game_scores')
-            .select('score, level, boss_defeated')
-            .eq('member_email', member.email)
-            .order('score', { ascending: false });
-
-          if (!error && scores && scores.length > 0) {
-            bestScore = scores[0].score;
-            bossDefeatedCount = scores.filter(s => s.boss_defeated).length;
-          }
-        } catch (e) {
-          console.error("Supabase error (using local storage):", e);
+      if (member) {
+        const nameEl = document.getElementById('member-name');
+        if (nameEl) {
+          const name = member.prenom || member.pseudo || 'Membre';
+          nameEl.textContent = 'Bienvenue, ' + name + ' !';
         }
-      }
-
-      // Mise à jour de l'UI
-      document.getElementById('member-score').textContent = bestScore;
-      document.getElementById('member-bosses').textContent = bossDefeatedCount;
-
-      // Logique des Rangs
-      let currentRank = 'Nouveau Membre';
-      if (bestScore > 0) currentRank = 'Perroquet Débutant';
-      if (bestScore >= 150) currentRank = 'Danseur de Plage';
-      if (bestScore >= 350) currentRank = 'Ambianceur Tropical';
-      if (bestScore >= 600) currentRank = 'Maître Perroquet';
-      if (bestScore >= 1000) currentRank = 'Légende du Soleil';
-      
-      document.getElementById('member-rank').textContent = currentRank;
-      
-      // Si le joueur n'a jamais joué, on peut changer le bouton
-      if (bestScore === 0) {
-        document.getElementById('member-since').textContent += " — Commence ton aventure tropicale ! 🦜";
+        const sinceEl = document.getElementById('member-since');
+        if (sinceEl && member.joined_at) {
+          const date = new Date(member.joined_at);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', options);
+        }
       }
     });
-  </script>
-
-  <!-- MINI PLAYER AUDIO (Phase 5) -->
-  <div class="dash-mini-player">
-    <div class="player-info">
-      <div class="player-cover">🌴</div>
-      <div class="player-text">
-        <div class="player-title">Playlist Stratégique</div>
-        <div class="player-artist">El Ramon Music</div>
-      </div>
-    </div>
-    <div class="player-controls">
-      <button id="audio-play-btn" class="player-btn" aria-label="Play">▶️</button>
-      <button id="audio-mute-btn" class="player-btn" aria-label="Mute">🔊</button>
-    </div>
-    <div class="player-actions">
-      <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA" target="_blank" class="player-yt-link">
-        YouTube <span style="font-size: 0.8rem;">↗</span>
-      </a>
-    </div>
-    <!-- Lecteur YouTube invisible pour l'audio -->
-    <div id="yt-audio-player" style="display: none;"></div>
-  </div>
-
-  <style>
-    .dash-mini-player {
-      position: fixed;
-      bottom: 0; left: 280px; right: 0;
-      height: 70px;
-      background: rgba(22, 33, 62, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 var(--space-xl);
-      z-index: 90;
-      transition: left var(--transition-mid);
-    }
-    .player-info { display: flex; align-items: center; gap: var(--space-sm); min-width: 200px; }
-    .player-cover {
-      width: 44px; height: 44px;
-      background: var(--grad-warm);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-    }
-    .player-title { font-weight: 700; font-size: 0.95rem; color: #FFF; }
-    .player-artist { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
-    .player-controls { display: flex; align-items: center; gap: var(--space-md); }
-    .player-btn {
-      background: none; border: none; cursor: pointer;
-      font-size: 1.5rem; color: #FFF;
-      transition: transform var(--transition-fast);
-      display: flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 50%;
-    }
-    .player-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-    .player-actions { min-width: 200px; text-align: right; }
-    .player-yt-link {
-      font-size: 0.85rem; color: rgba(255,255,255,0.7); text-decoration: none;
-      background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px;
-      transition: all var(--transition-fast);
-    }
-    .player-yt-link:hover { background: rgba(255,255,255,0.2); color: #FFF; }
-
-    @media (max-width: 992px) {
-      .dash-mini-player {
-        left: 0; bottom: 60px; /* au-dessus de la nav mobile */
-        padding: 0 var(--space-md);
-      }
-      .player-actions { display: none; }
-    }
-  </style>
-  <script>
-    // YouTube IFrame API logic for Mini Player
-    let ytPlayer;
-    let isPlaying = false;
-    let isMuted = false;
-    
-    function onYouTubeIframeAPIReady() {
-      ytPlayer = new YT.Player('yt-audio-player', {
-        height: '0', width: '0',
-        videoId: 'rgA6sLPfglY', // Première chanson playlist
-        playerVars: {
-          'autoplay': 0, 'controls': 0, 'listType': 'playlist', 'list': 'PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA'
-        },
-        events: {
-          'onReady': onPlayerReady
-        }
-      });
-    }
-
-    function onPlayerReady(event) {
-      const playBtn = document.getElementById('audio-play-btn');
-      const muteBtn = document.getElementById('audio-mute-btn');
-      
-      playBtn.addEventListener('click', () => {
-        if (isPlaying) {
-          ytPlayer.pauseVideo();
-          playBtn.textContent = '▶️';
-        } else {
-          ytPlayer.playVideo();
-          playBtn.textContent = '⏸️';
-        }
-        isPlaying = !isPlaying;
-      });
-
-      muteBtn.addEventListener('click', () => {
-        if (isMuted) {
-          ytPlayer.unMute();
-          muteBtn.textContent = '🔊';
-        } else {
-          ytPlayer.mute();
-          muteBtn.textContent = '🔇';
-        }
-        isMuted = !isMuted;
-      });
-    }
-
-    // Charger l'API YouTube
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   </script>
 </body>
 </html>
