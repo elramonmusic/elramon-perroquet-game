@@ -9,39 +9,7 @@
 // ============================================================
 // AUDIO (Synthétiseur rétro 8-bit)
 // ============================================================
-const SFX = {
-  ctx: null,
-  init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-  play(freq, type = 'square', duration = 0.1, vol = 0.1, slideFreq = null) {
-    if (!this.ctx) this.init();
-    if (this.ctx.state === 'suspended') this.ctx.resume();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-    if (slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, this.ctx.currentTime + duration);
-    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start();
-    osc.stop(this.ctx.currentTime + duration);
-  },
-  jump() { this.play(150, 'square', 0.2, 0.05, 300); },
-  coin() { this.play(880, 'sine', 0.1, 0.05, 1200); },
-  shoot() { this.play(400, 'square', 0.1, 0.05, 200); },
-  hit() { this.play(100, 'sawtooth', 0.3, 0.1, 50); },
-  bossHit() { this.play(80, 'sawtooth', 0.4, 0.2, 30); },
-  powerup() { this.play(400, 'sine', 0.5, 0.1, 800); }
-};
-
-function playSound(scene, key, fallbackSfx) {
-  if (scene.cache.audio.exists(key)) {
-    scene.sound.play(key);
-  } else if (fallbackSfx) {
-    fallbackSfx();
-  }
-}
+// Ancien objet SFX manuel supprimé. L'audio utilise maintenant Phaser Sound Manager.
 
 // ============================================================
 // PRELOAD SCENE — Chargement des assets réels (images et audio)
@@ -66,9 +34,18 @@ class PreloadScene extends Phaser.Scene {
     
     this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=50', { frameWidth: 250, frameHeight: 250 });
 
-    this.load.audio('voice_eat', '../assets/audio/game/voice_eat.mp3?v=4');
-    this.load.audio('voice_hit', '../assets/audio/game/voice_hit.mp3?v=4');
-    this.load.audio('voice_fall', '../assets/audio/game/voice_fall.mp3?v=4');
+    this.load.audio('bgm_tropical', '../assets/audio/game/bgm_tropical.mp3?v=1');
+    this.load.audio('sfx_boss_drum', '../assets/audio/game/sfx_boss_drum.mp3?v=1');
+    this.load.audio('sfx_chest', '../assets/audio/game/sfx_chest.mp3?v=1');
+    this.load.audio('sfx_collect_fruit', '../assets/audio/game/sfx_collect_fruit.mp3?v=1');
+    this.load.audio('sfx_collect_note', '../assets/audio/game/sfx_collect_note.mp3?v=1');
+    this.load.audio('sfx_hit_boss', '../assets/audio/game/sfx_hit_boss.mp3?v=1');
+    this.load.audio('sfx_hit_enemy', '../assets/audio/game/sfx_hit_enemy.mp3?v=1');
+    this.load.audio('sfx_hit_player', '../assets/audio/game/sfx_hit_player.mp3?v=1');
+    this.load.audio('sfx_jump', '../assets/audio/game/sfx_jump.mp3?v=1');
+    this.load.audio('sfx_potion', '../assets/audio/game/sfx_potion.mp3?v=1');
+    this.load.audio('sfx_shoot', '../assets/audio/game/sfx_shoot.mp3?v=1');
+    this.load.audio('sfx_victory', '../assets/audio/game/sfx_victory.mp3?v=1');
   }
   create() {
     this.scene.start('Boot');
@@ -328,8 +305,7 @@ class StartScene extends Phaser.Scene {
     btnPlay.on('pointerover', () => btnPlay.setStyle({ backgroundColor: '#FFA726' }));
     btnPlay.on('pointerout', () => btnPlay.setStyle({ backgroundColor: '#FF8C00' }));
     btnPlay.on('pointerdown', () => {
-      SFX.init(); // Init audio context on user gesture
-      SFX.coin();
+      this.sound.play('sfx_collect_note');
       this.scene.start('Level1');
     });
 
@@ -532,7 +508,16 @@ class Level1Scene extends Phaser.Scene {
     this.enemyBullets = this.physics.add.group();
     this.physics.add.overlap(this.player, this.enemyBullets, this.hitByProjectile, null, this);
 
-    // --- Boss zone (invisible trigger) ---
+    // Audio BGM
+    if (!this.sound.get('bgm_tropical')) {
+      this.bgm = this.sound.add('bgm_tropical', { loop: true, volume: 0.5 });
+      this.bgm.play();
+    } else {
+      this.bgm = this.sound.get('bgm_tropical');
+      if (!this.bgm.isPlaying) this.bgm.play();
+    }
+    
+    // Config Physics monde (invisible trigger) ---
     this.bossTrigger = this.physics.add.staticImage(level.boss.x, level.worldHeight / 2, 'platform_hitbox');
     this.bossTrigger.setDisplaySize(60, level.worldHeight).setAlpha(0).refreshBody();
     this.physics.add.overlap(this.player, this.bossTrigger, this.activateBoss, null, this);
@@ -662,6 +647,20 @@ class Level1Scene extends Phaser.Scene {
     this.hudPotionIndicator = this.add.text(250, 26, '', {
       fontSize: '14px', fontFamily: 'Arial', color: '#00BCD4',
     }).setVisible(false).setScrollFactor(0).setDepth(100);
+    
+    // --- Bouton Son ---
+    const soundBtn = this.add.text(GAME_CONFIG.width - 50, 20, '🔊', { fontSize: '24px' })
+      .setOrigin(0.5, 0)
+      .setScrollFactor(0)
+      .setDepth(150)
+      .setInteractive({ useHandCursor: true });
+      
+    soundBtn.text = this.sound.mute ? '🔇' : '🔊';
+
+    soundBtn.on('pointerdown', () => {
+      this.sound.mute = !this.sound.mute;
+      soundBtn.text = this.sound.mute ? '🔇' : '🔊';
+    });
   }
 
   updateHUD() {
@@ -753,7 +752,7 @@ class Level1Scene extends Phaser.Scene {
       this.player.setVelocityY(physCfg.playerJump);
       this.lastJumpPressed = 0;
       this.lastOnGround = 0;
-      SFX.jump();
+      this.sound.play('sfx_jump');
     }
 
     // Tir
@@ -762,7 +761,7 @@ class Level1Scene extends Phaser.Scene {
       if (this.fruits > 0) {
         this.fireBullet();
         window._gameControls.fire = false;
-        SFX.shoot();
+        this.sound.play('sfx_shoot');
       } else {
         // Feedback plus de munitions
         window._gameControls.fire = false;
@@ -824,7 +823,7 @@ class Level1Scene extends Phaser.Scene {
     emitter.explode(10, fruit.x, fruit.y);
     this.time.delayedCall(1000, () => emitter.destroy());
     
-    playSound(this, 'voice_eat', () => SFX.coin());
+    this.sound.play('sfx_collect_fruit');
 
     fruit.destroy();
     this.score += 10;
@@ -840,7 +839,7 @@ class Level1Scene extends Phaser.Scene {
   collectSpecial(player, item) {
     if (!item.active) return;
     item.destroy();
-    SFX.powerup(); // ou son specifique
+    this.sound.play(item.collectibleType === 'note' ? 'sfx_collect_note' : 'sfx_potion');
     
     let pts = item.collectibleType === 'note' ? 25 : 50;
     this.score += pts;
@@ -869,7 +868,7 @@ class Level1Scene extends Phaser.Scene {
   // --- Collecter potion ---
   collectPotion(player, potion) {
     potion.destroy();
-    SFX.powerup();
+    this.sound.play('sfx_collect_note');
     this.potionActiveUntil = this.time.now + GAME_CONFIG.player.potionDuration;
     this.hudPotionIndicator.setVisible(true);
   }
@@ -930,7 +929,7 @@ class Level1Scene extends Phaser.Scene {
     emitter.explode(15, enemy.x, enemy.y);
     this.time.delayedCall(1000, () => emitter.destroy());
     
-    SFX.hit();
+    this.sound.play('sfx_hit_enemy');
 
     const txt = this.add.text(enemy.x, enemy.y - 15, '+' + enemy.scoreValue, {
       fontSize: '16px', fontFamily: 'Arial Black', color: '#2ECC71',
@@ -945,7 +944,7 @@ class Level1Scene extends Phaser.Scene {
     this.lives--;
     this.invincibleUntil = this.time.now + GAME_CONFIG.player.invincibleTime;
     
-    playSound(this, 'voice_hit', () => SFX.hit());
+    this.sound.play('sfx_hit_player');
 
     // Camera shake
     this.cameras.main.shake(200, 0.015);
@@ -965,7 +964,7 @@ class Level1Scene extends Phaser.Scene {
     this.lives--;
     this.invincibleUntil = this.time.now + GAME_CONFIG.player.invincibleTime;
     
-    playSound(this, 'voice_fall', () => SFX.hit());
+    this.sound.play('sfx_hit_player');
     
     this.cameras.main.shake(300, 0.02);
     this.physics.world.isPaused = true;
@@ -1078,6 +1077,7 @@ class Level1Scene extends Phaser.Scene {
 
     if (now - this.lastBossShot > GAME_CONFIG.level1.boss.shootInterval) {
       this.lastBossShot = now;
+      this.sound.play('sfx_boss_drum');
       const proj = this.bossProjectiles.create(this.boss.x, this.boss.y + 20, 'seed');
       proj.body.setAllowGravity(false);
       proj.setVelocityX(250 * dir);
@@ -1097,7 +1097,7 @@ class Level1Scene extends Phaser.Scene {
         player.setVelocityY(-300);
         this.bossSpeed += 20;
         
-        SFX.bossHit();
+        this.sound.play('sfx_hit_boss');
 
         // Camera Shake & Hit-Stop
         this.cameras.main.shake(150, 0.01);
@@ -1128,7 +1128,7 @@ class Level1Scene extends Phaser.Scene {
     if (this.bossStunUntil < this.time.now) {
        this.bossHP--;
        this.bossSpeed += 10;
-       SFX.bossHit();
+       this.sound.play('sfx_hit_boss');
        
        const txt = this.add.text(boss.x, boss.y - 30, '💥', { fontSize: '28px' }).setOrigin(0.5).setDepth(50);
        this.tweens.add({ targets: txt, y: txt.y - 50, scale: 1.5, alpha: 0, duration: 600, onComplete: () => txt.destroy() });
@@ -1276,6 +1276,8 @@ class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOver' }); }
 
   create(data) {
+    this.sound.stopAll(); // Arrêter la BGM
+    
     saveGameScore(this, false, data);
     this.scene.pause();
     window.showCoffreTropical(data.score || 0, false);
@@ -1289,6 +1291,9 @@ class VictoryScene extends Phaser.Scene {
   constructor() { super({ key: 'Victory' }); }
 
   create(data) {
+    this.sound.stopAll(); // Arrêter la BGM
+    this.sound.play('sfx_victory');
+    
     saveGameScore(this, true, data);
     this.scene.pause();
     window.showCoffreTropical(data.score || 0, true);
