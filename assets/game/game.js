@@ -25,7 +25,7 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('parallax_plage', '../assets/images/game/parallax/plage.png?v=1');
     this.load.image('parallax_feuilles', '../assets/images/game/parallax/feuilles.png?v=1');
     this.load.image('particle_star', '../assets/images/game/star.png?v=1');
-    this.load.image('victory_bg', '../assets/images/game/victory_bg.png?v=1');
+    this.load.image('victory_bg', '../assets/images/game/victory_bg.png?v=2');
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
