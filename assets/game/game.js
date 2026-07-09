@@ -472,7 +472,9 @@ class BaseLevelScene extends Phaser.Scene {
       level.mushrooms.forEach(m => {
         const mush = this.mushrooms.create(m.x, m.y, 'mushroom');
         mush.setDisplaySize(64, 64);
-        mush.body.setSize(60, 60);
+        // Hitbox plus petite et concentrée sur le haut du champignon
+        mush.body.setSize(40, 20);
+        mush.body.setOffset(12, 10);
       });
       this.physics.add.collider(this.player, this.mushrooms, this.bounceMushroom, null, this);
     }
@@ -864,7 +866,7 @@ class BaseLevelScene extends Phaser.Scene {
   
   // --- Champignons Rebondissants ---
   bounceMushroom(player, mushroom) {
-    if (player.body.velocity.y > 0) {
+    if (player.body.velocity.y > 0 && player.body.bottom <= mushroom.body.bottom) {
       player.setVelocityY(-700);
       this.sound.play('sfx_jump', { rate: 0.7 });
       this.hasDoubleJumped = false;

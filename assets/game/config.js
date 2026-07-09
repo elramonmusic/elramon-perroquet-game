@@ -155,8 +155,8 @@ const GAME_CONFIG = {
     collectibles: [],
     mushrooms: [
       { x: 700, y: 390 },
-      { x: 1600, y: 390 },
-      { x: 2300, y: 390 }
+      { x: 1450, y: 390 },
+      { x: 2050, y: 390 }
     ],
     potion: { x: -100, y: -100 }, // pas de potion
     enemies: [
