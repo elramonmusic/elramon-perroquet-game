@@ -24,6 +24,14 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('parallax_montagnes', '../assets/images/game/parallax/montagnes.png?v=1');
     this.load.image('parallax_plage', '../assets/images/game/parallax/plage.png?v=1');
     this.load.image('parallax_feuilles', '../assets/images/game/parallax/feuilles.png?v=1');
+    
+    // Level 2 Assets
+    this.load.image('lvl2_ciel', '../assets/images/game/level2/bg_ciel_temple.png?v=1');
+    this.load.image('lvl2_montagnes', '../assets/images/game/level2/bg_montagnes_temple.png?v=1');
+    this.load.image('lvl2_plage', '../assets/images/game/level2/bg_plage_temple.png?v=1');
+    this.load.image('lvl2_feuilles', '../assets/images/game/level2/bg_feuilles_temple.png?v=1');
+    this.load.image('mushroom', '../assets/images/game/level2/mushroom.png?v=1');
+    this.load.spritesheet('boss_singe', '../assets/images/game/level2/boss_singe_maracasse.png?v=1', { frameWidth: 250, frameHeight: 250 });
     this.load.image('particle_star', '../assets/images/game/star.png?v=1');
     this.load.image('victory_bg', '../assets/images/game/victory_bg.png?v=2');
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
@@ -648,7 +656,7 @@ class BaseLevelScene extends Phaser.Scene {
     bossBg.fillStyle(0x1A1A2E, 0.7);
     bossBg.fillRoundedRect(w / 2 - 80, 50, 160, 30, 10);
     this.hudBossContainer.add(bossBg);
-    this.hudBossLabel = this.add.text(w / 2, 57, 'Toucan Tambour', {
+    this.hudBossLabel = this.add.text(w / 2, 57, GAME_CONFIG[this.levelKey] ? GAME_CONFIG[this.levelKey].boss.name : 'Boss', {
       fontSize: '11px', fontFamily: 'Arial', color: '#FFFFFF', align: 'center',
     }).setOrigin(0.5);
     this.hudBossContainer.add(this.hudBossLabel);
@@ -1088,7 +1096,7 @@ class BaseLevelScene extends Phaser.Scene {
     this.lastBossShot = 0;
     this.bossAITimer = this.time.addEvent({ delay: 200, callback: () => this.updateBoss(), loop: true });
 
-    const msg = this.add.text(this.cameras.main.midX, 100, '⚠️ Toucan Tambour !', {
+    const msg = this.add.text(this.cameras.main.midX, 100, '⚠️ ' + bossCfg.name + ' !', {
       fontSize: '20px', fontFamily: 'Arial Black', color: '#E53935',
       stroke: '#1A1A2E', strokeThickness: 3,
     }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
@@ -1208,7 +1216,8 @@ class BaseLevelScene extends Phaser.Scene {
       }
     });
 
-    const msg = this.add.text(this.cameras.main.midX, 120, "🐦 Le Toucan Tambour s'envole !", {
+    const bossName = GAME_CONFIG[this.levelKey].boss.name;
+    const msg = this.add.text(this.cameras.main.midX, 120, "🐦 " + bossName + " est vaincu !", {
       fontSize: '18px', fontFamily: 'Arial Black', color: '#FFD700',
       stroke: '#1A1A2E', strokeThickness: 3,
     }).setOrigin(0.5).setScrollFactor(0).setDepth(100);

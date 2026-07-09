@@ -118,6 +118,7 @@ const GAME_CONFIG = {
     // Boss
     boss: {
       name: 'Toucan Tambour',
+      spriteKey: 'boss_toucan',
       x: 3500,
       y: 376,
       hp: 3,
@@ -163,7 +164,8 @@ const GAME_CONFIG = {
       { x: 2600, y: 300, type: 'crabe', range: 150, speed: 90 }
     ],
     boss: {
-      name: 'Gardien du Temple',
+      name: 'Singe Maracasse',
+      spriteKey: 'boss_singe',
       x: 3500,
       y: 376,
       hp: 5,
