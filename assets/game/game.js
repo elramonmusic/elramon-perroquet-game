@@ -34,11 +34,11 @@ class PreloadScene extends Phaser.Scene {
     
     this.load.spritesheet('boss_toucan', '../assets/images/game/boss.png?v=50', { frameWidth: 250, frameHeight: 250 });
 
-    this.load.audio('bgm_tropical', '../assets/audio/game/bgm_tropical.mp3?v=1');
+    this.load.audio('bgm_tropical', '../assets/audio/game/bgm_tropical.mp3?v=2');
     this.load.audio('sfx_boss_drum', '../assets/audio/game/sfx_boss_drum.mp3?v=1');
     this.load.audio('sfx_chest', '../assets/audio/game/sfx_chest.mp3?v=1');
     this.load.audio('sfx_collect_fruit', '../assets/audio/game/sfx_collect_fruit.mp3?v=1');
-    this.load.audio('sfx_collect_note', '../assets/audio/game/sfx_collect_note.mp3?v=1');
+    this.load.audio('sfx_collect_note', '../assets/audio/game/sfx_collect_note.mp3?v=2');
     this.load.audio('sfx_hit_boss', '../assets/audio/game/sfx_hit_boss.mp3?v=1');
     this.load.audio('sfx_hit_enemy', '../assets/audio/game/sfx_hit_enemy.mp3?v=1');
     this.load.audio('sfx_hit_player', '../assets/audio/game/sfx_hit_player.mp3?v=1');
