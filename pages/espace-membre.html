@@ -15,7 +15,7 @@
   <style>
     /* PREMIUM DASHBOARD SPECIFIC STYLES */
     .dash-hero-img {
-       background: url('../assets/images/header_members.png') no-repeat center center;
+       background: url('../assets/images/header_members.png?v=2') no-repeat center center;
        background-size: cover;
        min-height: 45vh;
        position: relative;
@@ -331,21 +331,25 @@
       let bestScore = parseInt(localStorage.getItem('er_game_best_score') || '0');
       let bossDefeatedCount = localStorage.getItem('er_game_boss_defeated') === 'true' ? 1 : 0;
       
-      if (window.ElRamon.supabase) {
-        try {
-          const { data: scores, error } = await window.ElRamon.supabase
-            .from('game_scores')
-            .select('score, level, boss_defeated')
-            .eq('member_email', member.email)
-            .order('score', { ascending: false });
-
-          if (!error && scores && scores.length > 0) {
-            bestScore = scores[0].score;
-            bossDefeatedCount = scores.filter(s => s.boss_defeated).length;
+      try {
+        const resp = await fetch('/functions/game-score');
+        if (resp.ok) {
+          const scores = await resp.json();
+          // Chercher le membre dans le leaderboard
+          const userScore = scores.find(s => s.pseudo === member.pseudo);
+          if (userScore) {
+            bestScore = Math.max(bestScore, userScore.score);
+            if (userScore.badge && (userScore.badge.includes('Roi') || userScore.badge.includes('Sauvée'))) {
+              bossDefeatedCount = 1;
+            }
+            if (sinceEl && userScore.created_at) {
+              const date = new Date(userScore.created_at);
+              sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
           }
-        } catch (e) {
-          console.error("Erreur stats", e);
         }
+      } catch (e) {
+        console.error("Erreur stats", e);
       }
 
       document.getElementById('member-score').textContent = bestScore;
