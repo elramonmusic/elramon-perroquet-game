@@ -799,9 +799,11 @@ class Level1Scene extends Phaser.Scene {
   fireBullet() {
     this.fruits--;
     const dir = this.player.facingRight !== false ? 1 : -1;
-    const bullet = this.bullets.create(this.player.x + dir * 20, this.player.y - 5, 'fruit_bullet');
+    const bullet = this.bullets.create(this.player.x + dir * 20, this.player.y - 5, 'fruit_orange');
+    bullet.setDisplaySize(20, 20); // Taille du projectile
     bullet.body.setAllowGravity(false);
     bullet.setVelocityX(GAME_CONFIG.physics.bulletSpeed * dir);
+    bullet.setAngularVelocity(dir * 500); // Fait rouler le fruit dans les airs
     this.time.delayedCall(800, () => { if (bullet.active) bullet.destroy(); });
   }
 
