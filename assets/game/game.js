@@ -1444,10 +1444,16 @@ class VictoryScene extends Phaser.Scene {
       });
     };
 
-    // Ligne 1 : Rejouer | Partager
-    createBtn(cx - 130, h - 70, 240, '🔄 Rejouer', 0x2ECC71, () => {
-      this.scene.start('Level1');
-    });
+    // Ligne 1 : Rejouer / Niveau Suivant | Partager
+    if (data.level === 'level1') {
+      createBtn(cx - 130, h - 70, 240, '➡️ Niveau Suivant', 0x2ECC71, () => {
+        this.scene.start('Level2', { score: finalScore, lives: data.lives, fruits: data.fruits });
+      });
+    } else {
+      createBtn(cx - 130, h - 70, 240, '🔄 Rejouer le Niveau 2', 0x2ECC71, () => {
+        this.scene.start('Level2');
+      });
+    }
 
     createBtn(cx + 130, h - 70, 240, '📤 Partager mon score', 0x3498DB, () => {
       const shareText = `J’ai fait chanter le soleil avec le perroquet d’El Ramon Music 🦜☀️ Mon score : ${finalScore} pts. Viens battre mon score ! ${window.location.origin}`;
