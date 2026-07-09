@@ -1289,12 +1289,119 @@ class VictoryScene extends Phaser.Scene {
   constructor() { super({ key: 'Victory' }); }
 
   create(data) {
-    this.sound.stopAll(); // Arrêter la BGM
+    this.sound.stopAll();
     this.sound.play('sfx_victory');
     
     saveGameScore(this, true, data);
-    this.scene.pause();
-    window.showCoffreTropical(data.score || 0, true);
+
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Fond assombri
+    this.add.rectangle(0, 0, w, h, 0x000000, 0.7).setOrigin(0, 0);
+
+    // Confettis
+    const emitter = this.add.particles(0, -50, 'particle_star', {
+      x: { min: 0, max: w },
+      y: -50,
+      lifespan: 4000,
+      speedY: { min: 100, max: 300 },
+      speedX: { min: -50, max: 50 },
+      scale: { start: 1, end: 0.5 },
+      quantity: 2, // Limite pour mobile
+      tint: [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF],
+      gravityY: 100
+    });
+
+    // Perroquet au centre
+    const parrot = this.add.sprite(cx, cy - 100, 'player').setScale(2.5);
+    parrot.play('fly');
+
+    // Sauvegarde Best Score
+    const keys = GAME_CONFIG.storageKeys;
+    let bestScore = parseInt(localStorage.getItem(keys.bestScore) || '0', 10);
+    const finalScore = data.score || 0;
+    let isNewRecord = false;
+    
+    if (finalScore > bestScore) {
+      bestScore = finalScore;
+      localStorage.setItem(keys.bestScore, bestScore.toString());
+      isNewRecord = true;
+    }
+
+    // Rang Tropical (4 paliers)
+    let rang = '';
+    if (finalScore < 300) rang = 'Touriste Égaré';
+    else if (finalScore < 600) rang = 'Explorateur de la Jungle';
+    else if (finalScore < 1000) rang = 'Ambianceur Tropical';
+    else rang = 'Maître Perroquet 🦜';
+
+    // Textes
+    this.add.text(cx, 40, 'Victoire Tropicale ! ☀️', { fontSize: '32px', fontFamily: 'Arial Black', color: '#FFD700', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
+    this.add.text(cx, 80, 'Tu as fait chanter le soleil avec le perroquet d’El Ramon Music.', { fontSize: '16px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
+
+    // Bloc central (Score, Record, Rang)
+    const blockY = cy + 10;
+    this.add.text(cx, blockY - 20, `Score final : ${finalScore}`, { fontSize: '24px', fontFamily: 'Arial Black', color: '#2ECC71', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5);
+    this.add.text(cx, blockY + 10, `Meilleur score : ${bestScore}`, { fontSize: '18px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
+    this.add.text(cx, blockY + 40, `Rang : ${rang}`, { fontSize: '20px', fontFamily: 'Arial Black', color: '#FF9800', stroke: '#000', strokeThickness: 2 }).setOrigin(0.5);
+
+    // Messages Spéciaux
+    let msgY = blockY + 80;
+    if (isNewRecord) {
+      this.add.text(cx, msgY, 'Nouveau record tropical ! 🏆☀️', { fontSize: '16px', fontFamily: 'Arial Black', color: '#FFD700' }).setOrigin(0.5);
+      msgY += 25;
+    }
+    this.add.text(cx, msgY, 'Le Toucan Tambour est calmé 🥁☀️', { fontSize: '16px', fontFamily: 'Arial Black', color: '#00BCD4' }).setOrigin(0.5);
+
+    // --- Boutons interactifs ---
+    const createBtn = (x, y, wBtn, text, color, onClick) => {
+      const bg = this.add.rectangle(x, y, wBtn, 40, color, 1).setInteractive({ useHandCursor: true }).setStrokeStyle(2, 0xFFFFFF);
+      const txt = this.add.text(x, y, text, { fontSize: '16px', fontFamily: 'Arial Black', color: '#FFF' }).setOrigin(0.5);
+      
+      bg.on('pointerover', () => { bg.setFillStyle(0xFFFFFF); txt.setColor('#000'); });
+      bg.on('pointerout', () => { bg.setFillStyle(color); txt.setColor('#FFF'); });
+      bg.on('pointerdown', () => {
+        this.tweens.add({ targets: [bg, txt], scale: 0.9, duration: 50, yoyo: true, onComplete: onClick });
+      });
+    };
+
+    // Ligne 1 : Rejouer | Partager
+    createBtn(cx - 130, h - 70, 240, '🔄 Rejouer', 0x2ECC71, () => {
+      this.scene.start('Level1');
+    });
+
+    createBtn(cx + 130, h - 70, 240, '📤 Partager mon score', 0x3498DB, () => {
+      const shareText = `J’ai fait chanter le soleil avec le perroquet d’El Ramon Music 🦜☀️ Mon score : ${finalScore} pts. Viens battre mon score ! ${window.location.origin}`;
+      if (navigator.share) {
+        navigator.share({ title: 'Le Perroquet Tropical', text: shareText }).catch(console.error);
+      } else {
+        navigator.clipboard.writeText(shareText).then(() => {
+          const toast = this.add.text(cx + 130, h - 30, 'Score copié !', { fontSize: '14px', color: '#FFD700' }).setOrigin(0.5);
+          this.time.delayedCall(2000, () => toast.destroy());
+        });
+      }
+    });
+
+    // Ligne 2 : Coffre | Retour
+    createBtn(cx - 130, h - 20, 240, '🎁 Ouvrir mon Coffre Tropical', 0x9B59B6, () => {
+      // Ouvre le overlay HTML existant
+      window.showCoffreTropical(finalScore, true);
+    });
+
+    createBtn(cx + 130, h - 20, 240, '🏠 Retour au Club', 0xE67E22, () => {
+      window.location.href = './espace-membre.html';
+    });
+
+    // Bouton Mute
+    const muteText = this.sound.mute ? '🔇' : '🔊';
+    const muteBtn = this.add.text(w - 30, 20, muteText, { fontSize: '24px' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    muteBtn.on('pointerdown', () => {
+      this.sound.mute = !this.sound.mute;
+      muteBtn.setText(this.sound.mute ? '🔇' : '🔊');
+    });
   }
 }
 
@@ -1415,15 +1522,21 @@ window.showCoffreTropical = function(score, isVictory) {
       { text: '🎁 Bonus surprise (Kling)', link: GAME_CONFIG.bonusLinks.kling },
       { text: '🎁 Bonus surprise (Flow)', link: GAME_CONFIG.bonusLinks.flow }
     ];
-    const randomBonus = bonuses[Math.floor(Math.random() * bonuses.length)];
-    createBtn(randomBonus.text, '#2ECC71', '#FFF', () => window.open(randomBonus.link, '_blank'));
+    bonuses.forEach(b => {
+      createBtn(b.text, '#2ECC71', '#FFF', () => window.open(b.link, '_blank'));
+    });
+    
+    // Bouton pour fermer le coffre et revenir à l'écran de victoire Phaser
+    createBtn('❌ Fermer le Coffre', 'rgba(255,255,255,0.1)', '#FFF', () => {
+      overlay.style.display = 'none';
+    });
+  } else {
+    createBtn('🔄 Rejouer', '#FF8C00', '#FFF', () => {
+      overlay.style.display = 'none';
+      game.scene.getScenes(true).forEach(s => s.scene.stop());
+      game.scene.start('Level1');
+    });
   }
-
-  createBtn('🔄 Rejouer', '#FF8C00', '#FFF', () => {
-    overlay.style.display = 'none';
-    game.scene.getScenes(true).forEach(s => s.scene.stop());
-    game.scene.start('Level1');
-  });
 
   // Share API
   if (navigator.share) {
