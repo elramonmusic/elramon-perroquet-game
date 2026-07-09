@@ -466,7 +466,7 @@ class Level1Scene extends Phaser.Scene {
     }
 
     // --- Ennemis ---
-    this.enemies = [];
+    this.enemies = this.physics.add.group();
     level.enemies.forEach(e => {
       const cfgE = GAME_CONFIG.enemyTypes[e.type];
       const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake' };
@@ -497,7 +497,7 @@ class Level1Scene extends Phaser.Scene {
       this.physics.add.collider(enemy, this.platforms);
       this.physics.add.overlap(this.player, enemy, this.hitEnemy, null, this);
 
-      this.enemies.push(enemy);
+      this.enemies.add(enemy);
     });
 
     // --- Projectiles joueur ---
@@ -698,7 +698,7 @@ class Level1Scene extends Phaser.Scene {
 
     if (this.debugText) {
       const fps = Math.round(1000 / delta);
-      const activeEnemies = this.enemies.filter(e => e.alive).length;
+      const activeEnemies = this.enemies.getChildren().filter(e => e.alive).length;
       this.debugText.setText(
         `FPS: ${fps}\n` +
         `Player: (${Math.round(this.player.x)}, ${Math.round(this.player.y)})\n` +
@@ -934,8 +934,6 @@ class Level1Scene extends Phaser.Scene {
       stroke: '#000000', strokeThickness: 3
     }).setOrigin(0.5).setDepth(50);
     this.tweens.add({ targets: enemy, alpha: 0, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.easeIn', onComplete: () => { 
-      const idx = this.enemies.indexOf(enemy);
-      if (idx !== -1) this.enemies.splice(idx, 1);
       if (enemy.active) enemy.destroy(); 
     } });
     this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
@@ -993,7 +991,7 @@ class Level1Scene extends Phaser.Scene {
   // --- IA ennemis ---
   updateEnemies() {
     const now = this.time.now;
-    this.enemies.forEach(enemy => {
+    this.enemies.getChildren().forEach(enemy => {
       if (!enemy.alive) return;
 
       if (enemy.enemyType === 'singe') {
