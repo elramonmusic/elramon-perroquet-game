@@ -46,14 +46,8 @@ export async function onRequestGet(context) {
       }
     }
 
-    // Assigner le badge 🏆 Champion Tropical au top 10
-    uniqueScores.forEach((s, index) => {
-      if (index < 10 && s.score > 0) {
-        if (!s.badge || s.badge.indexOf('🏆') === -1) {
-            s.badge = `🏆 Champion Tropical`;
-        }
-      }
-    });
+    // On garde le badge original obtenu par le joueur en jeu.
+    // (Ancien code de forçage 'Champion Tropical' supprimé pour afficher le vrai badge)
 
     return new Response(JSON.stringify(uniqueScores), { status: 200, headers: CORS_HEADERS });
   } catch (err) {
