@@ -911,10 +911,6 @@ class Level1Scene extends Phaser.Scene {
     // Désactiver le corps physique immédiatement pour éviter les crashs de collision
     if (enemy.body) enemy.body.enable = false;
     
-    // Retirer de la liste des ennemis
-    const idx = this.enemies.indexOf(enemy);
-    if (idx !== -1) this.enemies.splice(idx, 1);
-    
     // Particules
     const emitter = this.add.particles(enemy.x, enemy.y, 'particle_star', {
       speed: { min: 80, max: 200 },
@@ -935,7 +931,11 @@ class Level1Scene extends Phaser.Scene {
       fontSize: '16px', fontFamily: 'Arial Black', color: '#2ECC71',
       stroke: '#000000', strokeThickness: 3
     }).setOrigin(0.5).setDepth(50);
-    this.tweens.add({ targets: enemy, alpha: 0, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.easeIn', onComplete: () => { if (enemy.active) enemy.destroy(); } });
+    this.tweens.add({ targets: enemy, alpha: 0, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.easeIn', onComplete: () => { 
+      const idx = this.enemies.indexOf(enemy);
+      if (idx !== -1) this.enemies.splice(idx, 1);
+      if (enemy.active) enemy.destroy(); 
+    } });
     this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
   }
 
