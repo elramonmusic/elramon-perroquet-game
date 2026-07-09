@@ -99,6 +99,12 @@ const GAME_CONFIG = {
       { x: 2750, y: 250, type: 'note' },
     ],
 
+    // Champignons rebondissants
+    mushrooms: [
+      { x: 800, y: 390 },
+      { x: 1500, y: 390 }
+    ],
+
     // Potion invincibilité
     potion: { x: 2360, y: 268 },
 
@@ -125,6 +131,50 @@ const GAME_CONFIG = {
     },
 
     // Perchoir final
+    perch: { x: 3800, y: 320 },
+  },
+
+  // --- NIVEAU 2 : Le Temple du Soleil Chantant ---
+  level2: {
+    name: 'Le Temple du Soleil Chantant',
+    worldWidth: 4000,
+    worldHeight: 450,
+    platforms: [
+      { x: 0, y: 400, w: 800, h: 50, type: 'ground' },
+      { x: 1000, y: 400, w: 500, h: 50, type: 'ground' },
+      { x: 1700, y: 400, w: 400, h: 50, type: 'ground' },
+      { x: 2500, y: 400, w: 1500, h: 50, type: 'ground' },
+      // Plateformes très hautes pour forcer le double saut
+      { x: 800, y: 200, w: 100, h: 16, type: 'platform' },
+      { x: 1550, y: 180, w: 100, h: 16, type: 'platform' },
+      { x: 2150, y: 150, w: 100, h: 16, type: 'platform' },
+    ],
+    fruits: [
+      { x: 800, y: 150, type: 'banana' },
+      { x: 1550, y: 130, type: 'cherry' },
+      { x: 2150, y: 100, type: 'orange' },
+    ],
+    collectibles: [],
+    mushrooms: [
+      { x: 700, y: 390 },
+      { x: 1600, y: 390 },
+      { x: 2300, y: 390 }
+    ],
+    potion: { x: -100, y: -100 }, // pas de potion
+    enemies: [
+      { x: 1100, y: 300, type: 'serpent', range: 100, speed: 120 },
+      { x: 2600, y: 300, type: 'crabe', range: 150, speed: 90 }
+    ],
+    boss: {
+      name: 'Gardien du Temple',
+      x: 3500,
+      y: 376,
+      hp: 5,
+      speed: 100,
+      jumpForce: -300,
+      shootInterval: 1500,
+      stunDuration: 800,
+    },
     perch: { x: 3800, y: 320 },
   },
 

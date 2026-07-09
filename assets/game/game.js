@@ -325,12 +325,12 @@ class StartScene extends Phaser.Scene {
 // ============================================================
 // LEVEL 1 SCENE — La Plage du Soleil
 // ============================================================
-class Level1Scene extends Phaser.Scene {
-  constructor() { super({ key: 'Level1' }); }
+class BaseLevelScene extends Phaser.Scene {
+  constructor(key) { super({ key }); }
 
   create() {
     const cfg = GAME_CONFIG;
-    const level = cfg.level1;
+    const level = cfg[this.levelKey];
 
     this.score = 0;
     this.fruits = 0;
@@ -338,6 +338,8 @@ class Level1Scene extends Phaser.Scene {
     this.invincibleUntil = 0;
     this.potionActiveUntil = 0;
     this.bossActive = false;
+    this.canDoubleJump = this.levelKey === 'level2' || (typeof DEBUG_MODE !== 'undefined' ? DEBUG_MODE : false);
+    this.hasDoubleJumped = false;
     this.bossDefeated = false;
     this.gameOver = false;
     this._paused = false;
@@ -453,6 +455,19 @@ class Level1Scene extends Phaser.Scene {
         this.collectibleSprites.push(sprite);
         this.physics.add.overlap(this.player, sprite, this.collectSpecial, null, this);
       });
+    }
+
+    
+    // --- Champignons Rebondissants ---
+    this.mushrooms = this.physics.add.staticGroup();
+    if (level.mushrooms) {
+      level.mushrooms.forEach(m => {
+        const mush = this.mushrooms.create(m.x, m.y, 'fruit_orange');
+        mush.setDisplaySize(40, 40);
+        mush.setTint(0xFF1493); // Rose tropical
+        mush.body.setSize(40, 40);
+      });
+      this.physics.add.collider(this.player, this.mushrooms, this.bounceMushroom, null, this);
     }
 
     // --- Potion ---
@@ -839,6 +854,24 @@ class Level1Scene extends Phaser.Scene {
     this.tweens.add({ targets: txt, y: txt.y - 40, scale: 1.5, alpha: 0, duration: 600, ease: 'Cubic.easeOut', onComplete: () => txt.destroy() });
   }
   
+  
+  // --- Champignons Rebondissants ---
+  bounceMushroom(player, mushroom) {
+    if (player.body.touching.down && mushroom.body.touching.up) {
+      player.setVelocityY(-700);
+      this.sound.play('sfx_jump', { rate: 0.7 });
+      this.hasDoubleJumped = false;
+      this.tweens.add({
+        targets: mushroom,
+        scaleY: 0.5,
+        scaleX: 1.2,
+        yoyo: true,
+        duration: 100,
+        onUpdate: () => { mushroom.body.updateFromGameObject(); }
+      });
+    }
+  }
+
   // --- Collecter Spécial (Note ou Soleil) ---
   collectSpecial(player, item) {
     if (!item.active) return;
@@ -1272,6 +1305,30 @@ class Level1Scene extends Phaser.Scene {
 // ============================================================
 // GAME OVER SCENE
 // ============================================================
+
+// ============================================================
+// LEVEL 1 SCENE
+// ============================================================
+class Level1Scene extends BaseLevelScene {
+  constructor() { super('Level1'); }
+  init() { this.levelKey = 'level1'; }
+}
+
+// ============================================================
+// LEVEL 2 SCENE : Le Temple du Soleil Chantant
+// ============================================================
+class Level2Scene extends BaseLevelScene {
+  constructor() { super('Level2'); }
+  init() { this.levelKey = 'level2'; }
+  create() {
+    super.create();
+    // Prototype Level 2 visuals (Sunset/Jungle Tint)
+    if (this.bgCiel) this.bgCiel.setTint(0xFF8C00); 
+    if (this.bgMontagnes) this.bgMontagnes.setTint(0xFF6347);
+    if (this.bgPlage) this.bgPlage.setTint(0x8B4513);
+  }
+}
+
 class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOver' }); }
 
@@ -1346,8 +1403,13 @@ class VictoryScene extends Phaser.Scene {
     }
 
     // Textes
-    this.add.text(cx, 40, 'Victoire Tropicale ! ☀️', { fontSize: '32px', fontFamily: 'Arial Black', color: '#FFD700', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
+    if (data.level === 'level2') {
+      this.add.text(cx, 40, 'Temple Conquis ! ☀️', { fontSize: '32px', fontFamily: 'Arial Black', color: '#FFD700', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
+      this.add.text(cx, 80, 'Le Temple chante encore plus fort... Suite bientôt disponible !', { fontSize: '16px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
+    } else {
+      this.add.text(cx, 40, 'Victoire Tropicale ! ☀️', { fontSize: '32px', fontFamily: 'Arial Black', color: '#FFD700', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
     this.add.text(cx, 80, 'Tu as fait chanter le soleil avec le perroquet d’El Ramon Music.', { fontSize: '16px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
+    }
 
     // Le badge réel est généré par le serveur (Supabase) pour éviter la triche.
     // On affiche un texte d'attente qui se mettra à jour dès que le serveur répond.
@@ -1368,7 +1430,7 @@ class VictoryScene extends Phaser.Scene {
       this.add.text(cx, msgY, 'Nouveau record tropical ! 🏆☀️', { fontSize: '16px', fontFamily: 'Arial Black', color: '#FFD700' }).setOrigin(0.5);
       msgY += 25;
     }
-    this.add.text(cx, msgY, 'Le Toucan Tambour est calmé 🥁☀️', { fontSize: '16px', fontFamily: 'Arial Black', color: '#00BCD4' }).setOrigin(0.5);
+    this.add.text(cx, msgY, data.level === 'level2' ? 'La magie du temple est restaurée ✨' : 'Le Toucan Tambour est calmé 🥁☀️', { fontSize: '16px', fontFamily: 'Arial Black', color: '#00BCD4' }).setOrigin(0.5);
 
     // --- Boutons interactifs ---
     const createBtn = (x, y, wBtn, text, color, onClick) => {
@@ -1474,7 +1536,7 @@ const gameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [PreloadScene, BootScene, StartScene, Level1Scene, GameOverScene, VictoryScene],
+  scene: [PreloadScene, BootScene, StartScene, Level1Scene, Level2Scene, GameOverScene, VictoryScene],
   pixelArt: false,
   roundPixels: true,
 };
