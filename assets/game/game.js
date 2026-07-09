@@ -470,10 +470,9 @@ class BaseLevelScene extends Phaser.Scene {
     this.mushrooms = this.physics.add.staticGroup();
     if (level.mushrooms) {
       level.mushrooms.forEach(m => {
-        const mush = this.mushrooms.create(m.x, m.y, 'fruit_orange');
-        mush.setDisplaySize(40, 40);
-        mush.setTint(0xFF1493); // Rose tropical
-        mush.body.setSize(40, 40);
+        const mush = this.mushrooms.create(m.x, m.y, 'mushroom');
+        mush.setDisplaySize(64, 64);
+        mush.body.setSize(60, 60);
       });
       this.physics.add.collider(this.player, this.mushrooms, this.bounceMushroom, null, this);
     }
@@ -865,7 +864,7 @@ class BaseLevelScene extends Phaser.Scene {
   
   // --- Champignons Rebondissants ---
   bounceMushroom(player, mushroom) {
-    if (player.body.touching.down && mushroom.body.touching.up) {
+    if (player.body.velocity.y > 0) {
       player.setVelocityY(-700);
       this.sound.play('sfx_jump', { rate: 0.7 });
       this.hasDoubleJumped = false;
@@ -1069,7 +1068,7 @@ class BaseLevelScene extends Phaser.Scene {
     this.cameras.main.setBounds(worldW - 800, 0, 800, worldH);
     this.physics.world.setBounds(worldW - 800, 0, 800, worldH);
 
-    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, 'boss_toucan');
+    this.boss = this.physics.add.sprite(bossCfg.x, bossCfg.y, bossCfg.spriteKey || 'boss_toucan');
     this.boss.setDisplaySize(130, 130);
     this.boss.setImmovable(true).setBounce(0).setCollideWorldBounds(true);
     this.boss.body.allowGravity = false;
@@ -1077,15 +1076,16 @@ class BaseLevelScene extends Phaser.Scene {
     // Hitbox ajustée pour que les pieds (y=224) touchent le sol sans s'enfoncer
     this.boss.body.setSize(150, 174).setOffset(50, 50);
     
-    if (!this.anims.exists('boss_drum')) {
+    const bossAnimKey = 'boss_anim_' + (bossCfg.spriteKey || 'boss_toucan');
+    if (!this.anims.exists(bossAnimKey)) {
       this.anims.create({
-        key: 'boss_drum',
-        frames: this.anims.generateFrameNumbers('boss_toucan', { start: 0, end: 3 }),
+        key: bossAnimKey,
+        frames: this.anims.generateFrameNumbers(bossCfg.spriteKey || 'boss_toucan', { start: 0, end: 3 }),
         frameRate: 8,
         repeat: -1
       });
     }
-    this.boss.play('boss_drum');
+    this.boss.play(bossAnimKey);
     this.boss.facingRight = false;
     this.physics.add.collider(this.boss, this.platforms);
     this.physics.add.overlap(this.player, this.boss, this.hitBoss, null, this);
@@ -1331,10 +1331,11 @@ class Level2Scene extends BaseLevelScene {
   init() { this.levelKey = 'level2'; }
   create() {
     super.create();
-    // Prototype Level 2 visuals (Sunset/Jungle Tint)
-    if (this.bgCiel) this.bgCiel.setTint(0xFF8C00); 
-    if (this.bgMontagnes) this.bgMontagnes.setTint(0xFF6347);
-    if (this.bgPlage) this.bgPlage.setTint(0x8B4513);
+    // Utiliser les visuels du Niveau 2
+    if (this.bgCiel) { this.bgCiel.clearTint(); this.bgCiel.setTexture('lvl2_ciel'); }
+    if (this.bgMontagnes) { this.bgMontagnes.clearTint(); this.bgMontagnes.setTexture('lvl2_montagnes'); }
+    if (this.bgPlage) { this.bgPlage.clearTint(); this.bgPlage.setTexture('lvl2_plage'); }
+    if (this.bgFeuilles) { this.bgFeuilles.clearTint(); this.bgFeuilles.setTexture('lvl2_feuilles'); }
   }
 }
 
