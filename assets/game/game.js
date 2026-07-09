@@ -1053,7 +1053,7 @@ class BaseLevelScene extends Phaser.Scene {
     this.bossActive = true;
     zone.destroy();
 
-    const bossCfg = GAME_CONFIG.level1.boss;
+    const bossCfg = GAME_CONFIG[this.levelKey].boss;
     const worldH = GAME_CONFIG.level1.worldHeight;
     const worldW = GAME_CONFIG.level1.worldWidth;
     
@@ -1110,7 +1110,7 @@ class BaseLevelScene extends Phaser.Scene {
     this.boss.setVelocityX(this.bossSpeed * dir);
     this.boss.setFlipX(dir < 0);
 
-    if (now - this.lastBossShot > GAME_CONFIG.level1.boss.shootInterval) {
+    if (now - this.lastBossShot > GAME_CONFIG[this.levelKey].boss.shootInterval) {
       this.lastBossShot = now;
       this.sound.play('sfx_boss_drum');
       const proj = this.bossProjectiles.create(this.boss.x, this.boss.y + 20, 'seed');
@@ -1123,7 +1123,7 @@ class BaseLevelScene extends Phaser.Scene {
   // --- Joueur vs boss ---
   hitBoss(player, boss) {
     const now = this.time.now;
-    const bossCfg = GAME_CONFIG.level1.boss;
+    const bossCfg = GAME_CONFIG[this.levelKey].boss;
 
     if (player.body.velocity.y > 0 && player.y < boss.y - 15) {
       if (this.bossStunUntil < now) {
@@ -1152,7 +1152,7 @@ class BaseLevelScene extends Phaser.Scene {
   }
 
   // --- Bullet hit boss ---
-  bulletHitBoss(boss, bullet) {
+  bulletHitBoss(bullet, boss) {
     if (!bullet.active) return;
     bullet.disableBody(true, true);
     this.time.delayedCall(50, () => { if (bullet) bullet.destroy(); });
@@ -1172,7 +1172,7 @@ class BaseLevelScene extends Phaser.Scene {
        }
     }
     
-    this.bossStunUntil = this.time.now + GAME_CONFIG.level1.boss.stunDuration;
+    this.bossStunUntil = this.time.now + GAME_CONFIG[this.levelKey].boss.stunDuration;
   }
 
   // --- Défaite du boss ---
