@@ -15,7 +15,7 @@
   <style>
     /* PREMIUM DASHBOARD SPECIFIC STYLES */
     .dash-hero-img {
-       background: url('../assets/images/header_members.png?v=2') no-repeat center center;
+       background: url('../assets/images/header_members_v2.png') no-repeat center center;
        background-size: cover;
        min-height: 45vh;
        position: relative;
@@ -206,7 +206,7 @@
           <div class="profile-avatar">🦜</div>
           <div class="profile-info">
             <h2 class="profile-name" id="member-name">Membre du Club</h2>
-            <p class="profile-sub" id="member-since">Chargement de ton profil...</p>
+            <p class="profile-sub" id="member-since">Prêt pour l'aventure !</p>
             <div class="profile-badges">
               <div class="stat-badge stat-badge-rank">👑 <span id="member-rank">Nouveau Membre</span></div>
               <div class="stat-badge stat-badge-score">🏆 <span id="member-score">0</span> pts</div>
@@ -328,8 +328,8 @@
         sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
       }
 
-      let bestScore = parseInt(localStorage.getItem('er_game_best_score') || '0');
-      let bossDefeatedCount = localStorage.getItem('er_game_boss_defeated') === 'true' ? 1 : 0;
+      let bestScore = parseInt(localStorage.getItem('elramon_game_best_score') || '0');
+      let bossDefeatedCount = localStorage.getItem('elramon_game_boss1_defeated') === 'true' ? 1 : 0;
       
       try {
         const resp = await fetch('/functions/game-score');
@@ -344,12 +344,12 @@
             }
             if (sinceEl && userScore.created_at) {
               const date = new Date(userScore.created_at);
-              sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+              // sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
             }
           }
         }
       } catch (e) {
-        console.error("Erreur stats", e);
+        console.error("Erreur stats api (local environment ?)", e);
       }
 
       document.getElementById('member-score').textContent = bestScore;
