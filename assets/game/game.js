@@ -1117,11 +1117,9 @@ class Level1Scene extends Phaser.Scene {
   }
 
   // --- Bullet hit boss ---
-  bulletHitBoss(bullet, boss) {
+  bulletHitBoss(boss, bullet) {
     if (!bullet.active) return;
-    if (bullet.body) bullet.body.enable = false;
-    bullet.active = false;
-    bullet.visible = false;
+    bullet.disableBody(true, true);
     this.time.delayedCall(50, () => { if (bullet) bullet.destroy(); });
     
     // Le boss prend des dégâts aussi par les balles maintenant !
