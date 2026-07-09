@@ -1301,9 +1301,12 @@ class VictoryScene extends Phaser.Scene {
     const cx = w / 2;
     const cy = h / 2;
 
-    // Fond personnalisé (image à fournir par l'utilisateur)
+    // Fond personnalisé
     const bg = this.add.image(cx, cy, 'victory_bg');
     bg.setDisplaySize(w, h);
+
+    // Voile sombre léger pour la lisibilité
+    this.add.rectangle(0, 0, w, h, 0x000000, 0.4).setOrigin(0, 0);
 
     // Confettis
     const emitter = this.add.particles(0, -50, 'particle_star', {
@@ -1317,6 +1320,18 @@ class VictoryScene extends Phaser.Scene {
       tint: [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF],
       gravityY: 100
     });
+
+    // Perroquet animé
+    const parrot = this.add.sprite(cx, cy - 110, 'real_parrot').setScale(0.8);
+    if (!this.anims.exists('parrot_fly')) {
+      this.anims.create({
+        key: 'parrot_fly',
+        frames: this.anims.generateFrameNumbers('real_parrot', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    parrot.play('parrot_fly');
 
     // Sauvegarde Best Score
     const keys = GAME_CONFIG.storageKeys;
