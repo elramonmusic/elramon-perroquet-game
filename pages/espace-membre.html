@@ -266,11 +266,13 @@
           </a>
 
           <!-- TEASING BANANES -->
-          <div class="glass-card" style="opacity: 0.7;">
+          <div class="glass-card">
             <span class="card-icon">🍌</span>
             <h3 class="card-title">Bananes du Club</h3>
-            <p class="card-desc">Gagne des bananes dans le mini-jeu pour débloquer des cadeaux inédits.</p>
-            <span class="card-tag tag-soon">Bientôt disponible</span>
+            <p class="card-desc">Gagne des bananes dans les niveaux pour débloquer des cadeaux inédits.</p>
+            <span class="card-tag tag-play" style="background:rgba(255,215,0,0.15); color:var(--yellow-sun); border:1px solid rgba(255,215,0,0.3); font-size: 1rem;">
+              Solde : <strong id="member-bananas">0</strong> 🍌
+            </span>
           </div>
         </div>
       </div>
@@ -330,21 +332,24 @@
 
       let bestScore = parseInt(localStorage.getItem('elramon_game_best_score') || '0');
       let bossDefeatedCount = localStorage.getItem('elramon_game_boss1_defeated') === 'true' ? 1 : 0;
+      let totalBananas = Math.floor(bestScore / 100);
       
       try {
-        const resp = await fetch('/functions/game-score');
+        const queryParams = new URLSearchParams();
+        if (member.email) queryParams.append('email', member.email);
+        if (member.pseudo) queryParams.append('pseudo', member.pseudo);
+
+        const resp = await fetch(`/functions/member-stats?${queryParams.toString()}`);
         if (resp.ok) {
-          const scores = await resp.json();
-          // Chercher le membre dans le leaderboard
-          const userScore = scores.find(s => s.pseudo === member.pseudo);
-          if (userScore) {
-            bestScore = Math.max(bestScore, userScore.score);
-            if (userScore.badge && (userScore.badge.includes('Roi') || userScore.badge.includes('Sauvée'))) {
-              bossDefeatedCount = 1;
-            }
-            if (sinceEl && userScore.created_at) {
-              const date = new Date(userScore.created_at);
-              // sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+          const stats = await resp.json();
+          if (stats && stats.total_score !== undefined) {
+            bestScore = stats.total_score;
+            bossDefeatedCount = stats.bosses_defeated;
+            totalBananas = stats.total_bananas;
+            
+            if (sinceEl && stats.joined_at) {
+              const date = new Date(stats.joined_at);
+              sinceEl.textContent = 'A commencé l\\'aventure le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
             }
           }
         }
@@ -354,6 +359,7 @@
 
       document.getElementById('member-score').textContent = bestScore;
       document.getElementById('member-bosses').textContent = bossDefeatedCount;
+      document.getElementById('member-bananas').textContent = totalBananas;
 
       let currentRank = 'Nouveau Membre';
       if (bestScore > 0) currentRank = 'Perroquet Débutant';
