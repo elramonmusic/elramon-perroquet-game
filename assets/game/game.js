@@ -1217,7 +1217,7 @@ class BaseLevelScene extends Phaser.Scene {
 
   // --- Perchoir ---
   showPerch() {
-    const pc = GAME_CONFIG.level1.perch;
+    const pc = GAME_CONFIG[this.levelKey].perch;
     this.perch = this.physics.add.staticImage(pc.x, pc.y, 'perch');
     this.physics.add.overlap(this.player, this.perch, this.reachPerch, null, this);
   }
@@ -1225,7 +1225,7 @@ class BaseLevelScene extends Phaser.Scene {
   reachPerch(player, perch) {
     perch.destroy();
     this.saveProgress();
-    this.scene.start('Victory', { score: this.score, fruitsCollected: this.fruits, lives: this.lives });
+    this.scene.start('Victory', { score: this.score, fruitsCollected: this.fruits, lives: this.lives, level: this.levelKey });
   }
 
   // --- Visuel invincibilité ---

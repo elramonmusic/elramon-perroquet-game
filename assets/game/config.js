@@ -99,11 +99,8 @@ const GAME_CONFIG = {
       { x: 2750, y: 250, type: 'note' },
     ],
 
-    // Champignons rebondissants
-    mushrooms: [
-      { x: 800, y: 390 },
-      { x: 1500, y: 390 }
-    ],
+    // Champignons rebondissants (uniquement niveau 2)
+    mushrooms: [],
 
     // Potion invincibilité
     potion: { x: 2360, y: 268 },
