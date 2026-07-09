@@ -24,6 +24,8 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('parallax_montagnes', '../assets/images/game/parallax/montagnes.png?v=1');
     this.load.image('parallax_plage', '../assets/images/game/parallax/plage.png?v=1');
     this.load.image('parallax_feuilles', '../assets/images/game/parallax/feuilles.png?v=1');
+    this.load.image('particle_star', '../assets/images/game/star.png?v=1');
+    this.load.image('victory_bg', '../assets/images/game/victory_bg.png?v=1');
     this.load.image('fruit_banana', '../assets/images/game/banana.png?v=1');
     this.load.image('fruit_orange', '../assets/images/game/orange.png?v=1');
     this.load.image('fruit_cherry', '../assets/images/game/cherry.png?v=1');
@@ -1299,8 +1301,9 @@ class VictoryScene extends Phaser.Scene {
     const cx = w / 2;
     const cy = h / 2;
 
-    // Fond assombri
-    this.add.rectangle(0, 0, w, h, 0x000000, 0.7).setOrigin(0, 0);
+    // Fond personnalisé (image à fournir par l'utilisateur)
+    const bg = this.add.image(cx, cy, 'victory_bg');
+    bg.setDisplaySize(w, h);
 
     // Confettis
     const emitter = this.add.particles(0, -50, 'particle_star', {
@@ -1314,10 +1317,6 @@ class VictoryScene extends Phaser.Scene {
       tint: [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF],
       gravityY: 100
     });
-
-    // Perroquet au centre
-    const parrot = this.add.sprite(cx, cy - 100, 'player').setScale(2.5);
-    parrot.play('fly');
 
     // Sauvegarde Best Score
     const keys = GAME_CONFIG.storageKeys;
