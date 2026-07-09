@@ -1345,22 +1345,22 @@ class VictoryScene extends Phaser.Scene {
       isNewRecord = true;
     }
 
-    // Rang Tropical (4 paliers)
-    let rang = '';
-    if (finalScore < 300) rang = 'Touriste Égaré';
-    else if (finalScore < 600) rang = 'Explorateur de la Jungle';
-    else if (finalScore < 1000) rang = 'Ambianceur Tropical';
-    else rang = 'Maître Perroquet 🦜';
-
     // Textes
     this.add.text(cx, 40, 'Victoire Tropicale ! ☀️', { fontSize: '32px', fontFamily: 'Arial Black', color: '#FFD700', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
     this.add.text(cx, 80, 'Tu as fait chanter le soleil avec le perroquet d’El Ramon Music.', { fontSize: '16px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
 
-    // Bloc central (Score, Record, Rang)
+    // Le badge réel est généré par le serveur (Supabase) pour éviter la triche.
+    // On affiche un texte d'attente qui se mettra à jour dès que le serveur répond.
     const blockY = cy + 10;
     this.add.text(cx, blockY - 20, `Score final : ${finalScore}`, { fontSize: '24px', fontFamily: 'Arial Black', color: '#2ECC71', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5);
     this.add.text(cx, blockY + 10, `Meilleur score : ${bestScore}`, { fontSize: '18px', fontFamily: 'Arial', color: '#FFF' }).setOrigin(0.5);
-    this.add.text(cx, blockY + 40, `Rang : ${rang}`, { fontSize: '20px', fontFamily: 'Arial Black', color: '#FF9800', stroke: '#000', strokeThickness: 2 }).setOrigin(0.5);
+    
+    const badgeText = this.add.text(cx, blockY + 40, `Analyse du score... ⏳`, { fontSize: '20px', fontFamily: 'Arial Black', color: '#FF9800', stroke: '#000', strokeThickness: 2 }).setOrigin(0.5);
+
+    // Écoute de l'événement émis par saveGameScore
+    this.events.once('score_saved', (serverBadge) => {
+      badgeText.setText(`Badge obtenu : ${serverBadge}`);
+    });
 
     // Messages Spéciaux
     let msgY = blockY + 80;
