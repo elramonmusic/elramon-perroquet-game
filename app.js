@@ -447,13 +447,9 @@ async function handleInscription(event) {
     }
 
     // Appel Supabase pour envoyer le Magic Link avec les métadonnées
-    try {
-      const { error } = await Auth.sendMagicLink(email, { pseudo, prenom });
-      if (error) {
-        console.warn("Erreur envoi Magic Link", error);
-      }
-    } catch(e) {
-      console.warn("Exception envoi Magic Link", e);
+    const { error } = await Auth.sendMagicLink(email, { pseudo, prenom });
+    if (error) {
+      throw error;
     }
 
     window._turnstileToken = undefined;
@@ -478,7 +474,7 @@ async function handleInscription(event) {
 
   } catch (err) {
     console.error('Inscription error:', err);
-    Toast.show('Une erreur est survenue. Réessaie dans un instant.', 'error');
+    Toast.show(err.message || 'Une erreur est survenue. Réessaie dans un instant.', 'error', 6000);
     Form.setLoading(btn, false);
     btn.dataset.submitting = '0';
   }
