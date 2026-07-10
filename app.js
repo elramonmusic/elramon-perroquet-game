@@ -453,7 +453,7 @@ async function handleInscription(event) {
     window._turnstileToken = undefined;
 
     // Afficher le message de succès chaleureux et les confettis
-    const successEl = form.querySelector('.form-success');
+    const successEl = document.querySelector('.form-success');
     if (successEl) {
       successEl.innerHTML = `
         <h3 style="font-size:1.3rem; margin-bottom:1rem;">Bienvenue dans le Club ! 🌴</h3>
@@ -462,6 +462,9 @@ async function handleInscription(event) {
       form.style.display = 'none';
       successEl.classList.add('visible');
       if (typeof fireConfetti === 'function') fireConfetti();
+    } else {
+      Form.setLoading(btn, false);
+      btn.dataset.submitting = '0';
     }
 
     // Plus de redirection automatique vers merci.html car ils doivent cliquer sur le mail
