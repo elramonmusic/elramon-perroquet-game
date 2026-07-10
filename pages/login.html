@@ -257,7 +257,7 @@
           window.ElRamon.Auth.sendMagicLink(email)
           .then(({ error }) => {
             if (error) {
-              window.ElRamon.Toast.show(error.message || 'Erreur d\\'envoi du lien magique.', 'error');
+              window.ElRamon.Toast.show(error.message || "Erreur d'envoi du lien magique.", 'error');
             } else {
               // Succès : demander à l'utilisateur de vérifier ses emails
               const successEl = document.querySelector('.form-success');
