@@ -341,34 +341,33 @@
     async function checkGameAccess() {
       showAccessLoading();
 
-      let session = null;
-
-      // Vérification Supabase V2 si dispo
-      if (window.supabase) {
-        const { data, error } = await window.supabase.auth.getSession();
-        if (error) {
-          console.error("Erreur vérification session Supabase:", error);
+      // Wait for app.js to initialize window.ElRamon.Auth
+      // Since checkGameAccess is called immediately, we delay it until DOMContentLoaded
+      if (!window.ElRamon || !window.ElRamon.Auth) {
+        // Fallback for immediate execution
+        const hasV1Key = localStorage.getItem("elramon_member") !== null;
+        const hasClubMemberKey = localStorage.getItem("elramonClubMember") === "true";
+        if (hasV1Key || hasClubMemberKey) {
+          showGame();
+          return;
         }
-        session = data?.session;
+        
+        // Listen for initialization
+        window.addEventListener('elramon_auth_ready', checkGameAccess);
+        // also check on load just in case
+        window.addEventListener('load', checkGameAccess);
+        return;
       }
 
-      if (session?.user) {
+      const member = await window.ElRamon.Auth.getMember();
+      
+      if (member) {
         localStorage.setItem("elramonClubMember", "true");
         showGame();
-        return;
+      } else {
+        localStorage.removeItem("elramonClubMember");
+        showMemberOnlyScreen();
       }
-
-      // Fallback via Auth.isLoggedIn() (qui check 'elramon_member') ou l'ancienne clé
-      const hasAuth = window.ElRamon && window.ElRamon.Auth && window.ElRamon.Auth.isLoggedIn();
-      const hasV1Key = localStorage.getItem("elramon_member") !== null;
-      const hasClubMemberKey = localStorage.getItem("elramonClubMember") === "true";
-      
-      if (hasAuth || hasV1Key || hasClubMemberKey) {
-        showGame();
-        return;
-      }
-
-      showMemberOnlyScreen();
     }
 
     // Écoute Supabase

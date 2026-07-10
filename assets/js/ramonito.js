@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   style.textContent = `
     .ramonito-widget-container {
       position: fixed;
-      bottom: 20px;
+      bottom: 120px;
       right: 20px;
       z-index: 9999;
       font-family: 'Inter', sans-serif;
@@ -56,111 +56,132 @@ document.addEventListener('DOMContentLoaded', async () => {
       border: 3px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       font-size: 1.8rem;
-      cursor: pointer;
+      cursor: grab;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      float: right;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-left: auto;
     }
     .ramonito-toggle-btn:hover {
-      transform: scale(1.1) rotate(10deg);
+      transform: scale(1.05);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     }
     .ramonito-chatbox {
-      width: 350px;
-      height: 500px;
-      max-height: 80vh;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      width: 320px;
+      height: 400px;
+      background: rgba(26, 26, 46, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+      border-radius: 16px;
+      margin-bottom: 16px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      margin-bottom: 15px;
-      transition: opacity 0.3s, transform 0.3s;
-      transform-origin: bottom right;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
       overflow: hidden;
+      transform-origin: bottom right;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .ramonito-chatbox.hidden {
       opacity: 0;
+      transform: scale(0.8);
       pointer-events: none;
-      transform: scale(0.8) translateY(20px);
     }
     .ramonito-header {
-      padding: 15px 20px;
+      padding: 12px 16px;
       background: rgba(255, 255, 255, 0.05);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      cursor: grab;
     }
     .ramonito-title {
       font-weight: 700;
-      color: white;
+      color: #FFF;
       font-size: 1.1rem;
     }
     .ramonito-balance {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      color: var(--turquoise);
+      gap: 8px;
     }
     .badge-free {
-      background: var(--turquoise);
-      color: #0f172a;
-      padding: 2px 8px;
-      border-radius: 12px;
+      background: #2ECC71;
+      color: #FFF;
       font-size: 0.7rem;
-      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .badge-free.hidden {
+      display: none;
+    }
+    #ramonito-bananas-count {
+      color: var(--yellow);
+      font-weight: 700;
+      font-size: 0.9rem;
     }
     .ramonito-close-btn {
       background: none;
       border: none;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255,255,255,0.6);
       font-size: 1.5rem;
       cursor: pointer;
-      line-height: 1;
+      transition: color 0.2s;
     }
-    .ramonito-close-btn:hover { color: white; }
+    .ramonito-close-btn:hover {
+      color: #FFF;
+    }
     .ramonito-messages {
       flex: 1;
+      padding: 16px;
       overflow-y: auto;
-      padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .ramonito-messages::-webkit-scrollbar { width: 6px; }
-    .ramonito-messages::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+    .ramonito-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .ramonito-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
     .message {
       max-width: 85%;
       padding: 10px 14px;
-      border-radius: 15px;
-      font-size: 0.95rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
       line-height: 1.4;
-      animation: fadeIn 0.3s ease;
+      animation: message-appear 0.3s ease forwards;
     }
-    @keyframes fadeIn {
+    .message.assistant {
+      background: rgba(46, 204, 113, 0.15);
+      color: #E8F8F5;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .message.user {
+      background: rgba(255, 215, 0, 0.15);
+      color: #FFF9C4;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .message.error {
+      background: rgba(229, 57, 53, 0.2);
+      color: #FFCDD2;
+      align-self: center;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    @keyframes message-appear {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .message.assistant {
-      background: rgba(45, 212, 191, 0.15);
-      color: #e2e8f0;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-    .message.user {
-      background: var(--turquoise);
-      color: #0f172a;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
     .ramonito-input-area {
-      padding: 15px;
+      padding: 12px;
       background: rgba(0, 0, 0, 0.2);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
@@ -306,6 +327,60 @@ document.addEventListener('DOMContentLoaded', async () => {
       inputEl.focus();
     }
   }
+
+  // Drag logic
+  const container = document.getElementById('ramonito-widget');
+  const header = document.querySelector('.ramonito-header');
+  
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  function onDragStart(e) {
+    if (e.target === document.getElementById('ramonito-close')) return;
+    isDragging = true;
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    const rect = container.getBoundingClientRect();
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+    
+    document.addEventListener('mousemove', onDragMove, { passive: false });
+    document.addEventListener('mouseup', onDragEnd);
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', onDragEnd);
+  }
+
+  function onDragMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    
+    const newLeft = clientX - offsetX;
+    const newTop = clientY - offsetY;
+    
+    const maxX = window.innerWidth - container.offsetWidth;
+    const maxY = window.innerHeight - container.offsetHeight;
+    
+    container.style.right = 'auto';
+    container.style.bottom = 'auto';
+    container.style.left = Math.min(Math.max(0, newLeft), maxX) + 'px';
+    container.style.top = Math.min(Math.max(0, newTop), maxY) + 'px';
+  }
+
+  function onDragEnd(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+  }
+
+  header.addEventListener('mousedown', onDragStart);
+  header.addEventListener('touchstart', onDragStart, { passive: true });
+  toggleBtn.addEventListener('mousedown', onDragStart);
+  toggleBtn.addEventListener('touchstart', onDragStart, { passive: true });
 
   sendBtn.addEventListener('click', handleSend);
   inputEl.addEventListener('keypress', (e) => {
