@@ -257,7 +257,11 @@
           window.ElRamon.Auth.sendMagicLink(email)
           .then(({ error }) => {
             if (error) {
-              window.ElRamon.Toast.show(error.message || "Erreur d'envoi du lien magique.", 'error');
+              let errMsg = error.message;
+              if (!errMsg || errMsg === '{}') {
+                errMsg = "Impossible d'envoyer le lien de connexion (limite d'envois atteinte ou SMTP invalide). Contacte l'admin.";
+              }
+              window.ElRamon.Toast.show(errMsg, 'error');
             } else {
               // Succès : demander à l'utilisateur de vérifier ses emails
               const successEl = document.querySelector('.form-success');

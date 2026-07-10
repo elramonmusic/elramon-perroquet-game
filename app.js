@@ -474,7 +474,11 @@ async function handleInscription(event) {
 
   } catch (err) {
     console.error('Inscription error:', err);
-    Toast.show(err.message || 'Une erreur est survenue. Réessaie dans un instant.', 'error', 6000);
+    let errMsg = err.message;
+    if (!errMsg || errMsg === '{}') {
+      errMsg = "Compte créé en base de données, mais l'envoi du mail de validation a échoué (limite d'envois atteinte ou SMTP invalide). Contacte l'admin.";
+    }
+    Toast.show(errMsg, 'error', 7000);
     Form.setLoading(btn, false);
     btn.dataset.submitting = '0';
   }
