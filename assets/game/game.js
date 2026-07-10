@@ -1504,9 +1504,17 @@ async function saveGameScore(scene, bossDefeated, data) {
       time_seconds: 0
     };
 
+    const session = await window.supabaseClient.auth.getSession();
+    const token = session?.data?.session?.access_token;
+    
+    if (!token) return;
+
     const res = await fetch('/game-score', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(payload)
     });
 

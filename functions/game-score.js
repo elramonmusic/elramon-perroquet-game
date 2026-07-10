@@ -99,67 +99,90 @@ export async function onRequestPost(context) {
     badge
   };
 
-  if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
-    try {
-      // 1. Insérer le score
-      const insertResp = await fetch(`${env.SUPABASE_URL}/rest/v1/game_scores`, {
-        method: 'POST',
-        headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(scoreData),
-      });
-
-      if (!insertResp.ok) {
-        const errText = await insertResp.text();
-        throw new Error('Supabase POST failed: ' + errText);
-      }
-
-      // 2. Mettre à jour le profil (bananes et meilleur score)
-      const earnedBananas = Math.floor(scoreData.score / 100);
-      
-      const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(member_email)}&select=id,bananas_balance,best_score`, {
-        method: 'GET',
-        headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
-        }
-      });
-
-      if (profileRes.ok) {
-        const profiles = await profileRes.json();
-        if (profiles.length > 0) {
-          const profile = profiles[0];
-          const newBananas = (profile.bananas_balance || 0) + earnedBananas;
-          const newBestScore = Math.max(profile.best_score || 0, scoreData.score);
-          
-          await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${profile.id}`, {
-            method: 'PATCH',
-            headers: {
-              'apikey': env.SUPABASE_SERVICE_KEY,
-              'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-              'Content-Type': 'application/json',
-              'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({
-              bananas_balance: newBananas,
-              best_score: newBestScore,
-              best_level: scoreData.level
-            })
-          });
-        }
-      }
-
-      return new Response(JSON.stringify({ success: true, badge, score: scoreData.score, earnedBananas }), { status: 200, headers: CORS_HEADERS });
-    } catch (err) {
-      console.error('Supabase error:', err.message);
-      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Non autorisé." }), { status: 401, headers: CORS_HEADERS });
     }
-  }
 
-  return new Response(JSON.stringify({ error: 'Configuration serveur manquante (pas de SUPABASE_SERVICE_KEY)' }), { status: 500, headers: CORS_HEADERS });
+    const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader,
+        'apikey': env.SUPABASE_SERVICE_KEY
+      }
+    });
+
+    if (!userRes.ok) {
+      return new Response(JSON.stringify({ error: "Session invalide." }), { status: 401, headers: CORS_HEADERS });
+    }
+    const user = await userRes.json();
+    const userId = user.id;
+
+    if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
+      try {
+        // 1. Insérer le score
+        const insertResp = await fetch(`${env.SUPABASE_URL}/rest/v1/game_scores`, {
+          method: 'POST',
+          headers: {
+            'apikey': env.SUPABASE_SERVICE_KEY,
+            'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(scoreData),
+        });
+
+        if (!insertResp.ok) {
+          const errText = await insertResp.text();
+          throw new Error('Supabase POST failed: ' + errText);
+        }
+
+        // 2. Mettre à jour le profil (bananes et meilleur score)
+        const earnedBananas = Math.floor(scoreData.score / 100);
+        
+        const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=id,bananas_balance,best_score`, {
+          method: 'GET',
+          headers: {
+            'apikey': env.SUPABASE_SERVICE_KEY,
+            'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
+          }
+        });
+
+        if (profileRes.ok) {
+          const profiles = await profileRes.json();
+          if (profiles.length > 0) {
+            const profile = profiles[0];
+            const newBananas = (profile.bananas_balance || 0) + earnedBananas;
+            const newBestScore = Math.max(profile.best_score || 0, scoreData.score);
+            
+            await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {
+              method: 'PATCH',
+              headers: {
+                'apikey': env.SUPABASE_SERVICE_KEY,
+                'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({
+                bananas_balance: newBananas,
+                best_score: newBestScore,
+                best_level: scoreData.level
+              })
+            });
+          } else {
+             console.error("Profile not found for user", userId);
+          }
+        } else {
+             console.error("Profile fetch failed", await profileRes.text());
+        }
+
+        return new Response(JSON.stringify({ success: true, badge, score: scoreData.score, earnedBananas }), { status: 200, headers: CORS_HEADERS });
+      } catch (err) {
+        console.error('Supabase error:', err.message);
+        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });
+      }
+    }
+
+    return new Response(JSON.stringify({ error: 'Configuration serveur manquante (pas de SUPABASE_SERVICE_KEY)' }), { status: 500, headers: CORS_HEADERS });
 }
 
 export async function onRequestOptions() {
