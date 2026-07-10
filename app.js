@@ -32,87 +32,124 @@ window.onTurnstileError = function() {
 };
 
 // ============================================================
-// AUTH UTILS (localStorage — session client uniquement)
-// La base de données Supabase est gérée côté serveur (Cloudflare Functions).
+// SUPABASE & AUTH
 // ============================================================
+window.ElRamon = window.ElRamon || {};
+window.supabaseClient = null;
+
 const Auth = {
   /**
-   * Récupère les données du membre connecté
-   * @returns {Object|null} données membre ou null
+   * Initialise le client Supabase
    */
-  getMember() {
+  async init() {
+    if (window.supabaseClient) return true;
     try {
-      const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
+      const res = await fetch('/config');
+      if (res.ok) {
+        const config = await res.json();
+        if (window.supabase) {
+          window.supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+          
+          // Abonnement aux changements d'état
+          window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+              localStorage.removeItem(CONFIG.STORAGE_KEY);
+              window.location.href = '/';
+            }
+          });
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error("Erreur init Supabase", e);
     }
+    return false;
   },
 
   /**
-   * Enregistre un nouveau membre
+   * Récupère la session utilisateur
+   * @returns {Promise<Object|null>} session ou null
    */
-  saveMember(data) {
-    const member = {
-      email: data.email,
-      pseudo: data.pseudo,
-      prenom: data.prenom || '',
-      role: 'member',
-      joined_at: new Date().toISOString(),
-    };
-    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(member));
-    localStorage.setItem('elramonClubMember', 'true');
-    return member;
+  async getSession() {
+    if (!window.supabaseClient) await this.init();
+    if (!window.supabaseClient) return null;
+    const { data, error } = await window.supabaseClient.auth.getSession();
+    if (error || !data.session) return null;
+    return data.session;
+  },
+
+  /**
+   * Récupère le profil complet (auth + table profiles)
+   * @returns {Promise<Object|null>} données membre ou null
+   */
+  async getMember() {
+    const session = await this.getSession();
+    if (!session) return null;
+    
+    // Récupérer les détails depuis la table profiles
+    const { data: profile, error } = await window.supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+      
+    if (error || !profile) {
+      // Profil pas encore créé (trigger en retard)
+      return { email: session.user.email, id: session.user.id };
+    }
+    
+    return { ...session.user, ...profile };
   },
 
   /**
    * Vérifie si l'utilisateur est connecté
    */
-  isLoggedIn() {
-    return !!this.getMember();
+  async isLoggedIn() {
+    return !!(await this.getSession());
   },
 
   /**
    * Déconnexion
    */
-  logout() {
+  async logout() {
+    if (window.supabaseClient) {
+      await window.supabaseClient.auth.signOut();
+    }
     localStorage.removeItem(CONFIG.STORAGE_KEY);
     localStorage.removeItem('elramonClubMember');
     window.location.href = '/';
   },
 
   /**
-   * Protection de page — redirige si non connecté
-   * @param {string} redirectUrl URL de redirection si non connecté
+   * Envoi du Magic Link (Connexion/Inscription)
    */
-  requireAuth(redirectUrl = null) {
-    if (!this.isLoggedIn()) {
-      const target = redirectUrl || (isSubPage() ? '../pages/inscription.html' : '/pages/inscription.html');
-      window.location.href = target;
-      return false;
-    }
-    return true;
-  },
-
-  /**
-   * Injection login en V2 (Supabase Auth) — à venir
-   */
-  async loginWithEmail(email, password) {
-    console.warn('Auth Supabase (V2) non encore implémentée.');
-    return { error: 'Backend non configuré' };
+  async sendMagicLink(email, metadata = {}) {
+    if (!window.supabaseClient) await this.init();
+    const redirectUrl = window.location.origin + '/pages/espace-membre.html';
+    
+    const { data, error } = await window.supabaseClient.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: metadata
+      }
+    });
+    return { data, error };
   },
 
   /**
    * Protection automatique des pages membres.
-   * À appeler via <body data-protect> — app.js détecte l'attribut au DOMContentLoaded.
+   * Redirige si non connecté
    */
-  protectPage(redirectUrl) {
+  async protectPage(redirectUrl) {
     const target = redirectUrl || (isSubPage() ? './inscription.html' : '/pages/inscription.html');
-    if (!this.isLoggedIn()) {
+    const loggedIn = await this.isLoggedIn();
+    if (!loggedIn) {
       window.location.href = target;
     }
   }
 };
+window.ElRamon.Auth = Auth;
 
 // ============================================================
 // NAVIGATION
@@ -161,8 +198,8 @@ function initNavigation() {
   updateNavAuth();
 }
 
-function updateNavAuth() {
-  const member = Auth.getMember();
+async function updateNavAuth() {
+  const member = await Auth.getMember();
   const authLinks = document.querySelectorAll('[data-auth-show]');
   const guestLinks = document.querySelectorAll('[data-guest-show]');
   const memberNameEls = document.querySelectorAll('[data-member-name]');
@@ -177,7 +214,7 @@ function updateNavAuth() {
 
   if (member) {
     memberNameEls.forEach(el => {
-      el.textContent = member.prenom || member.pseudo;
+      el.textContent = member.prenom || member.pseudo || 'Membre';
     });
   }
 }
@@ -393,40 +430,42 @@ async function handleInscription(event) {
     const payload = { email, pseudo, prenom, newsletter, abonne, rgpd, turnstile: window._turnstileToken || '' };
 
     // Tentative d'envoi vers le backend
-    let serverSaved = false;
     try {
-      const response = await fetch('/subscribe', {
+      await fetch('/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      if (response.ok) {
-        serverSaved = true;
-      }
     } catch (fetchError) {
-      console.warn('Backend unavailable, saving to localStorage only:', fetchError.message);
+      console.warn('Backend unavailable:', fetchError.message);
+    }
+
+    // Appel Supabase pour envoyer le Magic Link avec les métadonnées
+    try {
+      const { error } = await Auth.sendMagicLink(email, { pseudo, prenom });
+      if (error) {
+        console.warn("Erreur envoi Magic Link", error);
+      }
+    } catch(e) {
+      console.warn("Exception envoi Magic Link", e);
     }
 
     window._turnstileToken = undefined;
 
-    // Toujours sauvegarder en localStorage (session)
-    const member = Auth.saveMember({ email, pseudo, prenom });
-
     // Afficher le message de succès chaleureux et les confettis
     const successEl = form.querySelector('.form-success');
     if (successEl) {
+      successEl.innerHTML = `
+        <h3 style="font-size:1.3rem; margin-bottom:1rem;">Bienvenue dans le Club ! 🌴</h3>
+        <p>Vérifie ta boîte mail pour <strong>${email}</strong> et clique sur le lien magique pour te connecter à ton espace membre.</p>
+      `;
       form.style.display = 'none';
       successEl.classList.add('visible');
       if (typeof fireConfetti === 'function') fireConfetti();
     }
 
-    // Redirection vers page merci après délai
-    setTimeout(() => {
-      const isSubPage = window.location.pathname.includes('/pages/');
-      const merciUrl = isSubPage ? 'merci.html' : 'pages/merci.html';
-      window.location.href = merciUrl + '?email=' + encodeURIComponent(email);
-    }, 3500);
+    // Plus de redirection automatique vers merci.html car ils doivent cliquer sur le mail
+    // setTimeout(() => { ... }, 3500);
 
   } catch (err) {
     console.error('Inscription error:', err);
@@ -570,11 +609,9 @@ function formatDate(isoString) {
 // ============================================================
 function initLogout() {
   document.querySelectorAll('[data-logout]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      if (confirm('Se déconnecter du Club ?')) {
-        Auth.logout();
-      }
+      await Auth.logout();
     });
   });
 }

@@ -314,104 +314,40 @@
     <div id="yt-audio-player" style="position: absolute; left: -9999px; width: 200px; height: 200px; pointer-events: none;"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js?v=2" defer></script>
+  <script src="../assets/js/ramonito.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Profil Supabase
-      const member = window.ElRamon ? window.ElRamon.Auth.getMember() : null;
+      // Profil Supabase (récupéré depuis la nouvelle fonction async qui lit la table 'profiles')
+      const member = window.ElRamon && window.ElRamon.Auth ? await window.ElRamon.Auth.getMember() : null;
       if (!member) return;
 
       const nameEl = document.getElementById('member-name');
       if (nameEl) nameEl.textContent = member.prenom || member.pseudo || member.email.split('@')[0] || 'Membre du Club';
       
-      // Auto-réparation de la session si le pseudo est manquant (anciens caches)
-      if (!member.pseudo && member.email) {
-        try {
-          const loginRes = await fetch('/login', { 
-            method: 'POST', 
-            body: JSON.stringify({ email: member.email }), 
-            headers: { 'Content-Type': 'application/json' } 
-          });
-          if (loginRes.ok) {
-            const fullMember = await loginRes.json();
-            if (window.ElRamon && window.ElRamon.Auth) {
-              window.ElRamon.Auth.saveMember(fullMember);
-              member.pseudo = fullMember.pseudo;
-              member.prenom = fullMember.prenom;
-              if (nameEl) nameEl.textContent = member.prenom || member.pseudo || member.email.split('@')[0] || 'Membre du Club';
-            }
-          }
-        } catch(e) {
-          console.error("Auto-réparation session échouée", e);
-        }
-      }
-      
       const sinceEl = document.getElementById('member-since');
-      if (sinceEl && member.joined_at) {
-        const date = new Date(member.joined_at);
+      if (sinceEl && member.created_at) {
+        const date = new Date(member.created_at);
         sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
       }
 
-      let bestScore = parseInt(localStorage.getItem('elramon_game_best_score') || '0', 10);
-      let bossDefeatedCount = localStorage.getItem('elramon_game_boss1_defeated') === 'true' ? 1 : 0;
-      let totalBananas = Math.floor(bestScore / 100);
+      // Récupération des stats directement depuis le profil Supabase
+      let bestScore = member.best_score || 0;
+      let bossDefeatedCount = (member.toucan_defeated ? 1 : 0) + (member.singe_maracasse_defeated ? 1 : 0);
+      let totalBananas = member.bananas_balance || 0;
+      let tropicalRank = member.tropical_rank || '🌴 Explorateur';
       
-      try {
-        const queryParams = new URLSearchParams();
-        if (member.email) queryParams.append('email', member.email);
-        if (member.pseudo) queryParams.append('pseudo', member.pseudo);
-
-        const resp = await fetch(`/member-stats?${queryParams.toString()}`);
-        console.log("Stats API Response:", resp.status);
-        if (resp.ok) {
-          const stats = await resp.json();
-          console.log("Stats Data:", stats);
-          if (stats && stats.total_score !== undefined && stats.total_score > 0) {
-            bestScore = stats.total_score;
-            bossDefeatedCount = stats.bosses_defeated;
-            totalBananas = stats.total_bananas;
-            
-            if (sinceEl && stats.joined_at) {
-              const date = new Date(stats.joined_at);
-              sinceEl.textContent = 'A commencé l\\'aventure le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
-            }
-          }
-        } else {
-          console.error("Stats API failed:", await resp.text());
-          throw new Error("member-stats failed"); // force fallback
-        }
-      } catch (e) {
-        console.error("Erreur stats api, tentative du fallback sur game-score...", e);
-        try {
-          const fbResp = await fetch('/game-score');
-          if (fbResp.ok) {
-            const scores = await fbResp.json();
-            const userScore = scores.find(s => s.pseudo === member.pseudo);
-            if (userScore) {
-              bestScore = Math.max(bestScore, userScore.score);
-              totalBananas = Math.floor(bestScore / 100);
-              if (userScore.badge && (userScore.badge.includes('Roi') || userScore.badge.includes('Sauvée'))) {
-                bossDefeatedCount = 1;
-              }
-            }
-          }
-        } catch(err) {
-          console.error("Fallback echoué", err);
-        }
-      }
-
       document.getElementById('member-score').textContent = bestScore;
       document.getElementById('member-bosses').textContent = bossDefeatedCount;
       document.getElementById('member-bananas').textContent = totalBananas;
 
-      let currentRank = 'Nouveau Membre';
-      if (bestScore > 0) currentRank = 'Perroquet Débutant';
-      if (bestScore >= 150) currentRank = 'Danseur de Plage';
-      if (bestScore >= 350) currentRank = 'Ambianceur Tropical';
-      if (bestScore >= 600) currentRank = 'Maître Perroquet';
-      if (bestScore >= 1000) currentRank = 'Légende du Soleil';
+      // Afficher le rang
+      const rankBadge = document.querySelector('.stat-badge-rank');
+      if (rankBadge) rankBadge.innerHTML = `🏆 ${tropicalRank}`;
       
-      document.getElementById('member-rank').textContent = currentRank;
+      const memberRankEl = document.getElementById('member-rank');
+      if (memberRankEl) memberRankEl.textContent = tropicalRank;
       
       if (bestScore === 0) {
         if(sinceEl) sinceEl.textContent += " — Commence ton aventure tropicale ! 🦜";

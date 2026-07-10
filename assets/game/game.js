@@ -1235,7 +1235,6 @@ class BaseLevelScene extends Phaser.Scene {
 
   reachPerch(player, perch) {
     perch.destroy();
-    this.saveProgress();
     this.scene.start('Victory', { score: this.score, fruitsCollected: this.fruits, lives: this.lives, level: this.levelKey });
   }
 
@@ -1296,21 +1295,7 @@ class BaseLevelScene extends Phaser.Scene {
       btnQuit.on('pointerdown', () => window.location.href = './espace-membre.html');
     }
   }
-
-  // --- Sauvegarde localStorage ---
-  saveProgress() {
-    const keys = GAME_CONFIG.storageKeys;
-    try {
-      localStorage.setItem(keys.completed, 'true');
-      localStorage.setItem(keys.bossDefeated, 'true');
-      localStorage.setItem(keys.badge, GAME_CONFIG.badges.level1);
-      localStorage.setItem(keys.reward, 'suno');
-      const prev = parseInt(localStorage.getItem(keys.bestScore) || '0');
-      if (this.score > prev) localStorage.setItem(keys.bestScore, String(this.score));
-      localStorage.setItem(keys.fruitsCollected, String(this.fruits));
-      localStorage.setItem(keys.completedAt, new Date().toISOString());
-    } catch (e) { console.warn('Game save error:', e); }
-  }
+  // La sauvegarde est maintenant gérée par Supabase à la fin du jeu
 }
 
 // ============================================================
@@ -1504,36 +1489,32 @@ class VictoryScene extends Phaser.Scene {
 // ============================================================
 
 // ============================================================
-// SAUVEGARDE SCORE API
+// SAUVEGARDE SCORE API (Supabase)
 // ============================================================
 async function saveGameScore(scene, bossDefeated, data) {
-  if (!window.ElRamon || !window.ElRamon.Auth) return;
-  const member = window.ElRamon.Auth.getMember();
+  if (!window.ElRamon || !window.ElRamon.Auth || !window.supabaseClient) return;
+  const member = await window.ElRamon.Auth.getMember();
   if (!member) return;
 
-  const scoreData = {
-    member_email: member.email,
-    pseudo: member.pseudo || member.email.split('@')[0],
-    score: data.score || 0,
-    level: scene.levelKey || 'Level1',
-    fruits_collected: data.fruitsCollected || 0,
-    boss_defeated: bossDefeated,
-    lives_remaining: data.lives || 0,
-    time_seconds: 0
-  };
-
   try {
-    const res = await fetch('/game-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scoreData)
+    const { data: result, error } = await window.supabaseClient.rpc('process_game_result', {
+      p_score: data.score || 0,
+      p_boss_defeated: bossDefeated,
+      p_level: scene.levelKey || 'Level1'
     });
-    if (res.ok) {
-      const result = await res.json();
-      scene.events.emit('score_saved', result.badge);
+
+    if (error) {
+      console.error('Erreur Supabase RPC:', error);
+      return;
+    }
+
+    if (result && result.rank_updated) {
+      scene.events.emit('score_saved', result.new_rank);
+    } else {
+      scene.events.emit('score_saved', null);
     }
   } catch (err) {
-    console.error('Score API error:', err);
+    console.error('Score API exception:', err);
   }
 }
 

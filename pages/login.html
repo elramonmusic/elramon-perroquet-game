@@ -163,9 +163,8 @@
 
         <div class="login-note">
           <p>
-            <strong style="color:var(--turquoise);">Version V1 :</strong> La connexion se fait par email uniquement.
-            L'authentification complète avec mot de passe sera disponible en V2 avec Supabase.
-            Si tu as perdu l'accès, tu peux te réinscrire via le formulaire d'inscription.
+            <strong style="color:var(--turquoise);">Nouveau (Supabase Auth) :</strong> La connexion se fait par <strong>Magic Link</strong>.
+            Saisis ton email et tu recevras un lien sécurisé pour te connecter instantanément.
           </p>
         </div>
       </div>
@@ -224,11 +223,12 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js?v=2" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       // Si déjà connecté, rediriger vers espace membre
-      if (window.ElRamon && window.ElRamon.Auth.isLoggedIn()) {
+      if (window.ElRamon && await window.ElRamon.Auth.isLoggedIn()) {
         window.location.href = './espace-membre.html';
         return;
       }
@@ -254,27 +254,21 @@
           btn.dataset.submitting = '1';
           window.ElRamon.Form.setLoading(btn, true);
 
-          fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-          })
-          .then(async res => {
-            if (res.ok) {
-              const memberData = await res.json();
-              // Sauvegarde dans le localStorage pour la session
-              window.ElRamon.Auth.saveMember(memberData);
-              
-              // Connexion OK
-              const successEl = document.querySelector('.form-success');
-              if (successEl) successEl.classList.add('visible');
-              setTimeout(() => {
-                window.location.href = './espace-membre.html';
-              }, 1000);
-            } else if (res.status === 404) {
-              window.ElRamon.Toast.show('Aucun compte trouvé avec cet email. Inscris-toi d\'abord !', 'warning');
+          window.ElRamon.Auth.sendMagicLink(email)
+          .then(({ error }) => {
+            if (error) {
+              window.ElRamon.Toast.show(error.message || 'Erreur d\\'envoi du lien magique.', 'error');
             } else {
-              window.ElRamon.Toast.show('Erreur de connexion. Réessaie.', 'error');
+              // Succès : demander à l'utilisateur de vérifier ses emails
+              const successEl = document.querySelector('.form-success');
+              if (successEl) {
+                successEl.innerHTML = `
+                  <h3 style="font-size:1.3rem; margin-bottom:1rem;">Lien envoyé ! ✉️</h3>
+                  <p>Vérifie ta boîte mail (et tes spams) pour <strong>${email}</strong> et clique sur le lien magique pour te connecter.</p>
+                `;
+                successEl.classList.add('visible');
+              }
+              loginForm.style.display = 'none';
             }
           })
           .catch(err => {
