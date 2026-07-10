@@ -1,5 +1,0 @@
-Found 4 broken local links:
-  In pages\guides-suno.html: /download?file=suno-starter
-  In pages\guides-suno.html: /download?file=youtube-prompts
-  In pages\guides-suno.html: /download?file=clips-shorts-ia
-  In pages\guides-suno.html: /download?file=flow-music-tropical

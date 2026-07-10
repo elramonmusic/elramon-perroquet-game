@@ -59,6 +59,10 @@ export async function onRequestPost(context) {
       }
     } catch (err) {
       console.error('Turnstile verification error:', err.message);
+      return new Response(JSON.stringify({ error: 'Service anti-bot indisponible. Réessayez dans un instant.' }), {
+        status: 500,
+        headers: CORS_HEADERS,
+      });
     }
   }
 
