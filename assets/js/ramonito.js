@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: sessionData } = await window.supabaseClient.auth.getSession();
       
-      const res = await fetch(`${window.supabaseClient.supabaseUrl}/functions/v1/smart-task`, {
+      const res = await fetch('/smart-task', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
