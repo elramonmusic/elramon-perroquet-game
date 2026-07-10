@@ -45,7 +45,7 @@ export async function onRequestPost(context) {
     const userId = user.id;
 
     // 2. Vérification du solde (Bananes / Questions gratuites)
-    const profileRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=free_questions_remaining,bananas_balance,prenom,pseudo`, {
+    const profileRes = await fetch(`${supabaseUrl}/rest/v1/members?id=eq.${userId}&select=free_questions_remaining,bananas_balance,prenom,pseudo`, {
       method: 'GET',
       headers: {
         'apikey': supabaseServiceKey,
@@ -126,7 +126,7 @@ export async function onRequestPost(context) {
       bananas -= 1;
     }
 
-    const updateRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`, {
+    const updateRes = await fetch(`${supabaseUrl}/rest/v1/members?id=eq.${userId}`, {
       method: 'PATCH',
       headers: {
         'apikey': supabaseServiceKey,

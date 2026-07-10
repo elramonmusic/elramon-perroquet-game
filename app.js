@@ -86,9 +86,9 @@ const Auth = {
     const session = await this.getSession();
     if (!session) return null;
     
-    // Récupérer les détails depuis la table profiles
+    // Récupérer les détails depuis la table members
     const { data: profile, error } = await window.supabaseClient
-      .from('profiles')
+      .from('members')
       .select('*')
       .eq('id', session.user.id)
       .single();
