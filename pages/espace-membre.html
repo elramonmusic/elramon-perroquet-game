@@ -339,7 +339,7 @@
         if (member.email) queryParams.append('email', member.email);
         if (member.pseudo) queryParams.append('pseudo', member.pseudo);
 
-        const resp = await fetch(`/functions/member-stats?${queryParams.toString()}`);
+        const resp = await fetch(`/member-stats?${queryParams.toString()}`);
         console.log("Stats API Response:", resp.status);
         if (resp.ok) {
           const stats = await resp.json();
@@ -361,7 +361,7 @@
       } catch (e) {
         console.error("Erreur stats api, tentative du fallback sur game-score...", e);
         try {
-          const fbResp = await fetch('/functions/game-score');
+          const fbResp = await fetch('/game-score');
           if (fbResp.ok) {
             const scores = await fbResp.json();
             const userScore = scores.find(s => s.pseudo === member.pseudo);

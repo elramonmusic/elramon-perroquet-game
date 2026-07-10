@@ -1515,7 +1515,7 @@ async function saveGameScore(scene, bossDefeated, data) {
     member_email: member.email,
     pseudo: member.pseudo || member.email.split('@')[0],
     score: data.score || 0,
-    level: bossDefeated ? 'Level1_Finished' : 'Level1',
+    level: scene.levelKey || 'Level1',
     fruits_collected: data.fruitsCollected || 0,
     boss_defeated: bossDefeated,
     lives_remaining: data.lives || 0,
