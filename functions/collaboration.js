@@ -99,10 +99,9 @@ export async function onRequestPost(context) {
     ip: request.headers.get('cf-connecting-ip') || 'unknown',
   };
 
-  // Stockage Supabase (via variables d'environnement Cloudflare)
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
     try {
-      await fetch(`${env.SUPABASE_URL}/rest/v1/collaborations`, {
+      const response = await fetch(`${env.SUPABASE_URL}/rest/v1/collaborations`, {
         method: 'POST',
         headers: {
           'apikey': env.SUPABASE_SERVICE_KEY,
@@ -111,8 +110,16 @@ export async function onRequestPost(context) {
         },
         body: JSON.stringify(collaboration),
       });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
     } catch (err) {
       console.error('Supabase error:', err.message);
+      return new Response(JSON.stringify({ error: "Erreur de base de données lors de l'enregistrement." }), {
+        status: 500,
+        headers: CORS_HEADERS,
+      });
     }
   }
 

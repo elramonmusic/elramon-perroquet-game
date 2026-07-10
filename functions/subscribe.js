@@ -112,7 +112,6 @@ export async function onRequestPost(context) {
     source: 'elramon-music-club',
   };
 
-  // Stockage Supabase (via variables d'environnement Cloudflare)
   if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
     try {
       const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {
@@ -127,10 +126,14 @@ export async function onRequestPost(context) {
       });
 
       if (!supabaseResponse.ok) {
-        console.error('Supabase error:', await supabaseResponse.text());
+        throw new Error(await supabaseResponse.text());
       }
     } catch (err) {
       console.error('Supabase fetch error:', err.message);
+      return new Response(JSON.stringify({ error: "Erreur de base de données lors de l'inscription." }), {
+        status: 500,
+        headers: CORS_HEADERS,
+      });
     }
   }
 

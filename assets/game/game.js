@@ -336,9 +336,9 @@ class BaseLevelScene extends Phaser.Scene {
     const cfg = GAME_CONFIG;
     const level = cfg[this.levelKey];
 
-    this.score = 0;
-    this.fruits = 0;
-    this.lives = cfg.player.lives;
+    this.score = (this.carriedData && this.carriedData.score !== undefined) ? this.carriedData.score : 0;
+    this.fruits = (this.carriedData && this.carriedData.fruits !== undefined) ? this.carriedData.fruits : 0;
+    this.lives = (this.carriedData && this.carriedData.lives !== undefined) ? this.carriedData.lives : cfg.player.lives;
     this.invincibleUntil = 0;
     this.potionActiveUntil = 0;
     this.bossActive = false;
@@ -347,7 +347,8 @@ class BaseLevelScene extends Phaser.Scene {
     this.bossDefeated = false;
     this.gameOver = false;
     this._paused = false;
-    this.bossHP = level.boss.hp;
+    this.bossMaxHP = level.boss.hp;
+    this.bossHP = this.bossMaxHP;
     this.bossStunUntil = 0;
     this.lastBossShot = 0;
     this.bossSpeed = level.boss.speed;
@@ -659,8 +660,10 @@ class BaseLevelScene extends Phaser.Scene {
     this.hudBossContainer.add(this.hudBossLabel);
 
     this.hudBossHearts = [];
-    for (let i = 0; i < 3; i++) {
-      const heart = this.add.image(w / 2 - 24 + i * 24, 74, 'heart').setScale(0.8);
+    const maxHearts = this.bossMaxHP || 3;
+    const startX = w / 2 - ((maxHearts - 1) * 12);
+    for (let i = 0; i < maxHearts; i++) {
+      const heart = this.add.image(startX + i * 24, 74, 'heart').setScale(0.8);
       this.hudBossHearts.push(heart);
       this.hudBossContainer.add(heart);
     }
@@ -821,7 +824,7 @@ class BaseLevelScene extends Phaser.Scene {
   fireBullet() {
     this.fruits--;
     const dir = this.player.facingRight !== false ? 1 : -1;
-    const bullet = this.bullets.create(this.player.x + dir * 20, this.player.y - 5, 'fruit_orange');
+    const bullet = this.bullets.create(this.player.x + dir * 20, this.player.y - 5, 'fruit_bullet');
     bullet.setDisplaySize(20, 20); // Taille du projectile
     bullet.body.setAllowGravity(false);
     bullet.setVelocityX(GAME_CONFIG.physics.bulletSpeed * dir);
@@ -995,7 +998,7 @@ class BaseLevelScene extends Phaser.Scene {
 
     if (this.lives <= 0) {
       this.gameOver = true;
-      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives }));
+      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives, level: this.levelKey }));
     }
   }
 
@@ -1012,7 +1015,7 @@ class BaseLevelScene extends Phaser.Scene {
     
     if (this.lives <= 0) {
       this.gameOver = true;
-      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives }));
+      this.time.delayedCall(500, () => this.scene.start('GameOver', { score: this.score, fruitsCollected: this.fruits, lives: this.lives, level: this.levelKey }));
     } else {
       // Respawn
       this.player.setPosition(100, 300);
@@ -1259,16 +1262,16 @@ class BaseLevelScene extends Phaser.Scene {
   togglePause() {
     if (this.gameOver) return;
     this._paused = !this._paused;
-    this.physics.world.pause();
 
     if (this._paused) {
+      this.physics.world.pause();
       const w = this.cameras.main.width;
       const h = this.cameras.main.height;
       const overlay = this.add.graphics().setScrollFactor(0).setDepth(200);
       overlay.fillStyle(0x1A1A2E, 0.85);
       overlay.fillRect(0, 0, w, h);
 
-      this.add.text(w / 2, h / 2 - 40, '⏸️ Pause', {
+      const txtPause = this.add.text(w / 2, h / 2 - 40, '⏸️ Pause', {
         fontSize: '28px', fontFamily: 'Arial Black', color: '#FFD700',
       }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
 
@@ -1281,14 +1284,21 @@ class BaseLevelScene extends Phaser.Scene {
         fontSize: '14px', fontFamily: 'Arial', color: '#888888',
       }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
 
+      this.pauseEls = [overlay, txtPause, btnResume, btnQuit];
       const scene = this;
-      const pauseEls = [overlay, btnResume, btnQuit];
       btnResume.on('pointerdown', () => {
-        scene.physics.world.resume();
-        scene._paused = false;
-        pauseEls.forEach(el => { if (el.active) el.destroy(); });
+        scene.togglePause();
       });
-      btnQuit.on('pointerdown', () => window.location.href = './espace-membre.html');
+      btnQuit.on('pointerdown', () => {
+        scene.physics.world.resume();
+        window.location.href = './espace-membre.html';
+      });
+    } else {
+      this.physics.world.resume();
+      if (this.pauseEls) {
+        this.pauseEls.forEach(el => { if (el && el.active) el.destroy(); });
+        this.pauseEls = null;
+      }
     }
   }
   // La sauvegarde est maintenant gérée par Supabase à la fin du jeu
@@ -1303,7 +1313,10 @@ class BaseLevelScene extends Phaser.Scene {
 // ============================================================
 class Level1Scene extends BaseLevelScene {
   constructor() { super('Level1'); }
-  init() { this.levelKey = 'level1'; }
+  init(data) {
+    this.levelKey = 'level1';
+    this.carriedData = data;
+  }
 }
 
 // ============================================================
@@ -1311,7 +1324,10 @@ class Level1Scene extends BaseLevelScene {
 // ============================================================
 class Level2Scene extends BaseLevelScene {
   constructor() { super('Level2'); }
-  init() { this.levelKey = 'level2'; }
+  init(data) {
+    this.levelKey = 'level2';
+    this.carriedData = data;
+  }
   create() {
     super.create();
     // Utiliser les visuels du Niveau 2
@@ -1326,6 +1342,7 @@ class GameOverScene extends Phaser.Scene {
   constructor() { super({ key: 'GameOver' }); }
 
   create(data) {
+    this.levelKey = data.level || 'level1';
     this.sound.stopAll(); // Arrêter la BGM
     
     saveGameScore(this, false, data);
@@ -1341,6 +1358,7 @@ class VictoryScene extends Phaser.Scene {
   constructor() { super({ key: 'Victory' }); }
 
   create(data) {
+    this.levelKey = data.level || 'level1';
     this.sound.stopAll();
     this.sound.play('sfx_victory');
     
@@ -1522,7 +1540,7 @@ async function saveGameScore(scene, bossDefeated, data) {
 
     if (res.ok) {
       // The API doesn't return new_rank anymore, so we just pass true
-      scene.events.emit('score_saved', true);
+      scene.events.emit('score_saved', result.badge);
     } else {
       console.error('Erreur API score:', result.error);
       scene.events.emit('score_saved', null);

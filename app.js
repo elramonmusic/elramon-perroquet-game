@@ -421,7 +421,10 @@ async function handleInscription(event) {
     hasError = true;
   }
 
-  if (hasError) return;
+  if (hasError) {
+    btn.dataset.submitting = '0';
+    return;
+  }
 
   Form.setLoading(btn, true);
 
@@ -503,7 +506,10 @@ async function handleContact(event) {
   if (!email || !Form.isValidEmail(email)) { Form.showError(form.querySelector('#email'), 'Email invalide.'); hasError = true; }
   if (!message || message.length < 20) { Form.showError(form.querySelector('#message'), 'Message trop court (min. 20 caractères).'); hasError = true; }
 
-  if (hasError) return;
+  if (hasError) {
+    btn.dataset.submitting = '0';
+    return;
+  }
 
   Form.setLoading(btn, true);
 
@@ -513,6 +519,11 @@ async function handleContact(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nom, email, sujet, message, turnstile: window._turnstileToken || '' }),
     });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || 'Erreur serveur');
+    }
 
     window._turnstileToken = undefined;
 
@@ -562,16 +573,24 @@ async function handleCollaboration(event) {
   if (!data.email || !Form.isValidEmail(data.email)) { Form.showError(form.querySelector('#email'), 'Email invalide.'); hasError = true; }
   if (!data.message || data.message.length < 20) { Form.showError(form.querySelector('#collab-message'), 'Message trop court.'); hasError = true; }
 
-  if (hasError) return;
+  if (hasError) {
+    btn.dataset.submitting = '0';
+    return;
+  }
 
   Form.setLoading(btn, true);
 
   try {
-    await fetch('/collaboration', {
+    const response = await fetch('/collaboration', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...data, turnstile: window._turnstileToken || '' }),
     });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || 'Erreur serveur');
+    }
 
     window._turnstileToken = undefined;
 
