@@ -117,7 +117,42 @@ export async function onRequestPost(context) {
         throw new Error('Supabase POST failed: ' + errText);
       }
 
-      return new Response(JSON.stringify({ success: true, badge, score: scoreData.score }), { status: 200, headers: CORS_HEADERS });
+      // 2. Mettre à jour le profil (bananes et meilleur score)
+      const earnedBananas = Math.floor(scoreData.score / 100);
+      
+      const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(member_email)}&select=id,bananas_balance,best_score`, {
+        method: 'GET',
+        headers: {
+          'apikey': env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
+        }
+      });
+
+      if (profileRes.ok) {
+        const profiles = await profileRes.json();
+        if (profiles.length > 0) {
+          const profile = profiles[0];
+          const newBananas = (profile.bananas_balance || 0) + earnedBananas;
+          const newBestScore = Math.max(profile.best_score || 0, scoreData.score);
+          
+          await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${profile.id}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': env.SUPABASE_SERVICE_KEY,
+              'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+              bananas_balance: newBananas,
+              best_score: newBestScore,
+              best_level: scoreData.level
+            })
+          });
+        }
+      }
+
+      return new Response(JSON.stringify({ success: true, badge, score: scoreData.score, earnedBananas }), { status: 200, headers: CORS_HEADERS });
     } catch (err) {
       console.error('Supabase error:', err.message);
       return new Response(JSON.stringify({ error: 'Erreur base de données' }), { status: 500, headers: CORS_HEADERS });

@@ -34,12 +34,12 @@ export async function onRequestPost(context) {
       method: 'GET',
       headers: {
         'Authorization': authHeader,
-        'apikey': env.SUPABASE_ANON_KEY
+        'apikey': supabaseServiceKey
       }
     });
 
     if (!userRes.ok) {
-      return new Response(JSON.stringify({ error: "Session invalide." }), { status: 401, headers: CORS_HEADERS });
+      return new Response(JSON.stringify({ error: "Session invalide. Essaie de te reconnecter." }), { status: 401, headers: CORS_HEADERS });
     }
     const user = await userRes.json();
     const userId = user.id;
@@ -48,18 +48,20 @@ export async function onRequestPost(context) {
     const profileRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=free_questions_remaining,bananas_balance,prenom,pseudo`, {
       method: 'GET',
       headers: {
-        'apikey': env.SUPABASE_ANON_KEY,
+        'apikey': supabaseServiceKey,
         'Authorization': `Bearer ${supabaseServiceKey}`
       }
     });
 
     if (!profileRes.ok) {
-      return new Response(JSON.stringify({ error: "Erreur lecture profil." }), { status: 500, headers: CORS_HEADERS });
+      const errText = await profileRes.text();
+      console.error("Profile fetch error:", errText);
+      return new Response(JSON.stringify({ error: "Erreur lors de la lecture de ton profil Supabase." }), { status: 500, headers: CORS_HEADERS });
     }
     
     const profiles = await profileRes.json();
     if (!profiles || profiles.length === 0) {
-      return new Response(JSON.stringify({ error: "Profil introuvable." }), { status: 404, headers: CORS_HEADERS });
+      return new Response(JSON.stringify({ error: "Profil introuvable dans la base de données." }), { status: 404, headers: CORS_HEADERS });
     }
     
     const profile = profiles[0];
@@ -124,11 +126,10 @@ export async function onRequestPost(context) {
       bananas -= 1;
     }
 
-    // Mise à jour de la table profiles
     const updateRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`, {
       method: 'PATCH',
       headers: {
-        'apikey': env.SUPABASE_ANON_KEY,
+        'apikey': supabaseServiceKey,
         'Authorization': `Bearer ${supabaseServiceKey}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'

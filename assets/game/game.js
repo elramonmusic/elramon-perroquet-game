@@ -1488,29 +1488,40 @@ class VictoryScene extends Phaser.Scene {
 // SAUVEGARDE SCORE API (Supabase)
 // ============================================================
 async function saveGameScore(scene, bossDefeated, data) {
-  if (!window.ElRamon || !window.ElRamon.Auth || !window.supabaseClient) return;
+  if (!window.ElRamon || !window.ElRamon.Auth) return;
   const member = await window.ElRamon.Auth.getMember();
   if (!member) return;
 
   try {
-    const { data: result, error } = await window.supabaseClient.rpc('process_game_result', {
-      p_score: data.score || 0,
-      p_boss_defeated: bossDefeated,
-      p_level: scene.levelKey || 'Level1'
+    const payload = {
+      member_email: member.email,
+      pseudo: member.pseudo,
+      score: data.score || 0,
+      level: scene.levelKey || 'Level1',
+      fruits_collected: data.fruits || 0,
+      boss_defeated: bossDefeated,
+      lives_remaining: data.lives || 0,
+      time_seconds: 0
+    };
+
+    const res = await fetch('/game-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    if (error) {
-      console.error('Erreur Supabase RPC:', error);
-      return;
-    }
+    const result = await res.json();
 
-    if (result && result.rank_updated) {
-      scene.events.emit('score_saved', result.new_rank);
+    if (res.ok) {
+      // The API doesn't return new_rank anymore, so we just pass true
+      scene.events.emit('score_saved', true);
     } else {
+      console.error('Erreur API score:', result.error);
       scene.events.emit('score_saved', null);
     }
   } catch (err) {
     console.error('Score API exception:', err);
+    scene.events.emit('score_saved', null);
   }
 }
 
