@@ -370,20 +370,7 @@
       }
     }
 
-    // Écoute Supabase
-    if (window.supabase) {
-      window.supabase.auth.onAuthStateChange((event, session) => {
-        if (session?.user) {
-          localStorage.setItem("elramonClubMember", "true");
-          showGame();
-        }
 
-        if (event === "SIGNED_OUT") {
-          localStorage.removeItem("elramonClubMember");
-          showMemberOnlyScreen();
-        }
-      });
-    }
 
     // Lancer la vérif
     checkGameAccess();
