@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         bananas = result.remaining_bananas;
         updateBalanceUI();
       } else {
-        addMessage(result.message || "Erreur de connexion avec mon cerveau tropical !", 'assistant');
+        addMessage(result.error || result.message || "Erreur de connexion avec mon cerveau tropical !", 'assistant');
       }
 
     } catch (e) {

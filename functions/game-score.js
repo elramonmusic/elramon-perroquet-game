@@ -155,11 +155,11 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: true, badge, score: scoreData.score, earnedBananas }), { status: 200, headers: CORS_HEADERS });
     } catch (err) {
       console.error('Supabase error:', err.message);
-      return new Response(JSON.stringify({ error: 'Erreur base de données' }), { status: 500, headers: CORS_HEADERS });
+      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });
     }
   }
 
-  return new Response(JSON.stringify({ error: 'Configuration serveur manquante' }), { status: 500, headers: CORS_HEADERS });
+  return new Response(JSON.stringify({ error: 'Configuration serveur manquante (pas de SUPABASE_SERVICE_KEY)' }), { status: 500, headers: CORS_HEADERS });
 }
 
 export async function onRequestOptions() {
