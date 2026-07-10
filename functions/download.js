@@ -33,28 +33,48 @@ export async function onRequestGet(context) {
 
   const fileInfo = FILES_WHITELIST[fileKey];
 
-  // 2. Lecture du cookie de session
-  const cookieHeader = request.headers.get('Cookie');
-  
-  if (!cookieHeader || !cookieHeader.includes('erm_session=')) {
-    // Non connecté
-    return Response.redirect(`${url.origin}/pages/login.html`, 302);
-  }
-
-  if (!env.SESSION_SECRET || !env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
     return new Response(JSON.stringify({ error: 'Configuration serveur manquante' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
-  // 3. Vérification de la signature cryptographique
-  const session = await verifySessionCookie(cookieHeader, env.SESSION_SECRET);
-  if (!session) {
-    // Token invalide ou expiré
+  let email = null;
+
+  // 2. Lecture du token d'accès Supabase (URL parameter)
+  const token = url.searchParams.get('token');
+  if (token) {
+    const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': env.SUPABASE_SERVICE_KEY
+      }
+    });
+    if (userRes.ok) {
+      const user = await userRes.json();
+      email = user.email;
+    }
+  }
+
+  // 3. Lecture du cookie de session (Fallback)
+  if (!email) {
+    const cookieHeader = request.headers.get('Cookie');
+    if (cookieHeader && cookieHeader.includes('erm_session=')) {
+      if (env.SESSION_SECRET) {
+        const session = await verifySessionCookie(cookieHeader, env.SESSION_SECRET);
+        if (session) {
+          email = session.email;
+        }
+      }
+    }
+  }
+
+  if (!email) {
     return Response.redirect(`${url.origin}/pages/login.html`, 302);
   }
 
   // 4. Vérification du membre dans Supabase
   try {
-    const supabaseResp = await fetch(`${env.SUPABASE_URL}/rest/v1/members?email=eq.${encodeURIComponent(session.email)}&select=role`, {
+    const supabaseResp = await fetch(`${env.SUPABASE_URL}/rest/v1/members?email=eq.${encodeURIComponent(email)}&select=role`, {
       headers: {
         'apikey': env.SUPABASE_SERVICE_KEY,
         'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
@@ -88,7 +108,7 @@ export async function onRequestGet(context) {
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     const logEntry = {
-      member_email: session.email,
+      member_email: email,
       file_key: fileKey,
       ip_hash: hashHex.substring(0, 16),
       user_agent_hash: hashHex.substring(16, 32)

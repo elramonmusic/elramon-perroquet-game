@@ -274,6 +274,9 @@ const Toast = {
     if (!toast) {
       toast = document.createElement('div');
       toast.className = 'toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.setAttribute('aria-atomic', 'true');
       document.body.appendChild(toast);
     }
     this._el = toast;  // mémorise pour les appels suivants
@@ -699,6 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initLogout();
   animateCounters();
+  initProtectedDownloads();
 
   // Formulaires
   const inscriptionForm = document.querySelector('#inscription-form');
@@ -710,6 +714,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const collabForm = document.querySelector('#collaboration-form');
   if (collabForm) collabForm.addEventListener('submit', handleCollaboration);
 });
+
+// Protected Downloads helper
+async function initProtectedDownloads() {
+  try {
+    const downloadLinks = document.querySelectorAll('a[href*="/download"]');
+    if (downloadLinks.length > 0) {
+      const session = await Auth.getSession();
+      if (session && session.access_token) {
+        downloadLinks.forEach(link => {
+          try {
+            const url = new URL(link.href, window.location.origin);
+            url.searchParams.set('token', session.access_token);
+            link.href = url.pathname + url.search;
+          } catch (e) {
+            console.error('Error rewriting download link:', e);
+          }
+        });
+      }
+    }
+  } catch (e) {
+    console.error('Error initializing protected downloads:', e);
+  }
+}
 
 // ============================================================
 // NEW HOME FEATURES

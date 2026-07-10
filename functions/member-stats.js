@@ -8,16 +8,29 @@ const CORS_HEADERS = {
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const email = url.searchParams.get('email');
-  const pseudo = url.searchParams.get('pseudo'); // Fallback by pseudo if needed
-
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
     return new Response(JSON.stringify({ error: 'Configuration serveur manquante' }), { status: 500, headers: CORS_HEADERS });
   }
 
-  if (!email && !pseudo) {
-    return new Response(JSON.stringify({ error: 'Email ou pseudo manquant' }), { status: 400, headers: CORS_HEADERS });
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: 'Non autorisé' }), { status: 401, headers: CORS_HEADERS });
   }
+
+  const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+    method: 'GET',
+    headers: {
+      'Authorization': authHeader,
+      'apikey': env.SUPABASE_SERVICE_KEY
+    }
+  });
+
+  if (!userRes.ok) {
+    return new Response(JSON.stringify({ error: 'Session invalide' }), { status: 401, headers: CORS_HEADERS });
+  }
+
+  const user = await userRes.json();
+  const email = user.email;
 
   try {
     let queryUrl = `${env.SUPABASE_URL}/rest/v1/member_game_stats?select=total_score,total_bananas,bosses_defeated,joined_at&limit=1`;

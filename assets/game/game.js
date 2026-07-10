@@ -127,23 +127,7 @@ class BootScene extends Phaser.Scene {
     g.clear();
     g.fillStyle(0xFFD700, 1);
     g.fillRoundedRect(2, 4, 12, 10, 4);
-    g.fillStyle(0xFFC107, 1);
-    g.fillRect(2, 8, 12, 4);
-    g.generateTexture('banana', 16, 16);
 
-    g.clear();
-    g.fillStyle(0xFF8C00, 1);
-    g.fillCircle(8, 8, 7);
-    g.fillStyle(0x4CAF50, 1);
-    g.fillCircle(8, 3, 2);
-    g.generateTexture('orange_fruit', 16, 16);
-
-    g.clear();
-    g.fillStyle(0xE53935, 1);
-    g.fillCircle(8, 10, 6);
-    g.fillStyle(0x4CAF50, 1);
-    g.fillRect(7, 2, 2, 6);
-    g.generateTexture('cherry', 16, 16);
 
     // Fruit projectile
     g.clear();
@@ -161,21 +145,7 @@ class BootScene extends Phaser.Scene {
     g.fillCircle(8, 12, 3);
     g.generateTexture('potion', 16, 20);
 
-    // --- Toucan Boss (52x48) ---
-    g.clear();
-    g.fillStyle(0xFFFFFF, 1);
-    g.fillRoundedRect(8, 14, 32, 28, 8);
-    g.fillStyle(0x1A1A2E, 1);
-    g.fillRoundedRect(10, 4, 28, 20, 6);
-    g.fillStyle(0xFF8C00, 1);
-    g.fillTriangle(38, 12, 52, 18, 38, 24);
-    g.fillStyle(0xFFFFFF, 1);
-    g.fillCircle(18, 12, 4);
-    g.fillStyle(0x1A1A2E, 1);
-    g.fillCircle(19, 12, 2);
-    g.fillStyle(0xE53935, 1);
-    g.fillTriangle(8, 20, 2, 16, 4, 28);
-    g.generateTexture('toucan', 52, 48);
+
 
     // --- Graine (projectile boss) ---
     g.clear();
@@ -763,6 +733,7 @@ class BaseLevelScene extends Phaser.Scene {
     // --- Game Feel : Coyote Time & Jump Buffer ---
     if (onGround) {
       this.lastOnGround = this.time.now;
+      this.hasDoubleJumped = false;
     }
     
     const jumpDown = Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.wasd.up);
@@ -771,6 +742,14 @@ class BaseLevelScene extends Phaser.Scene {
 
     if (jumpDown || mobileJumpDown) {
       this.lastJumpPressed = this.time.now;
+      
+      // Double Jump
+      if (this.canDoubleJump && (this.time.now - this.lastOnGround >= 150) && !this.hasDoubleJumped) {
+        this.player.setVelocityY(physCfg.playerJump);
+        this.hasDoubleJumped = true;
+        this.lastJumpPressed = 0;
+        this.sound.play('sfx_jump', { rate: 1.25 });
+      }
     }
 
     if (this.time.now - this.lastJumpPressed < 150 && this.time.now - this.lastOnGround < 150) {
@@ -1179,9 +1158,9 @@ class BaseLevelScene extends Phaser.Scene {
          this.defeatBoss();
          return;
        }
+
+       this.bossStunUntil = this.time.now + GAME_CONFIG[this.levelKey].boss.stunDuration;
     }
-    
-    this.bossStunUntil = this.time.now + GAME_CONFIG[this.levelKey].boss.stunDuration;
   }
 
   // --- Défaite du boss ---
