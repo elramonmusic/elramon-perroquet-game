@@ -311,7 +311,7 @@
         YouTube ↗
       </a>
     </div>
-    <div id="yt-audio-player" style="display: none;"></div>
+    <div id="yt-audio-player" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
   </div>
 
   <script src="../app.js" defer></script>
@@ -330,7 +330,7 @@
         sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
       }
 
-      let bestScore = parseInt(localStorage.getItem('elramon_game_best_score') || '0');
+      let bestScore = parseInt(localStorage.getItem('elramon_game_best_score') || '0', 10);
       let bossDefeatedCount = localStorage.getItem('elramon_game_boss1_defeated') === 'true' ? 1 : 0;
       let totalBananas = Math.floor(bestScore / 100);
       
@@ -340,9 +340,11 @@
         if (member.pseudo) queryParams.append('pseudo', member.pseudo);
 
         const resp = await fetch(`/functions/member-stats?${queryParams.toString()}`);
+        console.log("Stats API Response:", resp.status);
         if (resp.ok) {
           const stats = await resp.json();
-          if (stats && stats.total_score !== undefined) {
+          console.log("Stats Data:", stats);
+          if (stats && stats.total_score !== undefined && stats.total_score > 0) {
             bestScore = stats.total_score;
             bossDefeatedCount = stats.bosses_defeated;
             totalBananas = stats.total_bananas;
@@ -352,9 +354,28 @@
               sinceEl.textContent = 'A commencé l\\'aventure le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
             }
           }
+        } else {
+          console.error("Stats API failed:", await resp.text());
+          throw new Error("member-stats failed"); // force fallback
         }
       } catch (e) {
-        console.error("Erreur stats api (local environment ?)", e);
+        console.error("Erreur stats api, tentative du fallback sur game-score...", e);
+        try {
+          const fbResp = await fetch('/functions/game-score');
+          if (fbResp.ok) {
+            const scores = await fbResp.json();
+            const userScore = scores.find(s => s.pseudo === member.pseudo);
+            if (userScore) {
+              bestScore = Math.max(bestScore, userScore.score);
+              totalBananas = Math.floor(bestScore / 100);
+              if (userScore.badge && (userScore.badge.includes('Roi') || userScore.badge.includes('Sauvée'))) {
+                bossDefeatedCount = 1;
+              }
+            }
+          }
+        } catch(err) {
+          console.error("Fallback echoué", err);
+        }
       }
 
       document.getElementById('member-score').textContent = bestScore;
