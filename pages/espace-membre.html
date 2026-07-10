@@ -311,10 +311,10 @@
         YouTube ↗
       </a>
     </div>
-    <div id="yt-audio-player" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
+    <div id="yt-audio-player" style="position: absolute; left: -9999px; width: 200px; height: 200px; pointer-events: none;"></div>
   </div>
 
-  <script src="../app.js" defer></script>
+  <script src="../app.js?v=2" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       // Profil Supabase
@@ -322,7 +322,29 @@
       if (!member) return;
 
       const nameEl = document.getElementById('member-name');
-      if (nameEl) nameEl.textContent = member.prenom || member.pseudo || 'Membre du Club';
+      if (nameEl) nameEl.textContent = member.prenom || member.pseudo || member.email.split('@')[0] || 'Membre du Club';
+      
+      // Auto-réparation de la session si le pseudo est manquant (anciens caches)
+      if (!member.pseudo && member.email) {
+        try {
+          const loginRes = await fetch('/login', { 
+            method: 'POST', 
+            body: JSON.stringify({ email: member.email }), 
+            headers: { 'Content-Type': 'application/json' } 
+          });
+          if (loginRes.ok) {
+            const fullMember = await loginRes.json();
+            if (window.ElRamon && window.ElRamon.Auth) {
+              window.ElRamon.Auth.saveMember(fullMember);
+              member.pseudo = fullMember.pseudo;
+              member.prenom = fullMember.prenom;
+              if (nameEl) nameEl.textContent = member.prenom || member.pseudo || member.email.split('@')[0] || 'Membre du Club';
+            }
+          }
+        } catch(e) {
+          console.error("Auto-réparation session échouée", e);
+        }
+      }
       
       const sinceEl = document.getElementById('member-since');
       if (sinceEl && member.joined_at) {
