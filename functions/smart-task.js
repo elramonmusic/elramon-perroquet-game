@@ -14,9 +14,22 @@ export async function onRequestPost(context) {
   const targetUrl = env.RAMONITO_FUNCTION_URL || `${env.SUPABASE_URL}/functions/v1/smart-task`;
 
   try {
+    const headers = new Headers();
+    headers.set('Content-Type', 'application/json');
+    
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader) {
+      headers.set('Authorization', authHeader);
+    }
+    
+    // Si la clé anon est dispo, on la passe aussi
+    if (env.SUPABASE_ANON_KEY) {
+      headers.set('apikey', env.SUPABASE_ANON_KEY);
+    }
+
     const response = await fetch(targetUrl, {
       method: 'POST',
-      headers: request.headers,
+      headers: headers,
       body: request.body
     });
 

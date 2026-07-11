@@ -50,9 +50,10 @@ serve(async (req) => {
     // Client service-role (Bypass RLS pour mise à jour sécurisée des bananes)
     const supabaseServiceClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) {
-      throw new Error('Non autorisé: Jeton invalide');
+      throw new Error('Non autorisé: Jeton invalide - ' + (userError?.message || 'Utilisateur non trouvé'));
     }
 
     // 2. Récupérer la question
