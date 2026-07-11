@@ -14,6 +14,11 @@
   <link rel="stylesheet" href="../styles.css" />
   <style>
     /* PREMIUM DASHBOARD SPECIFIC STYLES */
+    @keyframes sunset-pulse {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .dash-hero-img {
        background: url('../assets/images/header_members_v2.png') no-repeat center center;
        background-size: cover;
@@ -30,7 +35,10 @@
        content: '';
        position: absolute;
        inset: 0;
-       background: linear-gradient(to bottom, rgba(26, 26, 46, 0.4) 0%, var(--night-blue) 100%);
+       background: linear-gradient(to bottom, rgba(26, 26, 46, 0.3) 0%, var(--night-blue) 100%),
+                   linear-gradient(135deg, rgba(46, 26, 71, 0.4), rgba(74, 18, 53, 0.4), rgba(26, 26, 70, 0.4));
+       background-size: 400% 400%;
+       animation: sunset-pulse 12s ease infinite;
     }
     .hero-content {
        position: relative;
@@ -128,6 +136,30 @@
     .tag-yt { background: rgba(229,57,53,0.15); color: var(--coral-red); border: 1px solid rgba(229,57,53,0.3); }
     .tag-soon { background: rgba(255,140,0,0.15); color: var(--orange-tropical); border: 1px solid rgba(255,140,0,0.3); }
 
+    /* Achievements/Trophies Grid */
+    .achievement-card {
+      text-align: center;
+      padding: 20px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-mid);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .achievement-card.locked {
+      opacity: 0.3;
+      filter: grayscale(1);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .achievement-card:not(.locked) {
+      opacity: 1;
+      filter: grayscale(0);
+      background: rgba(255, 215, 0, 0.05);
+      border-color: rgba(255, 215, 0, 0.25);
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.1);
+    }
+
     /* Mini Player */
     .dash-mini-player {
        position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
@@ -147,6 +179,29 @@
        transition: transform var(--transition-fast); width: 40px; height: 40px; border-radius: 50%;
     }
     .player-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+
+    /* Music Visualizer Waves */
+    .music-waves {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+    }
+    .wave-bar {
+      width: 3px;
+      height: 100%;
+      background: var(--turquoise);
+      border-radius: 3px;
+      animation: wave-bounce 0.8s ease infinite alternate;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; background: var(--yellow-sun); }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; background: var(--orange-tropical); }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; background: var(--turquoise); }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; background: var(--yellow-sun); }
+    @keyframes wave-bounce {
+      0% { height: 4px; }
+      100% { height: 20px; }
+    }
 
     @media (max-width: 768px) {
        .profile-widget { flex-direction: column; text-align: center; margin-top: -40px; }
@@ -203,20 +258,64 @@
         
         <!-- PROFIL WIDGET -->
         <div class="glass-card profile-widget">
-          <div class="profile-avatar">🦜</div>
+          <div class="profile-avatar" id="profile-avatar-emoji">🦜</div>
           <div class="profile-info">
-            <h2 class="profile-name" id="member-name">Membre du Club</h2>
-            <p class="profile-sub" id="member-since">Prêt pour l'aventure !</p>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h2 class="profile-name" id="member-name" style="margin: 0;">Membre du Club</h2>
+              <button id="edit-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--turquoise); padding:0; line-height:1; display:flex; align-items:center;" title="Modifier mon prénom">✏️</button>
+            </div>
+            <div id="edit-name-container" style="display: none; align-items: center; gap: 8px; margin-bottom: 0.5rem; flex-wrap: wrap;">
+              <input type="text" id="edit-name-input" maxlength="20" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(0,206,209,0.3); color:#fff; border-radius:8px; padding:5px 12px; font-size:1rem; outline:none;" />
+              <button id="save-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:#2ECC71;" title="Enregistrer">✔️</button>
+              <button id="cancel-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--coral-red);" title="Annuler">❌</button>
+            </div>
+            <p class="profile-sub" id="member-since" style="margin-top: 4px; margin-bottom: 0.8rem;">Prêt pour l'aventure !</p>
             <div class="profile-badges">
               <div class="stat-badge stat-badge-rank">👑 <span id="member-rank">Nouveau Membre</span></div>
               <div class="stat-badge stat-badge-score">🏆 <span id="member-score">0</span> pts</div>
               <div class="stat-badge stat-badge-boss">⚔️ <span id="member-bosses">0</span> Boss</div>
             </div>
+            
+            <!-- BARRE DE PROGRESSION DE RANG -->
+            <div style="margin-top: 15px; max-width: 320px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;">
+                <span>Prochain Rang</span>
+                <span id="rank-progress-text">0 / 500 pts</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div id="rank-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--turquoise), var(--yellow-sun)); transition: width 0.6s ease-out;"></div>
+              </div>
+            </div>
           </div>
           <div>
-            <a href="./jeu.html" class="btn btn-lg" style="background: var(--orange-tropical); color: #fff; border-radius: 50px; text-decoration: none; display: inline-block; box-shadow: var(--shadow-glow-orange);">
+            <a href="./jeu.html" class="btn btn-lg" style="background: var(--orange-tropical); color: #fff; border-radius: 50px; text-decoration: none; display: inline-block; box-shadow: var(--shadow-glow-orange); transition: transform 0.2s;">
               🎮 Jouer au jeu
             </a>
+          </div>
+        </div>
+
+        <!-- SUCCÈS & ACCRÉDITATIONS TROPICALES -->
+        <h2 style="margin-bottom: 1.2rem; color: #FFF; font-weight: 800; font-size: 1.4rem;">🏆 Mes Succès Tropicaux</h2>
+        <div class="achievements-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 2.5rem;">
+          <div class="glass-card achievement-card locked" id="badge-first-score">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🌱</span>
+            <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px;">Premier Pas</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">Enregistrer un premier score</div>
+          </div>
+          <div class="glass-card achievement-card locked" id="badge-banana-collector">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🍌</span>
+            <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px;">Collectionneur</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">Gagner 10 bananes</div>
+          </div>
+          <div class="glass-card achievement-card locked" id="badge-toucan-hunter">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🦜</span>
+            <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px;">Toucan Vaincu</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">Battre le Boss du Level 1</div>
+          </div>
+          <div class="glass-card achievement-card locked" id="badge-monkey-drummer">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🥁</span>
+            <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px;">Singe Dompté</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">Battre le Boss du Level 2</div>
           </div>
         </div>
 
@@ -302,8 +401,18 @@
         <div style="font-size:0.75rem; color:rgba(255,255,255,0.6);">El Ramon Music</div>
       </div>
     </div>
-    <div class="player-controls">
+    <div class="player-controls" style="display: flex; align-items: center; gap: 10px;">
+      <!-- ONDES SONORES ANIMÉES -->
+      <div class="music-waves" id="music-waves" style="display: none; align-items: center; gap: 3px; height: 20px; margin-right: 10px;">
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+      </div>
+      <button id="audio-prev-btn" class="player-btn" aria-label="Précédent" style="font-size: 1.2rem;">⏮️</button>
       <button id="audio-play-btn" class="player-btn" aria-label="Play">▶️</button>
+      <button id="audio-next-btn" class="player-btn" aria-label="Suivant" style="font-size: 1.2rem;">⏭️</button>
       <button id="audio-mute-btn" class="player-btn" aria-label="Mute">🔊</button>
     </div>
     <div class="player-actions" style="min-width: 150px; text-align:right;">
@@ -320,7 +429,7 @@
   <script src="../assets/js/ramonito.js?v=6" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Profil Supabase (récupéré depuis la nouvelle fonction async qui lit la table 'profiles')
+      // Profil Supabase (récupéré depuis la nouvelle fonction async qui lit la table 'members')
       const member = window.ElRamon && window.ElRamon.Auth ? await window.ElRamon.Auth.getMember() : null;
       if (!member) return;
 
@@ -331,6 +440,58 @@
       if (sinceEl && member.created_at) {
         const date = new Date(member.created_at);
         sinceEl.textContent = 'Membre depuis le ' + date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+      }
+
+      // --- EDIT PSEUDO LOGIC ---
+      const editBtn = document.getElementById('edit-name-btn');
+      const editContainer = document.getElementById('edit-name-container');
+      const editInput = document.getElementById('edit-name-input');
+      const saveBtn = document.getElementById('save-name-btn');
+      const cancelBtn = document.getElementById('cancel-name-btn');
+
+      if (editBtn && editContainer && editInput && saveBtn && cancelBtn) {
+        editBtn.addEventListener('click', () => {
+          nameEl.parentElement.style.display = 'none';
+          editContainer.style.display = 'flex';
+          editInput.value = nameEl.textContent.trim();
+          editInput.focus();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+          editContainer.style.display = 'none';
+          nameEl.parentElement.style.display = 'flex';
+        });
+
+        const performSave = async () => {
+          const newName = editInput.value.trim();
+          if (!newName) return;
+
+          saveBtn.disabled = true;
+          const { error } = await window.supabaseClient
+            .from('members')
+            .update({ prenom: newName })
+            .eq('id', member.id);
+
+          if (error) {
+            if (window.ElRamon.Toast) {
+              window.ElRamon.Toast.show("Erreur lors de la mise à jour 🌴", 'error');
+            } else {
+              alert("Erreur lors de la mise à jour");
+            }
+          } else {
+            if (window.ElRamon.Toast) {
+              window.ElRamon.Toast.show("Prénom mis à jour ! 🌴", 'success');
+            }
+            nameEl.textContent = newName;
+            cancelBtn.click();
+          }
+          saveBtn.disabled = false;
+        };
+
+        saveBtn.addEventListener('click', performSave);
+        editInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') performSave();
+        });
       }
 
       // Récupération des stats directement depuis le profil Supabase
@@ -352,6 +513,67 @@
       
       if (bestScore === 0) {
         if(sinceEl) sinceEl.textContent += " — Commence ton aventure tropicale ! 🦜";
+      }
+
+      // --- CALCUL DU PROCHAIN RANG ET PROGRÈS ---
+      let nextThreshold = 100;
+      let progressPercent = 0;
+      let nextRankName = "Aventurier d'Argent";
+      let avatarEmoji = '🌴';
+      
+      if (bestScore < 100) {
+        nextThreshold = 100;
+        progressPercent = (bestScore / 100) * 100;
+        nextRankName = "Aventurier d'Argent 🥈";
+        avatarEmoji = '🌴';
+      } else if (bestScore < 500) {
+        nextThreshold = 500;
+        progressPercent = ((bestScore - 100) / 400) * 100;
+        nextRankName = "Aventurier d'Or 🥇";
+        avatarEmoji = '🥈';
+      } else if (bestScore < 1500) {
+        nextThreshold = 1500;
+        progressPercent = ((bestScore - 500) / 1000) * 100;
+        nextRankName = "Perroquet Royal 👑";
+        avatarEmoji = '🥇';
+      } else {
+        nextThreshold = bestScore;
+        progressPercent = 100;
+        nextRankName = "Niveau Max ! 👑";
+        avatarEmoji = '👑';
+      }
+      
+      const avatarEl = document.getElementById('profile-avatar-emoji');
+      if (avatarEl) avatarEl.textContent = avatarEmoji;
+      
+      const progressBar = document.getElementById('rank-progress-bar');
+      if (progressBar) progressBar.style.width = `${progressPercent}%`;
+      
+      const progressText = document.getElementById('rank-progress-text');
+      if (progressText) {
+        if (progressPercent >= 100) {
+          progressText.textContent = `Palier maximum atteint !`;
+        } else {
+          progressText.textContent = `${bestScore} / ${nextThreshold} pts (Vers ${nextRankName})`;
+        }
+      }
+
+      // --- DÉVERROUILLAGE DES TROPHÉES ---
+      if (bestScore > 0) {
+        const badge = document.getElementById('badge-first-score');
+        if (badge) badge.classList.remove('locked');
+      }
+      if (totalBananas >= 10) {
+        const badge = document.getElementById('badge-banana-collector');
+        if (badge) badge.classList.remove('locked');
+      }
+      if (member.toucan_defeated) {
+        const badge = document.getElementById('badge-toucan-hunter');
+        if (badge) badge.classList.remove('locked');
+      }
+      if (member.singe_maracasse_defeated) {
+        const badge = document.getElementById('badge-monkey-drummer');
+        if (badge) badge.classList.remove('locked');
       }
 
       // YouTube API
@@ -377,10 +599,21 @@
     function onPlayerReady(event) {
       const playBtn = document.getElementById('audio-play-btn');
       const muteBtn = document.getElementById('audio-mute-btn');
+      const prevBtn = document.getElementById('audio-prev-btn');
+      const nextBtn = document.getElementById('audio-next-btn');
+      const waves = document.getElementById('music-waves');
       
       playBtn.addEventListener('click', () => {
-        if (isPlaying) { ytPlayer.pauseVideo(); playBtn.textContent = '▶️'; } 
-        else { ytPlayer.playVideo(); playBtn.textContent = '⏸️'; }
+        if (isPlaying) { 
+          ytPlayer.pauseVideo(); 
+          playBtn.textContent = '▶️'; 
+          if (waves) waves.style.display = 'none';
+        } 
+        else { 
+          ytPlayer.playVideo(); 
+          playBtn.textContent = '⏸️'; 
+          if (waves) waves.style.display = 'flex';
+        }
         isPlaying = !isPlaying;
       });
 
@@ -389,6 +622,24 @@
         else { ytPlayer.mute(); muteBtn.textContent = '🔇'; }
         isMuted = !isMuted;
       });
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          ytPlayer.previousVideo();
+          if (!isPlaying) {
+            playBtn.click();
+          }
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          ytPlayer.nextVideo();
+          if (!isPlaying) {
+            playBtn.click();
+          }
+        });
+      }
     }
   </script>
 </body>
