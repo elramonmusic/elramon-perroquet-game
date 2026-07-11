@@ -395,6 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const result = await res.json();
       
+      console.log("Ramonito API response:", result);
       if (res.ok) {
         await addAssistantResponse(result);
         freeQuestionsUsed = result.free_questions_used;
