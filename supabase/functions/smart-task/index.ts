@@ -71,7 +71,7 @@ serve(async (req) => {
     // 4. Recherche de produits d'affiliation actifs
     const { data: products } = await supabaseServiceClient
       .from('affiliate_products')
-      .select('id, name, category, keywords, description, is_premium, banana_cost, disclosure, image_url')
+      .select('id, name, category, keywords, description, is_premium, banana_cost, disclosure, image_url, url')
       .eq('is_active', true);
 
     const questionLower = question.toLowerCase();
@@ -165,12 +165,24 @@ serve(async (req) => {
         model: 'llama-3.1-8b-instant'
       });
 
-    // 8. Retourner la réponse et la liste des produits pour le widget
+    // 8. Retourner la réponse et la liste des produits pour le widget (en masquant l'URL des produits premium pour la sécurité)
+    const sanitizedProducts = selectedProducts.map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      description: p.description,
+      is_premium: p.is_premium,
+      banana_cost: p.banana_cost,
+      disclosure: p.disclosure,
+      image_url: p.image_url,
+      url: p.is_premium ? null : p.url
+    }));
+
     return new Response(JSON.stringify({
       answer: answer,
       remaining_bananas: bananas,
       free_questions_used: freeQuestionsUsed,
-      matched_products: selectedProducts
+      matched_products: sanitizedProducts
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
