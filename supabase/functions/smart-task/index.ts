@@ -1,21 +1,3 @@
-# Ramonito Edge Function (smart-task)
-
-Voici le code TypeScript complet pour la **Supabase Edge Function** `smart-task` mis à jour pour utiliser la table unique de vérité `members`, la règle des questions gratuites utilisées et un client privilégié (`SUPABASE_SERVICE_ROLE_KEY`) pour l'écriture sécurisée en base de données.
-
-Cette fonction s'exécute côté serveur sur l'infrastructure de Supabase, appelle l'API de Groq et gère le solde de bananes et de questions gratuites directement en base de données.
-
-## 1. Créer la fonction localement
-
-Si tu as installé la CLI Supabase, exécute cette commande à la racine de ton projet :
-```bash
-supabase functions new smart-task
-```
-
-## 2. Remplacer le code (index.ts)
-
-Remplace le contenu du fichier généré (`supabase/functions/smart-task/index.ts`) par le code ci-dessous :
-
-```typescript
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -201,13 +183,3 @@ serve(async (req) => {
     });
   }
 });
-```
-
-## 3. Déployer la fonction
-
-Exécute la commande suivante pour déployer ton code sur Supabase (assure-toi d'être connecté via `supabase login` et que ton projet est lié avec `supabase link --project-ref ton-projet-id`) :
-
-```bash
-supabase functions deploy smart-task --no-verify-jwt
-```
-*(L'option `--no-verify-jwt` permet de désactiver la vérification "legacy" puisque nous gérons nous-mêmes le JWT directement dans le code via le client Supabase).*

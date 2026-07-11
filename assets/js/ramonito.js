@@ -252,6 +252,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         height: 60vh;
       }
     }
+    
+    .ramonito-product-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 206, 209, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: message-appear 0.3s ease forwards;
+    }
+    .ramonito-product-img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .ramonito-product-title {
+      font-weight: 700;
+      color: #FFF;
+      font-size: 0.88rem;
+    }
+    .ramonito-product-desc {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.3;
+    }
+    .ramonito-product-disclosure {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.2;
+      font-style: italic;
+    }
+    .ramonito-product-btn {
+      background: var(--turquoise);
+      color: #0f172a;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .ramonito-product-btn:hover {
+      background: var(--yellow-sun, #FFD700);
+      transform: scale(1.02);
+    }
+    .ramonito-product-btn:disabled {
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.4);
+      cursor: not-allowed;
+    }
   `;
   document.head.appendChild(style);
 
@@ -339,7 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await res.json();
       
       if (res.ok) {
-        addMessage(result.answer, 'assistant');
+        await addAssistantResponse(result);
         freeQuestionsUsed = result.free_questions_used;
         bananas = result.remaining_bananas;
         updateBalanceUI();
@@ -355,6 +412,151 @@ document.addEventListener('DOMContentLoaded', async () => {
       sendBtn.textContent = '💋';
       inputEl.focus();
     }
+  }
+
+  async function addAssistantResponse(result) {
+    let text = result.answer;
+    const matchedProducts = result.matched_products || [];
+    
+    // Rechercher les balises [PRODUCT:uuid]
+    const productTagRegex = /\[PRODUCT:([a-f0-9\-]+)\]/i;
+    const match = text.match(productTagRegex);
+    let productId = null;
+    if (match) {
+      productId = match[1];
+      // Nettoyer la balise du texte de réponse
+      text = text.replace(productTagRegex, '').trim();
+    }
+    
+    // Afficher la bulle de texte épurée
+    addMessage(text, 'assistant');
+    
+    // Si un produit a été recommandé et qu'il est présent dans matched_products
+    if (productId) {
+      const product = matchedProducts.find(p => p.id === productId);
+      if (product) {
+        // Créer la carte produit
+        const card = document.createElement('div');
+        card.className = 'ramonito-product-card';
+        
+        if (product.image_url) {
+          const img = document.createElement('img');
+          img.className = 'ramonito-product-img';
+          img.src = product.image_url;
+          img.alt = product.name;
+          card.appendChild(img);
+        }
+        
+        const title = document.createElement('div');
+        title.className = 'ramonito-product-title';
+        title.textContent = product.name;
+        card.appendChild(title);
+        
+        if (product.description) {
+          const desc = document.createElement('div');
+          desc.className = 'ramonito-product-desc';
+          desc.textContent = product.description;
+          card.appendChild(desc);
+        }
+        
+        if (product.disclosure) {
+          const disc = document.createElement('div');
+          disc.className = 'ramonito-product-disclosure';
+          disc.textContent = product.disclosure;
+          card.appendChild(disc);
+        }
+        
+        const btn = document.createElement('button');
+        btn.className = 'ramonito-product-btn';
+        
+        if (product.is_premium && product.banana_cost > 0) {
+          // Vérifier si déjà débloqué
+          let isUnlocked = false;
+          try {
+            const { data: unlocks, error } = await window.supabaseClient
+              .from('affiliate_unlocks')
+              .select('id')
+              .eq('product_id', product.id);
+            if (!error && unlocks && unlocks.length > 0) {
+              isUnlocked = true;
+            }
+          } catch (e) {
+            console.error("Erreur de vérification des déblocages", e);
+          }
+          
+          if (isUnlocked) {
+            setupBuyButton(btn, product.url);
+          } else {
+            btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
+            btn.addEventListener('click', async () => {
+              if (bananas < product.banana_cost) {
+                if (window.ElRamon && window.ElRamon.Toast) {
+                  window.ElRamon.Toast.show("Il te manque quelques bananes 🍌 Joue au jeu !", "error");
+                } else {
+                  alert("Il te manque quelques bananes 🍌");
+                }
+                return;
+              }
+              
+              btn.disabled = true;
+              btn.textContent = 'Déblocage...';
+              
+              try {
+                const { data: sessionData } = await window.supabaseClient.auth.getSession();
+                const unlockResp = await fetch('/functions/unlock-affiliate-product', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionData.session.access_token}`
+                  },
+                  body: JSON.stringify({ productId: product.id })
+                });
+                
+                const unlockResult = await unlockResp.json();
+                if (unlockResp.ok && unlockResult.success) {
+                  if (window.ElRamon && window.ElRamon.Toast) {
+                    window.ElRamon.Toast.show("Produit débloqué ! 🍌", "success");
+                  }
+                  
+                  // Déduire localement
+                  bananas -= product.banana_cost;
+                  updateBalanceUI();
+                  
+                  // Configurer le bouton vers le lien d'achat
+                  setupBuyButton(btn, unlockResult.url);
+                } else {
+                  if (window.ElRamon && window.ElRamon.Toast) {
+                    window.ElRamon.Toast.show(unlockResult.error || "Erreur de déblocage", "error");
+                  }
+                  btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
+                  btn.disabled = false;
+                }
+              } catch (err) {
+                console.error(err);
+                btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
+                btn.disabled = false;
+              }
+            });
+          }
+        } else {
+          setupBuyButton(btn, product.url);
+        }
+        
+        card.appendChild(btn);
+        messagesEl.appendChild(card);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+    }
+  }
+
+  function setupBuyButton(btnElement, url) {
+    btnElement.disabled = false;
+    btnElement.textContent = 'Voir le produit 🦜';
+    btnElement.style.background = 'var(--turquoise)';
+    btnElement.style.color = '#0f172a';
+    btnElement.onclick = () => {
+      window.open(url, '_blank', 'noopener sponsored nofollow');
+    };
   }
 
   // Drag logic
