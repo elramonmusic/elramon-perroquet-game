@@ -418,21 +418,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let text = result.answer;
     const matchedProducts = result.matched_products || [];
     
-    // Rechercher les balises [PRODUCT:uuid]
-    const productTagRegex = /\[PRODUCT:([a-f0-9\-]+)\]/i;
-    const match = text.match(productTagRegex);
-    let productId = null;
-    if (match) {
-      productId = match[1];
-      // Nettoyer la balise du texte de réponse
-      text = text.replace(productTagRegex, '').trim();
-    }
+    // Rechercher les balises [PRODUCT:uuid] de façon ultra-robuste (tolère espaces/retours à la ligne)
+    const productTagRegex = /\[PRODUCT:\s*([^\]\s]+)\s*\]/gi;
+    const matches = [...text.matchAll(productTagRegex)];
+    
+    // Nettoyer toutes les balises du texte de réponse
+    text = text.replace(productTagRegex, '').trim();
     
     // Afficher la bulle de texte épurée
     addMessage(text, 'assistant');
     
-    // Si un produit a été recommandé et qu'il est présent dans matched_products
-    if (productId) {
+    // Si des produits ont été recommandés et sont présents dans matched_products
+    for (const match of matches) {
+      const productId = match[1].trim();
       const product = matchedProducts.find(p => p.id === productId);
       if (product) {
         // Créer la carte produit
