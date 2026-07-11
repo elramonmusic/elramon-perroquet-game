@@ -486,6 +486,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (isUnlocked) {
             setupBuyButton(btn, product.url);
           } else {
+            btn.setAttribute('href', '#');
             btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
             btn.style.cursor = 'pointer';
             
@@ -550,7 +551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 btn.style.color = '#0f172a';
               }
             };
-            btn.addEventListener('click', handleUnlock);
+            btn.onclick = handleUnlock;
           }
         } else {
           setupBuyButton(btn, product.url);
