@@ -139,7 +139,7 @@ export async function onRequestPost(context) {
         // 2. Mettre à jour le profil (bananes et meilleur score)
         const earnedBananas = Math.floor(scoreData.score / 100);
         
-        const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/members?id=eq.${userId}&select=id,bananas_balance,best_score,best_level`, {
+        const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/members?id=eq.${userId}&select=id,bananas_balance,best_score,best_level,toucan_defeated,singe_maracasse_defeated`, {
           method: 'GET',
           headers: {
             'apikey': env.SUPABASE_SERVICE_KEY,
@@ -158,6 +158,9 @@ export async function onRequestPost(context) {
             const incomingLevel = (scoreData.level || 'level1').toLowerCase();
             const finalBestLevel = (currentBestLevel === 'level2' || incomingLevel === 'level2') ? 'level2' : 'level1';
             
+            const hasDefeatedToucan = !!(profile.toucan_defeated || (scoreData.boss_defeated && incomingLevel === 'level1'));
+            const hasDefeatedSinge = !!(profile.singe_maracasse_defeated || (scoreData.boss_defeated && incomingLevel === 'level2'));
+
             const patchRes = await fetch(`${env.SUPABASE_URL}/rest/v1/members?id=eq.${userId}`, {
               method: 'PATCH',
               headers: {
@@ -169,7 +172,9 @@ export async function onRequestPost(context) {
               body: JSON.stringify({
                 bananas_balance: newBananas,
                 best_score: newBestScore,
-                best_level: finalBestLevel
+                best_level: finalBestLevel,
+                toucan_defeated: hasDefeatedToucan,
+                singe_maracasse_defeated: hasDefeatedSinge
               })
             });
 
