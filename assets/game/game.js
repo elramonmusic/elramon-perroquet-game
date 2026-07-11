@@ -644,7 +644,7 @@ class BaseLevelScene extends Phaser.Scene {
     }).setVisible(false).setScrollFactor(0).setDepth(100);
     
     // --- Bouton Son ---
-    const soundBtn = this.add.text(GAME_CONFIG.width - 50, 20, '🔊', { fontSize: '24px' })
+    const soundBtn = this.add.text(w - 50, 20, '🔊', { fontSize: '24px' })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(150)

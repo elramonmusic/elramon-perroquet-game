@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--turquoise), var(--orange));
+      background: linear-gradient(135deg, var(--turquoise), var(--orange-tropical, #FF8C00));
       border: 3px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       font-size: 1.8rem;
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       display: none;
     }
     #ramonito-bananas-count {
-      color: var(--yellow);
+      color: var(--yellow-sun, #FFD700);
       font-weight: 700;
       font-size: 0.9rem;
     }

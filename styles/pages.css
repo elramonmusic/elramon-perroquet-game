@@ -493,7 +493,7 @@
 }
 .tag-afrobeat { background: rgba(255,107,107,0.15); color: var(--coral-red); }
 .tag-zouk { background: rgba(255,107,157,0.15); color: #FF6B9D; }
-.tag-compas { background: rgba(255,140,0,0.15); color: var(--orange-sun); }
+.tag-compas { background: rgba(255,140,0,0.15); color: var(--orange-tropical); }
 .tag-tropical { background: rgba(46,204,113,0.15); color: var(--palm-green); }
 .tag-reggaeton { background: rgba(255,215,0,0.15); color: var(--yellow-sun); }
 .tag-instrumental { background: rgba(0,206,209,0.15); color: var(--turquoise); }

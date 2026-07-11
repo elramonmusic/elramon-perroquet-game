@@ -36,8 +36,6 @@ export async function onRequestGet(context) {
     let queryUrl = `${env.SUPABASE_URL}/rest/v1/member_game_stats?select=total_score,total_bananas,bosses_defeated,joined_at&limit=1`;
     if (email) {
       queryUrl += `&member_email=eq.${encodeURIComponent(email)}`;
-    } else if (pseudo) {
-      queryUrl += `&pseudo=eq.${encodeURIComponent(pseudo)}`;
     }
 
     const response = await fetch(queryUrl, {

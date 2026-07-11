@@ -188,6 +188,13 @@ const GAME_CONFIG = {
       color: 0x2ECC71,
       size: { w: 30, h: 16 },
       score: 25,
+    },
+    singe: {
+      color: 0x8D6E63,
+      size: { w: 24, h: 32 },
+      score: 50,
+      shootInterval: 2000,
+      projectileSpeed: 150
     }
   },
 
