@@ -238,13 +238,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const freeBadge = document.getElementById('ramonito-free-badge');
   const bananasCount = document.getElementById('ramonito-bananas-count');
 
-  let freeQuestions = member.free_questions_remaining || 0;
+  let freeQuestionsUsed = member.free_questions_used || 0;
   let bananas = member.bananas_balance || 0;
 
   function updateBalanceUI() {
-    if (freeQuestions > 0) {
+    let freeQuestionsLeft = Math.max(0, 3 - freeQuestionsUsed);
+    if (freeQuestionsLeft > 0) {
       freeBadge.classList.remove('hidden');
-      freeBadge.textContent = `${freeQuestions} Gratuit${freeQuestions > 1 ? 's' : ''}`;
+      freeBadge.textContent = `${freeQuestionsLeft} Gratuit${freeQuestionsLeft > 1 ? 's' : ''}`;
     } else {
       freeBadge.classList.add('hidden');
     }
@@ -280,8 +281,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const text = inputEl.value.trim();
     if (!text) return;
 
-    if (freeQuestions <= 0 && bananas < 1) {
-      addMessage("Tu n'as plus de bananes, amigo ! Joue au jeu pour en gagner d'autres ! 🍌", 'assistant');
+    let freeQuestionsLeft = Math.max(0, 3 - freeQuestionsUsed);
+    if (freeQuestionsLeft <= 0 && bananas < 1) {
+      addMessage("Ton panier de bananes est vide 🍌 Va jouer au Perroquet Tropical pour en gagner, puis reviens me poser ta question 🦜☀️", 'assistant');
       inputEl.value = '';
       return;
     }
@@ -311,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (res.ok) {
         addMessage(result.answer, 'assistant');
-        freeQuestions = result.free_questions_remaining;
+        freeQuestionsUsed = result.free_questions_used;
         bananas = result.remaining_bananas;
         updateBalanceUI();
       } else {
