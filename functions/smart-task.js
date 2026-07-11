@@ -45,7 +45,7 @@ export async function onRequestPost(context) {
     const userId = user.id;
 
     // 2. Vérification du solde (Bananes / Questions gratuites)
-    const profileRes = await fetch(`${supabaseUrl}/rest/v1/members?id=eq.${userId}&select=free_questions_remaining,bananas_balance,prenom,pseudo`, {
+    const profileRes = await fetch(`${supabaseUrl}/rest/v1/members?id=eq.${userId}&select=free_questions_used,bananas_balance,prenom,pseudo`, {
       method: 'GET',
       headers: {
         'apikey': supabaseServiceKey,
@@ -65,14 +65,16 @@ export async function onRequestPost(context) {
     }
     
     const profile = profiles[0];
-    let freeQuestions = profile.free_questions_remaining || 0;
+    let freeQuestionsUsed = profile.free_questions_used || 0;
     let bananas = profile.bananas_balance || 0;
     const userName = profile.prenom || profile.pseudo || 'Amigo';
 
-    if (freeQuestions <= 0 && bananas < 1) {
+    const isFree = freeQuestionsUsed < 3;
+    if (!isFree && bananas < 1) {
       return new Response(JSON.stringify({ 
-        message: "Tu n'as plus de bananes, amigo ! Joue au mini-jeu pour en gagner d'autres ! 🍌",
-        free_questions_remaining: freeQuestions,
+        error: 'solde_insuffisant',
+        message: "Ton panier de bananes est vide 🍌 Va jouer au Perroquet Tropical pour en gagner, puis reviens me poser ta question 🦜☀️",
+        free_questions_used: freeQuestionsUsed,
         remaining_bananas: bananas
       }), { status: 403, headers: CORS_HEADERS });
     }
@@ -88,7 +90,7 @@ export async function onRequestPost(context) {
     // 4. Appel à l'API Groq (Llama 3)
     const systemPrompt = `Tu es Ramonito, le perroquet mascotte officiel du 'El Ramon Music Club'. 
     Ton ton est très fun, chaleureux, tropical, et légèrement décalé. Tu utilises souvent des émojis tropicaux (🦜, 🌴, 🍍, 🍌, 🎶).
-    Tu dois répondre de manière très concise (2 ou 3 phrases maximum) pour garder l'interface du chat lisible.
+    Tu devez répondre de manière très concise (2 ou 3 phrases maximum) pour garder l'interface du chat lisible.
     Tu t'adresses à l'utilisateur en l'appelant par son prénom ou pseudo : ${userName}.
     L'utilisateur te pose une question musicale ou sur le club, réponds-lui avec panache !`;
 
@@ -120,8 +122,8 @@ export async function onRequestPost(context) {
     const answer = groqData.choices[0].message.content;
 
     // 5. Déduction du paiement
-    if (freeQuestions > 0) {
-      freeQuestions -= 1;
+    if (isFree) {
+      freeQuestionsUsed += 1;
     } else {
       bananas -= 1;
     }
@@ -135,7 +137,7 @@ export async function onRequestPost(context) {
         'Prefer': 'return=minimal'
       },
       body: JSON.stringify({
-        free_questions_remaining: freeQuestions,
+        free_questions_used: freeQuestionsUsed,
         bananas_balance: bananas
       })
     });
@@ -147,7 +149,7 @@ export async function onRequestPost(context) {
     // 6. Retourner la réponse et les nouveaux soldes
     return new Response(JSON.stringify({
       answer: answer,
-      free_questions_remaining: freeQuestions,
+      free_questions_used: freeQuestionsUsed,
       remaining_bananas: bananas
     }), { status: 200, headers: CORS_HEADERS });
 
