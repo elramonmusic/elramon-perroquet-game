@@ -492,6 +492,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const handleUnlock = async (e) => {
               e.preventDefault();
+              console.log("handleUnlock déclenché !", product.id);
+              if (window.ElRamon && window.ElRamon.Toast) {
+                window.ElRamon.Toast.show("Déblocage demandé... 🍌", "info");
+              }
               if (btn.classList.contains('disabled')) return;
               
               if (bananas < product.banana_cost) {
