@@ -65,29 +65,7 @@ export async function onRequestPost(context) {
 
     const product = products[0];
 
-    // Si le produit est gratuit, on peut renvoyer directement le lien
-    if (!product.is_premium || product.banana_cost <= 0) {
-      return new Response(JSON.stringify({ success: true, url: product.url }), { status: 200, headers: CORS_HEADERS });
-    }
-
-    // 4. Vérifier si l'utilisateur a déjà débloqué ce produit
-    const unlockRes = await fetch(`${env.SUPABASE_URL}/rest/v1/affiliate_unlocks?user_id=eq.${userId}&product_id=eq.${productId}`, {
-      method: 'GET',
-      headers: {
-        'apikey': env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
-      }
-    });
-
-    if (unlockRes.ok) {
-      const unlocks = await unlockRes.json();
-      if (unlocks.length > 0) {
-        // Déjà débloqué par le passé ! Retourner l'URL directement.
-        return new Response(JSON.stringify({ success: true, url: product.url, alreadyUnlocked: true }), { status: 200, headers: CORS_HEADERS });
-      }
-    }
-
-    // 5. Récupérer la balance de bananes du membre
+    // 4. Récupérer la balance de bananes du membre
     const memberRes = await fetch(`${env.SUPABASE_URL}/rest/v1/members?id=eq.${userId}&select=id,bananas_balance`, {
       method: 'GET',
       headers: {
@@ -108,6 +86,42 @@ export async function onRequestPost(context) {
     const member = members[0];
     const balance = member.bananas_balance || 0;
     const cost = product.banana_cost;
+
+    // Si le produit est gratuit, on peut renvoyer directement le lien
+    if (!product.is_premium || cost <= 0) {
+      return new Response(JSON.stringify({
+        success: true,
+        unlocked: true,
+        alreadyUnlocked: true,
+        bananasBalance: balance,
+        url: product.url,
+        message: "Lien gratuit disponible."
+      }), { status: 200, headers: CORS_HEADERS });
+    }
+
+    // 5. Vérifier si l'utilisateur a déjà débloqué ce produit
+    const unlockRes = await fetch(`${env.SUPABASE_URL}/rest/v1/affiliate_unlocks?user_id=eq.${userId}&product_id=eq.${productId}`, {
+      method: 'GET',
+      headers: {
+        'apikey': env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
+      }
+    });
+
+    if (unlockRes.ok) {
+      const unlocks = await unlockRes.json();
+      if (unlocks.length > 0) {
+        // Déjà débloqué par le passé ! Retourner l'URL directement.
+        return new Response(JSON.stringify({
+          success: true,
+          unlocked: true,
+          alreadyUnlocked: true,
+          bananasBalance: balance,
+          url: product.url,
+          message: "Lien déjà débloqué."
+        }), { status: 200, headers: CORS_HEADERS });
+      }
+    }
 
     if (balance < cost) {
       return new Response(JSON.stringify({
@@ -177,8 +191,11 @@ export async function onRequestPost(context) {
     // Retourner le lien et succès
     return new Response(JSON.stringify({
       success: true,
+      unlocked: true,
+      alreadyUnlocked: false,
+      bananasBalance: newBalance,
       url: product.url,
-      message: `Produit "${product.name}" débloqué avec succès ! 🍌`
+      message: "Lien débloqué avec succès."
     }), { status: 200, headers: CORS_HEADERS });
 
   } catch (error) {

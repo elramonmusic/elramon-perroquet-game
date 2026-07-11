@@ -515,31 +515,60 @@ document.addEventListener('DOMContentLoaded', async () => {
               
               try {
                 const { data: sessionData } = await window.supabaseClient.auth.getSession();
-                const unlockResp = await fetch('/functions/unlock-affiliate-product', {
+                const token = sessionData?.session?.access_token;
+                if (!token) {
+                  throw new Error("Session expirée. Reconnecte-toi amigo !");
+                }
+
+                const unlockResp = await fetch('/unlock-affiliate-product', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionData.session.access_token}`
+                    'Authorization': `Bearer ${token}`
                   },
                   body: JSON.stringify({ productId: product.id })
                 });
                 
-                const unlockResult = await unlockResp.json();
+                const responseText = await unlockResp.text();
+                let unlockResult = {};
+                if (responseText) {
+                  try {
+                    unlockResult = JSON.parse(responseText);
+                  } catch (jsonErr) {
+                    console.error("Erreur de parsing JSON serveur :", responseText);
+                  }
+                }
+                
                 if (unlockResp.ok && unlockResult.success) {
                   if (window.ElRamon && window.ElRamon.Toast) {
                     window.ElRamon.Toast.show("Produit débloqué ! 🍌", "success");
                   }
                   
-                  // Déduire localement
-                  bananas -= product.banana_cost;
+                  // Déduire localement et mettre à jour l'affichage
+                  bananas = unlockResult.bananasBalance !== undefined ? unlockResult.bananasBalance : (bananas - product.banana_cost);
                   updateBalanceUI();
                   
-                  // Configurer le bouton vers le lien d'achat
+                  // Ajouter un libellé visuel de succès au-dessus du bouton
+                  const successDiv = document.createElement('div');
+                  successDiv.className = 'ramonito-product-disclosure';
+                  successDiv.style.color = '#2ECC71';
+                  successDiv.style.fontWeight = '700';
+                  successDiv.style.textAlign = 'center';
+                  successDiv.style.marginTop = '4px';
+                  successDiv.textContent = '✅ Recommandation débloquée !';
+                  if (btn.parentNode) {
+                    btn.parentNode.insertBefore(successDiv, btn);
+                  }
+
+                  // Transformer le bouton vers le lien d'achat
                   setupBuyButton(btn, unlockResult.url);
                 } else {
+                  const errMsg = unlockResult.error || unlockResult.message || "Impossible de débloquer ce lien pour l'instant 🦜 Réessaie dans un moment.";
                   if (window.ElRamon && window.ElRamon.Toast) {
-                    window.ElRamon.Toast.show(unlockResult.error || "Erreur de déblocage", "error");
+                    window.ElRamon.Toast.show(errMsg, "error");
                   }
+                  addMessage(`🦜 Ramonito : ${errMsg}`, 'assistant');
+
                   btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
                   btn.classList.remove('disabled');
                   btn.style.pointerEvents = 'auto';
@@ -547,7 +576,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                   btn.style.color = '#0f172a';
                 }
               } catch (err) {
-                console.error(err);
+                console.error("Erreur d'exécution de handleUnlock :", err);
+                const errMsg = err.message || "Erreur réseau, impossible de débloquer ce lien.";
+                if (window.ElRamon && window.ElRamon.Toast) {
+                  window.ElRamon.Toast.show(errMsg, "error");
+                }
+                addMessage(`🦜 Ramonito : ${errMsg}`, 'assistant');
+
                 btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
                 btn.classList.remove('disabled');
                 btn.style.pointerEvents = 'auto';
