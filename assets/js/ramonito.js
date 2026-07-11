@@ -464,8 +464,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           card.appendChild(disc);
         }
         
-        const btn = document.createElement('button');
+        const btn = document.createElement('a');
         btn.className = 'ramonito-product-btn';
+        btn.style.display = 'block';
         
         if (product.is_premium && product.banana_cost > 0) {
           // Vérifier si déjà débloqué
@@ -486,7 +487,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             setupBuyButton(btn, product.url);
           } else {
             btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
-            btn.addEventListener('click', async () => {
+            btn.style.cursor = 'pointer';
+            
+            const handleUnlock = async (e) => {
+              e.preventDefault();
+              if (btn.classList.contains('disabled')) return;
+              
               if (bananas < product.banana_cost) {
                 if (window.ElRamon && window.ElRamon.Toast) {
                   window.ElRamon.Toast.show("Il te manque quelques bananes 🍌 Joue au jeu !", "error");
@@ -496,7 +502,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
               }
               
-              btn.disabled = true;
+              btn.classList.add('disabled');
+              btn.style.pointerEvents = 'none';
+              btn.style.background = 'rgba(255,255,255,0.15)';
+              btn.style.color = 'rgba(255,255,255,0.4)';
               btn.textContent = 'Déblocage...';
               
               try {
@@ -527,14 +536,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.ElRamon.Toast.show(unlockResult.error || "Erreur de déblocage", "error");
                   }
                   btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
-                  btn.disabled = false;
+                  btn.classList.remove('disabled');
+                  btn.style.pointerEvents = 'auto';
+                  btn.style.background = 'var(--turquoise)';
+                  btn.style.color = '#0f172a';
                 }
               } catch (err) {
                 console.error(err);
                 btn.textContent = `Débloquer pour ${product.banana_cost} bananes 🍌`;
-                btn.disabled = false;
+                btn.classList.remove('disabled');
+                btn.style.pointerEvents = 'auto';
+                btn.style.background = 'var(--turquoise)';
+                btn.style.color = '#0f172a';
               }
-            });
+            };
+            btn.addEventListener('click', handleUnlock);
           }
         } else {
           setupBuyButton(btn, product.url);
@@ -548,13 +564,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function setupBuyButton(btnElement, url) {
-    btnElement.disabled = false;
     btnElement.textContent = 'Voir le produit 🦜';
     btnElement.style.background = 'var(--turquoise)';
     btnElement.style.color = '#0f172a';
-    btnElement.onclick = () => {
-      window.open(url, '_blank', 'noopener sponsored nofollow');
-    };
+    btnElement.style.pointerEvents = 'auto';
+    btnElement.setAttribute('href', url);
+    btnElement.setAttribute('target', '_blank');
+    btnElement.setAttribute('rel', 'noopener sponsored nofollow');
+    
+    // Remplacer par un clone pour désactiver proprement tout click event d'unlock
+    const newBtn = btnElement.cloneNode(true);
+    newBtn.onclick = null;
+    if (btnElement.parentNode) {
+      btnElement.parentNode.replaceChild(newBtn, btnElement);
+    }
   }
 
   // Drag logic
