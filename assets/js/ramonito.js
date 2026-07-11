@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <button id="ramonito-close" class="ramonito-close-btn">&times;</button>
         </div>
         <div id="ramonito-messages" class="ramonito-messages">
-          <div class="message assistant">Hola amigo ! Je suis Ramonito. Une question musicale ou besoin d'aide avec ton compte ? 🌴</div>
+          <div class="message assistant">Salut, moi c’est Ramonito 🦜 Je suis la mascotte du El Ramon Music Club. Tu as 3 questions gratuites, puis tu pourras utiliser tes bananes gagnées dans le jeu pour continuer à discuter avec moi 🍌☀️</div>
         </div>
         <div class="ramonito-input-area">
           <input type="text" id="ramonito-input" placeholder="Pose ta question..." autocomplete="off">
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   style.textContent = `
     .ramonito-widget-container {
       position: fixed;
-      bottom: 120px;
+      bottom: 20px;
       right: 20px;
       z-index: 9999;
       font-family: 'Inter', sans-serif;
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       height: 60px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--turquoise), var(--orange-tropical, #FF8C00));
-      border: 3px solid rgba(255, 255, 255, 0.2);
+      border: 3px solid var(--yellow-sun, #FFD700);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       font-size: 1.8rem;
       cursor: grab;
@@ -70,10 +70,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     .ramonito-chatbox {
       width: 320px;
       height: 400px;
-      background: rgba(26, 26, 46, 0.7);
+      background: rgba(26, 15, 43, 0.95);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(0, 206, 209, 0.25);
       border-radius: 16px;
       margin-bottom: 16px;
       display: flex;
@@ -90,8 +90,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     .ramonito-header {
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(0, 206, 209, 0.2);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -158,16 +158,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       animation: message-appear 0.3s ease forwards;
     }
     .message.assistant {
-      background: rgba(46, 204, 113, 0.15);
+      background: rgba(0, 206, 209, 0.1);
       color: #E8F8F5;
       align-self: flex-start;
       border-bottom-left-radius: 2px;
+      border-left: 3px solid var(--turquoise);
     }
     .message.user {
-      background: rgba(255, 215, 0, 0.15);
+      background: rgba(255, 215, 0, 0.1);
       color: #FFF9C4;
       align-self: flex-end;
       border-bottom-right-radius: 2px;
+      border-right: 3px solid var(--yellow-sun);
     }
     .message.error {
       background: rgba(229, 57, 53, 0.2);
@@ -175,6 +177,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       align-self: center;
       text-align: center;
       font-size: 0.85rem;
+    }
+    .ramonito-play-btn {
+      display: block;
+      background: var(--yellow-sun, #FFD700);
+      color: #0f172a;
+      text-align: center;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      align-self: center;
+      width: 90%;
+    }
+    .ramonito-play-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
     }
     @keyframes message-appear {
       from { opacity: 0; transform: translateY(10px); }

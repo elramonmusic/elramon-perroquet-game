@@ -20,7 +20,8 @@ export async function onRequestGet(context) {
 
   return new Response(JSON.stringify({
     SUPABASE_URL: env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY
+    SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY,
+    RAMONITO_FUNCTION_URL: env.RAMONITO_FUNCTION_URL || `${env.SUPABASE_URL}/functions/v1/smart-task`
   }), { status: 200, headers: CORS_HEADERS });
 }
 
