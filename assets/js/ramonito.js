@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="ramonito-input-area">
           <input type="text" id="ramonito-input" placeholder="Pose ta question..." autocomplete="off">
-          <button id="ramonito-send">Envoyer</button>
+          <button id="ramonito-send" title="Envoyer">💋</button>
         </div>
       </div>
       <button id="ramonito-toggle" class="ramonito-toggle-btn">
@@ -225,14 +225,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       background: var(--turquoise);
       color: #0f172a;
       border: none;
-      padding: 0 15px;
-      border-radius: 20px;
-      font-weight: 600;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      font-size: 1.25rem;
       cursor: pointer;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
     }
     .ramonito-input-area button:hover {
-      background: #20b8a5;
+      background: var(--yellow-sun, #FFD700);
+      transform: scale(1.05);
     }
     .ramonito-input-area button:disabled {
       background: rgba(255, 255, 255, 0.2);
@@ -316,7 +322,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Désactiver l'input pendant le chargement
     inputEl.disabled = true;
     sendBtn.disabled = true;
-    sendBtn.textContent = '...';
+    sendBtn.textContent = '💬';
 
     try {
       const { data: sessionData } = await window.supabaseClient.auth.getSession();
@@ -346,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } finally {
       inputEl.disabled = false;
       sendBtn.disabled = false;
-      sendBtn.textContent = 'Envoyer';
+      sendBtn.textContent = '💋';
       inputEl.focus();
     }
   }
