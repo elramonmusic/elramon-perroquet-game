@@ -486,6 +486,7 @@ class BaseLevelScene extends Phaser.Scene {
       enemy.patrolRange = e.range;
       enemy.patrolSpeed = e.speed;
       enemy.facingRight = true;
+      enemy.lastShot = 0;
       
       this.physics.add.collider(enemy, this.platforms);
       this.physics.add.overlap(this.player, enemy, this.hitEnemy, null, this);
@@ -538,7 +539,7 @@ class BaseLevelScene extends Phaser.Scene {
 
   // --- Background ---
   createBackground() {
-    const ww = GAME_CONFIG.level1.worldWidth;
+    const ww = GAME_CONFIG[this.levelKey].worldWidth;
     // --- Décor et Parallax ---
     const scaleY = 450 / 375; // 1.2 pour adapter la hauteur 375 à l'écran 450
     // On met une largeur de 800 pour couvrir l'écran (le TileSprite se répètera si on avance)
@@ -554,7 +555,7 @@ class BaseLevelScene extends Phaser.Scene {
 
     // Particules ambiantes (Lucioles/Pollen)
     this.pollenEmitter = this.add.particles(0, 0, 'particle_star', {
-      x: { min: 0, max: GAME_CONFIG.level1.worldWidth },
+      x: { min: 0, max: GAME_CONFIG[this.levelKey].worldWidth },
       y: { min: 0, max: 450 },
       lifespan: { min: 3000, max: 6000 },
       speedY: { min: -5, max: -15 },
@@ -1041,8 +1042,8 @@ class BaseLevelScene extends Phaser.Scene {
     zone.destroy();
 
     const bossCfg = GAME_CONFIG[this.levelKey].boss;
-    const worldH = GAME_CONFIG.level1.worldHeight;
-    const worldW = GAME_CONFIG.level1.worldWidth;
+    const worldH = GAME_CONFIG[this.levelKey].worldHeight;
+    const worldW = GAME_CONFIG[this.levelKey].worldWidth;
     
     // Verrouiller la caméra et le monde sur l'arène (les 800 derniers pixels)
     this.cameras.main.setBounds(worldW - 800, 0, 800, worldH);
@@ -1074,7 +1075,6 @@ class BaseLevelScene extends Phaser.Scene {
     this.hudBossContainer.setVisible(true);
 
     this.lastBossShot = 0;
-    this.bossAITimer = this.time.addEvent({ delay: 200, callback: () => this.updateBoss(), loop: true });
 
     const msg = this.add.text(this.cameras.main.midX, 100, '⚠️ ' + bossCfg.name + ' !', {
       fontSize: '20px', fontFamily: 'Arial Black', color: '#E53935',
@@ -1172,7 +1172,6 @@ class BaseLevelScene extends Phaser.Scene {
   defeatBoss() {
     this.bossDefeated = true;
     this.bossActive = false;
-    if (this.bossAITimer) this.bossAITimer.destroy();
 
     this.score += 100;
     

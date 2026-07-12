@@ -288,7 +288,13 @@ const Toast = {
       warning: '⚠️'
     };
 
-    toast.innerHTML = `<span>${icons[type] || '🎵'}</span> <span>${message}</span>`;
+    toast.innerHTML = '';
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = (icons[type] || '🎵') + ' ';
+    const msgSpan = document.createElement('span');
+    msgSpan.textContent = message;
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
     toast.classList.add('visible');
 
     clearTimeout(toast._timeout);

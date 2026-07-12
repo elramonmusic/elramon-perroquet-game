@@ -1,0 +1,9 @@
+- [x] Supprimer l'inclusion inutile de game.js de espace-membre.html
+- [x] Initialiser enemy.lastShot = 0 dans game.js (débloquer le tir des singes)
+- [x] Supprimer le timer bossAITimer redondant dans game.js
+- [x] Corriger le ciblage rigide de GAME_CONFIG.level1 dans game.js par GAME_CONFIG[this.levelKey]
+- [x] Sécuriser les Toasts XSS dans app.js via textContent
+- [x] Ajouter le filtre user_id dans la vérification de déblocage locale dans ramonito.js
+- [x] Ajouter le chaînage optionnel sur token de session dans ramonito.js
+- [x] Nettoyer les console.log de débogage dans ramonito.js
+- [x] Incrémenter la version cache buster des scripts dans les fichiers HTML

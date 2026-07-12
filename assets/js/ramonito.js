@@ -383,19 +383,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const { data: sessionData } = await window.supabaseClient.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) {
+        throw new Error("Session expirée");
+      }
       
       const res = await fetch('/smart-task', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionData.session.access_token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ question: text })
       });
 
       const result = await res.json();
-      
-      console.log("Ramonito API response:", JSON.stringify(result, null, 2));
       if (res.ok) {
         await addAssistantResponse(result);
         freeQuestionsUsed = result.free_questions_used;
@@ -476,7 +478,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data: unlocks, error } = await window.supabaseClient
               .from('affiliate_unlocks')
               .select('id')
-              .eq('product_id', product.id);
+              .eq('product_id', product.id)
+              .eq('user_id', member.id);
             if (!error && unlocks && unlocks.length > 0) {
               isUnlocked = true;
             }
@@ -493,7 +496,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const handleUnlock = async (e) => {
               e.preventDefault();
-              console.log("handleUnlock déclenché !", product.id);
               if (window.ElRamon && window.ElRamon.Toast) {
                 window.ElRamon.Toast.show("Déblocage demandé... 🍌", "info");
               }
