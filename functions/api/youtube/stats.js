@@ -92,39 +92,121 @@ export async function onRequestGet(context) {
     const stats = channel.statistics;
     const snippet = channel.snippet;
 
-    // 5. Fetch YouTube Analytics (Last 30 days views & estimated minutes watched)
-    const endDate = new Date().toISOString().split('T')[0];
-    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    // 5. Fetch YouTube Analytics (Last 30 days & Previous 30 days)
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
     
-    const analyticsRes = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=${startDate}&endDate=${endDate}&metrics=views,estimatedMinutesWatched,averageViewDuration&dimensions=day&sort=day`, {
-      headers: { 'Authorization': `Bearer ${accessToken}` }
-    });
+    const endDate = new Date().toISOString().split('T')[0];
+    const startDate = new Date(now - 30 * dayMs).toISOString().split('T')[0];
+    const prevEndDate = new Date(now - 31 * dayMs).toISOString().split('T')[0];
+    const prevStartDate = new Date(now - 60 * dayMs).toISOString().split('T')[0];
 
-    let analyticsMetrics = { viewsLast30Days: 0, estimatedMinutesWatched: 0, chartData: [] };
+    const metrics = 'views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares';
+    const baseUrl = 'https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE';
+    
+    const currentStatsUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=${metrics}&dimensions=day&sort=day`;
+    const prevStatsUrl = `${baseUrl}&startDate=${prevStartDate}&endDate=${prevEndDate}&metrics=views`;
+    const topVideosUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=views,estimatedMinutesWatched,likes&dimensions=video&sort=-views&maxResults=5`;
+    const demographicsUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=viewerPercentage&dimensions=ageGroup,gender&sort=ageGroup`;
+    const trafficUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=views&dimensions=insightTrafficSourceType&sort=-views&maxResults=5`;
 
-    if (analyticsRes.ok) {
-      const analyticsData = await analyticsRes.json();
-      if (analyticsData.rows) {
-        let totalViews = 0;
-        let totalMinutes = 0;
-        const chartData = analyticsData.rows.map(row => {
-          totalViews += row[1];
-          totalMinutes += row[2];
-          return {
-            date: row[0],
-            views: row[1],
-            minutesWatched: row[2]
-          };
+    const fetchConfig = { headers: { 'Authorization': `Bearer ${accessToken}` } };
+
+    const [currentRes, prevRes, topVidRes, demogRes, trafficRes] = await Promise.all([
+      fetch(currentStatsUrl, fetchConfig),
+      fetch(prevStatsUrl, fetchConfig),
+      fetch(topVideosUrl, fetchConfig),
+      fetch(demographicsUrl, fetchConfig),
+      fetch(trafficUrl, fetchConfig)
+    ]);
+
+    let analyticsMetrics = { 
+      viewsLast30Days: 0, 
+      estimatedMinutesWatched: 0, 
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      averageViewDuration: 0,
+      chartData: [],
+      prevViews: 0,
+      topVideos: [],
+      demographics: [],
+      trafficSources: []
+    };
+
+    if (currentRes.ok) {
+      const data = await currentRes.json();
+      if (data.rows) {
+        let sumViews = 0, sumMins = 0, sumLikes = 0, sumComments = 0, sumShares = 0;
+        const chartData = data.rows.map(row => {
+          sumViews += row[1] || 0;
+          sumMins += row[2] || 0;
+          sumLikes += row[4] || 0;
+          sumComments += row[5] || 0;
+          sumShares += row[6] || 0;
+          return { date: row[0], views: row[1], minutesWatched: row[2] };
         });
-        analyticsMetrics = {
-          viewsLast30Days: totalViews,
-          estimatedMinutesWatched: Math.round(totalMinutes),
-          chartData
-        };
+        analyticsMetrics.viewsLast30Days = sumViews;
+        analyticsMetrics.estimatedMinutesWatched = Math.round(sumMins);
+        analyticsMetrics.likes = sumLikes;
+        analyticsMetrics.comments = sumComments;
+        analyticsMetrics.shares = sumShares;
+        analyticsMetrics.averageViewDuration = sumViews > 0 ? Math.round((sumMins * 60) / sumViews) : 0;
+        analyticsMetrics.chartData = chartData;
       }
     } else {
-      console.warn('Analytics API failed:', await analyticsRes.text());
-      // Analytics API might not be fully enabled or needs channel connection time, we just continue.
+      console.warn('Current Stats API failed:', await currentRes.text());
+    }
+
+    if (prevRes.ok) {
+      const data = await prevRes.json();
+      if (data.rows) {
+        // If not dimensioned, it might be a single row or empty
+        analyticsMetrics.prevViews = data.rows.reduce((sum, row) => sum + (row[0]||0), 0);
+      }
+    }
+
+    if (topVidRes.ok) {
+      const data = await topVidRes.json();
+      if (data.rows && data.rows.length > 0) {
+        const videoIds = data.rows.map(r => r[0]).join(',');
+        const vidReq = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds}`, fetchConfig);
+        if (vidReq.ok) {
+          const vidData = await vidReq.json();
+          const snippets = {};
+          vidData.items.forEach(item => { snippets[item.id] = item.snippet; });
+          
+          analyticsMetrics.topVideos = data.rows.map(row => ({
+            id: row[0],
+            views: row[1],
+            minutesWatched: Math.round(row[2]),
+            likes: row[3],
+            title: snippets[row[0]]?.title || 'Vidéo inconnue',
+            thumbnail: snippets[row[0]]?.thumbnails?.medium?.url || snippets[row[0]]?.thumbnails?.default?.url || ''
+          }));
+        }
+      }
+    }
+
+    if (demogRes.ok) {
+      const data = await demogRes.json();
+      if (data.rows) {
+        analyticsMetrics.demographics = data.rows.map(row => ({
+          ageGroup: row[0].replace('age', ''),
+          gender: row[1],
+          percentage: row[2]
+        }));
+      }
+    }
+
+    if (trafficRes.ok) {
+      const data = await trafficRes.json();
+      if (data.rows) {
+        analyticsMetrics.trafficSources = data.rows.map(row => ({
+          source: row[0],
+          views: row[1]
+        }));
+      }
     }
 
     // 6. Return combined data
