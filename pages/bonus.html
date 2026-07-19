@@ -295,6 +295,30 @@
 <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
+  </section>
+  <!-- CTA FOOTER -->
+  <section class="section-sm section-darker">
+    <div class="container">
+      <div class="text-center" style="padding: var(--space-xl) 0;">
+        <span style="font-size:2.5rem; display:block; margin-bottom:var(--space-md);">🦜</span>
+        <h3 style="font-size:1.3rem; font-weight:800; color:var(--white-light); margin-bottom:var(--space-sm);">Envie de créer ta propre musique ?</h3>
+        <p style="color:rgba(255,255,255,0.6); margin-bottom:var(--space-lg); max-width:450px; margin-left:auto; margin-right:auto;">
+          Découvre nos guides Suno IA et notre bibliothèque de prompts pour créer tes propres chansons tropicales.
+        </p>
+        <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+          <a href="./guides-suno.html" class="btn btn-primary btn-lg">📖 Guides Suno IA</a>
+          <a href="./prompts.html" class="btn btn-secondary btn-lg">🤖 Prompts IA</a>
+          <a href="./espace-membre.html" class="btn btn-turquoise btn-lg">🎵 Retour Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+<footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
         <div class="footer-brand">
           <div class="footer-logo">
             <img src="../assets/images/logo.webp" alt="El Ramon Music Club" loading="lazy" />
@@ -302,8 +326,12 @@
           </div>
           <p class="footer-tagline">Les chansons tropicales qui donnent le sourire.</p>
           <div class="footer-social">
-            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube">&#9654;</a>
-            <a href="mailto:elramonmusic@gmail.com" class="footer-social-btn" title="Email">&#9993;</a>
+            <a href="https://open.spotify.com/artist/5kjkwjZVoKNqhh3jdFQfA9" target="_blank" rel="noopener" class="footer-social-btn" title="Spotify" style="color:#1DB954; font-size:1.3rem;">🎧</a>
+            <a href="https://itunes.apple.com/us/artist/el-ramon/1884453868" target="_blank" rel="noopener" class="footer-social-btn" title="Apple Music" style="color:#FA243C; font-size:1.3rem;">🍎</a>
+            <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="footer-social-btn" title="YouTube" style="color:#FF0000; font-size:1.3rem;">▶</a>
+            <a href="https://www.instagram.com/elramonmusic/?hl=fr" target="_blank" rel="noopener" class="footer-social-btn" title="Instagram" style="color:#E1306C; font-size:1.3rem;">📸</a>
+            <a href="https://www.facebook.com/profile.php?id=61582177896605" target="_blank" rel="noopener" class="footer-social-btn" title="Facebook" style="color:#1877F2; font-size:1.3rem;">📘</a>
+            <a href="https://www.bandlab.com/elramonmusic" target="_blank" rel="noopener" class="footer-social-btn" title="BandLab" style="color:#FFD700; font-size:1.3rem;">🎹</a>
           </div>
         </div>
         <div>
@@ -344,5 +372,126 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const checkAuth = async () => {
+      if (!window.ElRamon || !window.ElRamon.Auth) {
+        setTimeout(checkAuth, 100);
+        return;
+      }
+      await window.ElRamon.Auth.init();
+      const session = await window.ElRamon.Auth.getSession();
+      if (!session) {
+        window.location.href = '/pages/inscription.html';
+        return;
+      }
+      loadBonusContent(session.access_token);
+    };
+    checkAuth();
+  });
+
+  async function loadBonusContent(token) {
+    const container = document.getElementById('bonusContainer');
+    try {
+      const res = await fetch('/api/bonus/list', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Erreur serveur");
+      
+      const bonuses = await res.json();
+      renderBonuses(bonuses);
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = '<p style="text-align:center; color:red;">Erreur lors du chargement des recommandations.</p>';
+    }
+  }
+
+  function renderBonuses(bonuses) {
+    const container = document.getElementById('bonusContainer');
+    container.innerHTML = '';
+    
+    if (bonuses.length === 0) {
+      container.innerHTML = '<p style="grid-column: 1/-1; text-align:center;">Aucune recommandation disponible pour le moment.</p>';
+      return;
+    }
+
+    bonuses.forEach(b => {
+      const card = document.createElement('div');
+      card.className = 'bonus-card' + (b.is_premium && !b.is_unlocked ? ' locked' : '');
+      
+      const imageHtml = b.image_url 
+        ? `<img src="${b.image_url}" alt="${b.title}" class="bonus-card-img" loading="lazy">` 
+        : `<div class="bonus-card-img" style="display:flex; align-items:center; justify-content:center; font-size:3rem;">🎵</div>`;
+      
+      let buttonHtml = '';
+      if (b.is_premium && !b.is_unlocked) {
+        buttonHtml = `<button class="bonus-btn premium" onclick="unlockBonus('${b.id}', ${b.banana_cost})">🔒 Débloquer (${b.banana_cost} 🍌)</button>`;
+      } else {
+        buttonHtml = `<a href="${b.url}" target="_blank" rel="noopener" class="bonus-btn">▶️ Accéder</a>`;
+      }
+
+      card.innerHTML = `
+        ${imageHtml}
+        <div class="bonus-card-content">
+          <span class="bonus-card-category">${b.category}</span>
+          <h3>${b.title}</h3>
+          <p>${b.description || ''}</p>
+          <div class="bonus-card-footer">
+            ${b.is_premium ? `<span style="color:#FFD700; font-size:0.9rem;">⭐ Premium</span>` : `<span style="color:rgba(255,255,255,0.5); font-size:0.9rem;">Gratuit</span>`}
+            ${buttonHtml}
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  window.unlockBonus = async (id, cost) => {
+    if (!confirm(`Veux-tu dépenser ${cost} bananes 🍌 pour débloquer ce contenu premium exclusif ?`)) return;
+
+    if (window.ElRamon && window.ElRamon.Toast) {
+      window.ElRamon.Toast.show("Déblocage en cours... 🍌", "info");
+    }
+
+    try {
+      const session = await window.ElRamon.Auth.getSession();
+      if (!session) return;
+
+      const res = await fetch('/api/bonus/unlock', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ bonusId: id })
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        if (data.error === "Fonds insuffisants") {
+           if (window.ElRamon.Toast) window.ElRamon.Toast.show("Il te manque quelques bananes 🍌 Joue au jeu !", "error");
+           else alert("Il te manque quelques bananes 🍌");
+        } else {
+           throw new Error(data.error || "Erreur inconnue");
+        }
+        return;
+      }
+
+      if (window.ElRamon.Toast) {
+        window.ElRamon.Toast.show("Bonus débloqué ! 🎉", "success");
+      } else {
+        alert("Bonus débloqué ! 🎉");
+      }
+
+      loadBonusContent(session.access_token);
+      
+    } catch (err) {
+      console.error(err);
+      alert("Erreur: " + err.message);
+    }
+  };
+</script>
 </body>
 </html>
