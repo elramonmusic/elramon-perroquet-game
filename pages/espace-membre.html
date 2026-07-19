@@ -246,6 +246,12 @@
   </header>
 
   <main id="main-content">
+    
+    <!-- ANNONCE GLOBALE -->
+    <div id="global-announcement" style="display: none; background: linear-gradient(135deg, #FFD700, #F39C12); color: #0F172A; text-align: center; padding: 12px 20px; font-weight: bold; font-family: 'Outfit'; z-index: 100;">
+      📢 <span id="global-announcement-text">Message</span>
+    </div>
+
     <!-- HERO SECTION WITH USER IMAGE -->
     <section class="dash-hero-img">
       <div class="hero-content">
@@ -589,6 +595,25 @@
       if (member.email && adminEmails.includes(member.email.toLowerCase())) {
         const adminBtn = document.getElementById('admin-dashboard-btn');
         if (adminBtn) adminBtn.style.display = 'block';
+      }
+
+      // --- GLOBAL ANNOUNCEMENT ---
+      try {
+        const { data: settingsData } = await window.supabaseClient
+          .from('global_settings')
+          .select('setting_value')
+          .eq('setting_key', 'mot_du_jour')
+          .single();
+        if (settingsData && settingsData.setting_value) {
+          const banner = document.getElementById('global-announcement');
+          const textEl = document.getElementById('global-announcement-text');
+          if (banner && textEl) {
+            textEl.textContent = settingsData.setting_value;
+            banner.style.display = 'block';
+          }
+        }
+      } catch (e) {
+        console.error("Annonce non chargée", e);
       }
 
       // YouTube API

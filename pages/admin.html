@@ -246,10 +246,24 @@
         </div>
       </div>
 
+      <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 20px; padding: 20px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <h2 style="margin-top:0; font-family:'Outfit'; color:#FFD700;">📢 Annonce Globale (Mot du jour)</h2>
+        <p style="color:#94A3B8; font-size:0.95rem; margin-bottom:15px;">Ce message s'affichera en haut du Dashboard de tous les membres.</p>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="announcementInput" placeholder="Ex: 🔥 Nouveau clip disponible sur YouTube !" style="flex:1; background:rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.2); color:white; padding:12px 15px; border-radius:10px; font-size:1rem; outline:none;">
+          <button id="saveAnnouncementBtn" style="background:#FFD700; color:#0F172A; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold; font-family:'Outfit'; font-size:1rem;">Publier</button>
+        </div>
+      </div>
+
       <div class="table-container">
-        <div class="table-header-actions">
+        <div class="table-header-actions" style="flex-wrap: wrap; gap: 10px;">
           <h2 style="margin:0; font-family:'Outfit';">Liste des Membres</h2>
-          <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un pseudo ou email...">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button id="exportCsvBtn" style="background: rgba(46, 204, 113, 0.2); border: 1px solid rgba(46, 204, 113, 0.5); color: #2ecc71; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Outfit'; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+              <span>⬇️</span> Exporter CSV
+            </button>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un pseudo ou email...">
+          </div>
         </div>
         
         <table id="membersTable">
@@ -261,6 +275,7 @@
               <th>Bananes 🍌</th>
               <th>Toucan Vaincu</th>
               <th>Date Inscription</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="membersTableBody">
@@ -333,6 +348,17 @@
         allMembers = data.members;
         renderTable(allMembers);
 
+        // Fetch current announcement
+        const { data: settingsData } = await window.supabaseClient
+          .from('global_settings')
+          .select('setting_value')
+          .eq('setting_key', 'mot_du_jour')
+          .single();
+        
+        if (settingsData && settingsData.setting_value) {
+          document.getElementById('announcementInput').value = settingsData.setting_value;
+        }
+
       } catch (err) {
         console.error("Erreur chargement admin:", err);
         alert("Erreur lors du chargement des données. " + err.message);
@@ -358,12 +384,93 @@
           <td class="pseudo-cell">${DOMPurify.sanitize(m.pseudo || 'Anonyme')}</td>
           <td class="email-cell">${DOMPurify.sanitize(m.email)}</td>
           <td style="color:#FFD700; font-weight:bold;">${(m.best_score || 0).toLocaleString('fr-FR')}</td>
-          <td>${m.bananas_balance || 0}</td>
+          <td style="display:flex; align-items:center; gap:8px;">
+            <span id="bananas-${m.id}">${m.bananas_balance || 0}</span>
+            <button onclick="updateBananas('${m.id}', 10)" style="background:rgba(46,204,113,0.2); color:#2ecc71; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;" title="Donner 10 bananes">+</button>
+            <button onclick="updateBananas('${m.id}', -10)" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;" title="Retirer 10 bananes">-</button>
+          </td>
           <td>${bossStatus}</td>
           <td style="color:#94A3B8; font-size:0.85rem;">${dateStr}</td>
+          <td>
+            <button onclick="resetScore('${m.id}', '${DOMPurify.sanitize(m.pseudo || 'Anonyme')}')" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid rgba(231,76,60,0.5); border-radius:6px; cursor:pointer; padding:4px 8px; font-size:0.8rem;" title="Remettre le score à 0">🗑️ Reset Score</button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    async function updateBananas(memberId, defaultAmount) {
+      const amountStr = prompt(`Entrez le nombre de bananes à ${defaultAmount > 0 ? 'ajouter' : 'retirer'} :`, Math.abs(defaultAmount));
+      if (!amountStr) return;
+      
+      let amount = parseInt(amountStr);
+      if (isNaN(amount)) return;
+      if (defaultAmount < 0) amount = -Math.abs(amount);
+
+      try {
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session) return;
+        
+        const res = await fetch('/admin/update-bananas', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ member_id: memberId, amount })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || await res.text());
+        }
+        const data = await res.json();
+        
+        // Update UI
+        document.getElementById(`bananas-${memberId}`).textContent = data.new_balance;
+        
+        // Update allMembers array so search doesn't revert it
+        const m = allMembers.find(x => x.id === memberId);
+        if (m) m.bananas_balance = data.new_balance;
+
+      } catch (err) {
+        console.error(err);
+        alert("Erreur : " + err.message);
+      }
+    }
+
+    async function resetScore(memberId, pseudo) {
+      if (!confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir remettre le score de ${pseudo} à 0 ?\nCela supprimera toutes ses données dans le classement.`)) {
+        return;
+      }
+
+      try {
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session) return;
+        
+        const res = await fetch('/admin/reset-score', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ member_id: memberId })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || await res.text());
+        }
+        
+        alert("Score réinitialisé avec succès ! 🧹");
+        
+        // Refresh la page pour mettre à jour la liste
+        loadAdminData(session.access_token);
+
+      } catch (err) {
+        console.error(err);
+        alert("Erreur : " + err.message);
+      }
     }
 
     // Recherche / Filtre
@@ -374,6 +481,72 @@
         (m.email && m.email.toLowerCase().includes(search))
       );
       renderTable(filtered);
+    });
+
+    // Export CSV
+    document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
+      if (!allMembers || allMembers.length === 0) {
+        alert("Aucun membre à exporter.");
+        return;
+      }
+
+      // Colonnes du CSV
+      const headers = ["ID", "Email", "Pseudo", "Date d'inscription", "Meilleur Score", "Bananes", "Toucan Vaincu", "Singe Vaincu"];
+      
+      const rows = allMembers.map(m => {
+        return [
+          m.id,
+          m.email,
+          m.pseudo || '',
+          m.created_at ? new Date(m.created_at).toISOString() : '',
+          m.best_score || 0,
+          m.bananas_balance || 0,
+          m.toucan_defeated ? 'Oui' : 'Non',
+          m.singe_maracasse_defeated ? 'Oui' : 'Non'
+        ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(','); // Échapper les guillemets
+      });
+
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(',') + "\n" + rows.join('\n');
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `elramon_membres_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Sauvegarde Annonce Globale
+    document.getElementById('saveAnnouncementBtn')?.addEventListener('click', async () => {
+      const msg = document.getElementById('announcementInput').value.trim();
+      const btn = document.getElementById('saveAnnouncementBtn');
+      btn.textContent = '...';
+      btn.disabled = true;
+
+      try {
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session) return;
+
+        const res = await fetch('/admin/announcement', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: msg })
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+        
+        btn.textContent = '✔️ Publié';
+        setTimeout(() => { btn.textContent = 'Publier'; btn.disabled = false; }, 2000);
+      } catch (err) {
+        console.error(err);
+        alert("Erreur: " + err.message);
+        btn.textContent = 'Erreur';
+        btn.disabled = false;
+      }
     });
 
     document.addEventListener('DOMContentLoaded', initAdmin);
