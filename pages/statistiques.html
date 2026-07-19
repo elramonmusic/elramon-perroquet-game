@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="../styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { background: var(--night-blue); color: var(--text-light); }
     .glass-panel {
@@ -196,11 +198,25 @@
     <div id="dashboard-area" style="display: none;">
       
       <!-- Profil Chaîne -->
-      <div class="glass-panel" style="display:flex; align-items:center; gap:20px;">
-        <img id="yt-avatar" src="" alt="Avatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--turquoise);">
-        <div>
-          <h2 id="yt-title" style="color:var(--yellow-sun); margin-bottom:5px;">Chaîne</h2>
-          <p id="yt-videos" style="color:#ccc;">0 vidéos publiées • Analyse des 30 derniers jours</p>
+      <div class="glass-panel" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+        <div style="display:flex; align-items:center; gap:20px;">
+          <img id="yt-avatar" src="" alt="Avatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--turquoise);">
+          <div>
+            <h2 id="yt-title" style="color:var(--yellow-sun); margin-bottom:5px;">Chaîne</h2>
+            <p id="yt-videos" style="color:#ccc;">0 vidéos publiées</p>
+          </div>
+        </div>
+        
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select id="period-selector" onchange="loadStats()" style="padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); outline:none; font-family:Outfit, sans-serif; cursor:pointer;">
+            <option value="7d" style="color:#000;">7 derniers jours</option>
+            <option value="30d" selected style="color:#000;">30 derniers jours</option>
+            <option value="90d" style="color:#000;">90 derniers jours</option>
+            <option value="365d" style="color:#000;">Dernière année (365j)</option>
+          </select>
+          <button id="btn-export-pdf" onclick="exportPDF()" class="btn-youtube" style="background:#1A1A2E; border:1px solid var(--turquoise); padding:10px 20px; font-size:1rem;">
+            📄 PDF
+          </button>
         </div>
       </div>
 
@@ -324,28 +340,50 @@
       });
     });
 
-    async function loadStats() {
+    async function loadStats(forceRefresh = false) {
       try {
-        const session = await window.ElRamon.Auth.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
-
-        const res = await fetch('/api/youtube/stats', { headers: { 'Authorization': `Bearer ${session.access_token}` } });
-        const data = await res.json();
+        const period = document.getElementById('period-selector').value;
+        const cacheKey = `yt_stats_${period}`;
         
-        document.getElementById('loading-area').style.display = 'none';
+        document.getElementById('loading-area').style.display = 'block';
+        document.getElementById('dashboard-area').style.display = 'none';
 
-        if (res.status === 403 && data.needsLogin) {
-          document.getElementById('login-area').style.display = 'block';
-          return;
+        let data = null;
+
+        if (!forceRefresh) {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Date.now() - parsed.timestamp < 3 * 60 * 60 * 1000) { // 3 hours cache
+              data = parsed.data;
+            }
+          }
         }
-        if (!res.ok) throw new Error(data.error || "Erreur serveur.");
 
+        if (!data) {
+          const session = await window.ElRamon.Auth.getSession();
+          if (!session) { window.location.href = 'login.html'; return; }
+
+          const res = await fetch(`/api/youtube/stats?period=${period}`, { headers: { 'Authorization': `Bearer ${session.access_token}` } });
+          data = await res.json();
+          
+          if (res.status === 403 && data.needsLogin) {
+            document.getElementById('loading-area').style.display = 'none';
+            document.getElementById('login-area').style.display = 'block';
+            return;
+          }
+          if (!res.ok) throw new Error(data.error || "Erreur serveur.");
+          
+          localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data }));
+        }
+
+        document.getElementById('loading-area').style.display = 'none';
         document.getElementById('dashboard-area').style.display = 'block';
 
         // 1. HEADER
         document.getElementById('yt-title').textContent = DOMPurify.sanitize(data.channel.title);
         document.getElementById('yt-avatar').src = DOMPurify.sanitize(data.channel.thumbnail);
-        document.getElementById('yt-videos').innerHTML = `${data.channel.videoCount} vidéos publiées &bull; Analyse des 30 derniers jours`;
+        document.getElementById('yt-videos').innerHTML = `${data.channel.videoCount} vidéos publiées`;
 
         // 2. OVERVIEW KPI
         document.getElementById('val-subs').textContent = data.channel.subscriberCount.toLocaleString('fr-FR');
@@ -359,9 +397,14 @@
         trendEl.textContent = tViews.text;
         trendEl.className = 'trend ' + tViews.class;
 
+        // Destroy previous chart if exists
+        if(window.mainChartInst) window.mainChartInst.destroy();
+        if(window.demogChartInst) window.demogChartInst.destroy();
+        if(window.trafficChartInst) window.trafficChartInst.destroy();
+
         // 3. MAIN CHART
         if (data.analytics.chartData && data.analytics.chartData.length > 0) {
-          new Chart(document.getElementById('mainChart').getContext('2d'), {
+          window.mainChartInst = new Chart(document.getElementById('mainChart').getContext('2d'), {
             type: 'line',
             data: {
               labels: data.analytics.chartData.map(d => d.date.slice(5)), // MM-DD
@@ -399,7 +442,7 @@
           data.analytics.demographics.forEach(d => {
             ageGroups[d.ageGroup] = (ageGroups[d.ageGroup] || 0) + d.percentage;
           });
-          new Chart(document.getElementById('demographicsChart').getContext('2d'), {
+          window.demogChartInst = new Chart(document.getElementById('demographicsChart').getContext('2d'), {
             type: 'bar',
             data: {
               labels: Object.keys(ageGroups),
@@ -413,7 +456,7 @@
         }
 
         if (data.analytics.trafficSources && data.analytics.trafficSources.length > 0) {
-          new Chart(document.getElementById('trafficChart').getContext('2d'), {
+          window.trafficChartInst = new Chart(document.getElementById('trafficChart').getContext('2d'), {
             type: 'doughnut',
             data: {
               labels: data.analytics.trafficSources.map(t => t.source),
@@ -450,6 +493,37 @@
       } catch (e) {
         document.getElementById('loading-area').style.display = 'none';
         showAlert(e.message, 'error');
+      }
+    }
+
+    // PDF Export
+    async function exportPDF() {
+      const btn = document.getElementById('btn-export-pdf');
+      btn.textContent = "Génération...";
+      btn.disabled = true;
+
+      try {
+        const dashboard = document.getElementById('dashboard-area');
+        // Pre-configure specific styles for PDF (e.g. background color for canvas)
+        const canvas = await html2canvas(dashboard, {
+          backgroundColor: '#1A1A2E',
+          scale: 2
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+        pdf.save(`ElRamon_Analytics_${document.getElementById('period-selector').value}.pdf`);
+      } catch (err) {
+        alert("Erreur lors de la génération du PDF: " + err.message);
+      } finally {
+        btn.innerHTML = "📄 PDF";
+        btn.disabled = false;
       }
     }
   </script>

@@ -92,14 +92,21 @@ export async function onRequestGet(context) {
     const stats = channel.statistics;
     const snippet = channel.snippet;
 
-    // 5. Fetch YouTube Analytics (Last 30 days & Previous 30 days)
+    // 5. Fetch YouTube Analytics (Dynamic Period)
+    const url = new URL(request.url);
+    const periodParam = url.searchParams.get('period') || '30d'; // 7d, 30d, 90d, 365d
+    let days = 30;
+    if (periodParam === '7d') days = 7;
+    else if (periodParam === '90d') days = 90;
+    else if (periodParam === '365d') days = 365;
+
     const now = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
     
     const endDate = new Date().toISOString().split('T')[0];
-    const startDate = new Date(now - 30 * dayMs).toISOString().split('T')[0];
-    const prevEndDate = new Date(now - 31 * dayMs).toISOString().split('T')[0];
-    const prevStartDate = new Date(now - 60 * dayMs).toISOString().split('T')[0];
+    const startDate = new Date(now - days * dayMs).toISOString().split('T')[0];
+    const prevEndDate = new Date(now - (days + 1) * dayMs).toISOString().split('T')[0];
+    const prevStartDate = new Date(now - (days * 2) * dayMs).toISOString().split('T')[0];
 
     const metrics = 'views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares';
     const baseUrl = 'https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE';
