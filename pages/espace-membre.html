@@ -365,6 +365,14 @@
             <span class="card-tag tag-yt">S'abonner</span>
           </a>
 
+          <!-- ADMIN DASHBOARD (Hidden by default) -->
+          <a href="./admin.html" class="glass-card interactive" id="admin-dashboard-btn" style="display: none; border-color: rgba(255, 215, 0, 0.4); background: rgba(255, 215, 0, 0.05);">
+            <span class="card-icon">⚙️</span>
+            <h3 class="card-title" style="color: #FFD700;">Centre de Contrôle</h3>
+            <p class="card-desc">Accès exclusif administrateur. Gère ta communauté et les statistiques.</p>
+            <span class="card-tag tag-play" style="background: rgba(255, 215, 0, 0.15); color: #FFD700; border-color: rgba(255, 215, 0, 0.3);">Gérer</span>
+          </a>
+
           <!-- TEASING BANANES -->
           <div class="glass-card">
             <span class="card-icon">🍌</span>
@@ -574,6 +582,13 @@
       if (member.singe_maracasse_defeated) {
         const badge = document.getElementById('badge-monkey-drummer');
         if (badge) badge.classList.remove('locked');
+      }
+
+      // --- ADMIN BUTTON LOGIC ---
+      const adminEmails = ['elramonmusic@gmail.com', 'gard.eau.arbres@gmail.com', 'ramon.mikmak13@gmail.com'];
+      if (member.email && adminEmails.includes(member.email.toLowerCase())) {
+        const adminBtn = document.getElementById('admin-dashboard-btn');
+        if (adminBtn) adminBtn.style.display = 'block';
       }
 
       // YouTube API
