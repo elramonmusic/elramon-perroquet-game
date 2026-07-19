@@ -1492,47 +1492,43 @@ class VictoryScene extends Phaser.Scene {
 // SAUVEGARDE SCORE API (Supabase)
 // ============================================================
 async function saveGameScore(scene, bossDefeated, data) {
-  if (!window.ElRamon || !window.ElRamon.Auth) return;
+  if (!window.ElRamon || !window.ElRamon.Auth || !window.ElRamon.Auth.supabase) return;
   const member = await window.ElRamon.Auth.getMember();
   if (!member) return;
 
   try {
-    const payload = {
-      member_email: member.email,
-      pseudo: member.pseudo,
-      score: data.score || 0,
-      level: scene.levelKey || 'Level1',
-      fruits_collected: data.fruits || 0,
-      boss_defeated: bossDefeated,
-      lives_remaining: data.lives || 0,
-      time_seconds: 0
-    };
+    const session = await window.ElRamon.Auth.getSession();
+    const userId = session?.user?.id;
+    if (!userId) return;
 
-    const session = await window.supabaseClient.auth.getSession();
-    const token = session?.data?.session?.access_token;
-    
-    if (!token) return;
+    const finalScore = data.score || 0;
+    const playerName = member.pseudo || member.full_name || member.email.split('@')[0];
 
-    const res = await fetch('/game-score', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    });
+    // Insert into Supabase
+    const { data: insertData, error } = await window.ElRamon.Auth.supabase
+      .from('scores')
+      .insert([
+        {
+          user_id: userId,
+          player_name: playerName,
+          score: finalScore
+        }
+      ]);
 
-    const result = await res.json();
-
-    if (res.ok) {
-      // The API doesn't return new_rank anymore, so we just pass true
-      scene.events.emit('score_saved', result.badge);
-    } else {
-      console.error('Erreur API score:', result.error);
+    if (error) {
+      console.error('Erreur Supabase insert score:', error.message);
       scene.events.emit('score_saved', null);
+    } else {
+      console.log('Score sauvegardé dans Supabase !', finalScore);
+      // Determine badge manually for Victory UI if needed, or just emit a default
+      let badge = "Plume Tropicale";
+      if (finalScore > 500) badge = "Couronne Solaire";
+      if (finalScore > 1000) badge = "Perroquet d'Or";
+      
+      scene.events.emit('score_saved', badge);
     }
   } catch (err) {
-    console.error('Score API exception:', err);
+    console.error('Score Supabase exception:', err);
     scene.events.emit('score_saved', null);
   }
 }

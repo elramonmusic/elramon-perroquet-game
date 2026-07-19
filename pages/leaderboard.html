@@ -202,23 +202,80 @@
       <a href="./espace-membre.html" class="btn-back">Retour à l'espace membre</a>
     </div>
   </main>
+</head>
+<body data-protect="true">
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
+  <header class="site-header" id="site-header">
+    <nav class="nav">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <span>El Ramon Music Club</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
+        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
+        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
+        <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
+        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <nav class="nav-mobile" id="nav-mobile">
+      <a href="../index.html" class="nav-link">🏠 Accueil</a>
+      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
+      <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
+      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
+      <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
+    </nav>
+  </header>
+
+  <main id="main-content" style="padding-top: 80px;">
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <h1>🏆 Classement Tropical</h1>
+        <p>Les meilleurs joueurs du Perroquet Tropical</p>
+      </div>
+
+      <ul class="score-list" id="scoreList">
+        <div class="loading-scores">Chargement des scores... 🦜</div>
+      </ul>
+
+      <a href="./jeu.html" class="btn-play">🎮 Jouer et battre un record</a>
+      <a href="./espace-membre.html" class="btn-back">Retour à l'espace membre</a>
+    </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    function loadLeaderboard() {
+      if (!window.ElRamon || !window.ElRamon.Auth || !window.ElRamon.Auth.supabase) {
+        setTimeout(loadLeaderboard, 100);
+        return;
+      }
+      fetchScores();
+    }
+
+    async function fetchScores() {
       const scoreList = document.getElementById('scoreList');
       try {
-        const res = await fetch('/game-score');
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`Erreur serveur (${res.status}): ${errText}`);
-        }
-        const scores = await res.json();
+        const { data: scores, error } = await window.ElRamon.Auth.supabase
+          .from('scores')
+          .select('player_name, score')
+          .order('score', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
 
         scoreList.innerHTML = '';
-        if (scores.length === 0) {
+        if (!scores || scores.length === 0) {
           scoreList.innerHTML = '<div class="loading-scores">Aucun score pour le moment. Sois le premier !</div>';
           return;
         }
@@ -233,13 +290,17 @@
           if (rank === 2) rankDisplay = '🥈';
           if (rank === 3) rankDisplay = '🥉';
 
+          let badge = "Plume Tropicale";
+          if (s.score > 500) badge = "Couronne Solaire";
+          if (s.score > 1000) badge = "Perroquet d'Or";
+
           li.innerHTML = `
             <div class="score-rank">${rankDisplay}</div>
             <div class="score-info">
-              <div class="score-pseudo">${s.pseudo}</div>
-              <div class="score-badge">${s.badge || '🦜 Explorateur'}</div>
+              <div class="score-pseudo">${DOMPurify.sanitize(s.player_name)}</div>
+              <div class="score-badge">🦜 ${badge}</div>
             </div>
-            <div class="score-points">${s.score} <span style="font-size:0.8rem;color:#94A3B8;">pts</span></div>
+            <div class="score-points">${s.score.toLocaleString('fr-FR')} <span style="font-size:0.8rem;color:#94A3B8;">pts</span></div>
           `;
           scoreList.appendChild(li);
         });
@@ -248,7 +309,9 @@
         console.error(err);
         scoreList.innerHTML = `<div class="loading-scores" style="color:#E53935;">Impossible de charger le classement :<br/><br/>${err.message}</div>`;
       }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadLeaderboard);
   </script>
 </body>
 </html>
