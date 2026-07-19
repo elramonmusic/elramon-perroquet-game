@@ -210,6 +210,7 @@
        .player-actions { display: none; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 </head>
 <body data-protect style="padding-bottom: 70px;">
   <a href="#main-content" class="skip-link">Aller au contenu</a>
@@ -505,7 +506,7 @@
 
       // Afficher le rang
       const rankBadge = document.querySelector('.stat-badge-rank');
-      if (rankBadge) rankBadge.innerHTML = `🏆 ${tropicalRank}`;
+      if (rankBadge) rankBadge.textContent = `🏆 ${tropicalRank}`;
       
       const memberRankEl = document.getElementById('member-rank');
       if (memberRankEl) memberRankEl.textContent = tropicalRank;

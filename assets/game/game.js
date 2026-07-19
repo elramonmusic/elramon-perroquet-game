@@ -462,7 +462,7 @@ class BaseLevelScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     level.enemies.forEach(e => {
       const cfgE = GAME_CONFIG.enemyTypes[e.type];
-      const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake' };
+      const texMap = { crabe: 'enemy_crab', serpent: 'enemy_snake', singe: 'singe' };
       const enemy = this.physics.add.sprite(e.x, e.y, texMap[e.type]);
       
       enemy.setDisplaySize(80, 80); // Taille visuelle 80x80
@@ -472,11 +472,13 @@ class BaseLevelScene extends Phaser.Scene {
         enemy.play('crab_walk');
         // Les pieds du crabe sont à y=190 sur la frame de 250
         enemy.body.setSize(200, 125).setOffset(25, 65);
-      }
-      if (e.type === 'serpent') {
+      } else if (e.type === 'serpent') {
         enemy.play('snake_walk');
         // Les pieds du serpent sont à y=223 sur la frame de 250
         enemy.body.setSize(200, 156).setOffset(25, 67);
+      } else if (e.type === 'singe') {
+        // Adjust monkey size if needed
+        enemy.body.setSize(28, 32);
       }
       
       enemy.enemyType = e.type;
@@ -1042,6 +1044,7 @@ class BaseLevelScene extends Phaser.Scene {
     zone.destroy();
 
     const bossCfg = GAME_CONFIG[this.levelKey].boss;
+    this.bossSpeed = bossCfg.speed || 80;
     const worldH = GAME_CONFIG[this.levelKey].worldHeight;
     const worldW = GAME_CONFIG[this.levelKey].worldWidth;
     

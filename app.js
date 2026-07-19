@@ -74,7 +74,7 @@ const Auth = {
     if (!window.supabaseClient) await this.init();
     if (!window.supabaseClient) return null;
     const { data, error } = await window.supabaseClient.auth.getSession();
-    if (error || !data.session) return null;
+    if (error || !data || !data.session) return null;
     return data.session;
   },
 
@@ -463,9 +463,10 @@ async function handleInscription(event) {
     // Afficher le message de succès chaleureux et les confettis
     const successEl = document.querySelector('.form-success');
     if (successEl) {
+      const safeEmail = window.DOMPurify ? window.DOMPurify.sanitize(email) : email;
       successEl.innerHTML = `
         <h3 style="font-size:1.3rem; margin-bottom:1rem;">Bienvenue dans le Club ! 🌴</h3>
-        <p>Vérifie ta boîte mail pour <strong>${email}</strong> et clique sur le lien magique pour te connecter à ton espace membre.</p>
+        <p>Vérifie ta boîte mail pour <strong>${safeEmail}</strong> et clique sur le lien magique pour te connecter à ton espace membre.</p>
       `;
       form.style.display = 'none';
       successEl.classList.add('visible');

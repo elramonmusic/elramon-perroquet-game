@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A1A2E" />
+  <title>Statistiques YouTube — El Ramon Music Club</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="../assets/images/logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <style>
+    body { background: var(--night-blue); color: var(--text-light); }
+    .glass-panel {
+      background: rgba(26, 15, 43, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .stats-header {
+      text-align: center;
+      padding: 80px 20px 40px;
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(74, 18, 53, 0.8));
+    }
+    .stats-header h1 {
+      font-size: 3rem;
+      color: var(--yellow-sun);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.15);
+      border-color: var(--yellow-sun);
+    }
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--turquoise);
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 1rem;
+      color: #ccc;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-youtube {
+      background: #FF0000;
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-youtube:hover {
+      background: #CC0000;
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
+    }
+    #error-message {
+      color: var(--coral-red);
+      background: rgba(255,0,0,0.1);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+      display: none;
+    }
+    #success-message {
+      color: var(--turquoise);
+      background: rgba(0,255,255,0.1);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .loader {
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top: 4px solid var(--turquoise);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body data-protect="admin">
+
+  <!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/images/logo.webp" alt="El Ramon Music Club" loading="lazy" />
+    </a>
+    <div class="nav-links">
+      <a href="espace-membre.html" class="nav-link">Espace Membre</a>
+      <button class="nav-cta" id="logout-btn">Se Déconnecter</button>
+    </div>
+  </nav>
+
+  <header class="stats-header">
+    <h1>YouTube Analytics</h1>
+    <p>Performances de la chaîne El Ramon Music</p>
+  </header>
+
+  <main class="container" style="max-width: 1000px; padding: 40px 20px;">
+    
+    <div id="error-message"></div>
+    <div id="success-message"></div>
+
+    <div id="loading-area" style="text-align: center; padding: 50px;">
+      <div class="loader"></div>
+      <p style="margin-top:20px; color:#aaa;">Chargement des statistiques...</p>
+    </div>
+
+    <!-- ZONE CONNEXION YOUTUBE (Cachée par défaut) -->
+    <div id="login-area" class="glass-panel" style="text-align: center; display: none;">
+      <h2 style="margin-bottom: 15px;">Authentification Requise</h2>
+      <p style="margin-bottom: 25px; color:#bbb;">Pour voir les statistiques détaillées, vous devez lier votre compte administrateur YouTube.</p>
+      <button id="btn-connect-youtube" class="btn-youtube">
+        ▶ Connecter YouTube
+      </button>
+    </div>
+
+    <!-- DASHBOARD YOUTUBE -->
+    <div id="dashboard-area" style="display: none;">
+      
+      <!-- Profil Chaîne -->
+      <div class="glass-panel" style="display:flex; align-items:center; gap:20px;">
+        <img id="yt-avatar" src="" alt="Avatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--turquoise);">
+        <div>
+          <h2 id="yt-title" style="color:var(--yellow-sun); margin-bottom:5px;">Chaîne</h2>
+          <p id="yt-videos" style="color:#ccc;">0 vidéos</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="val-subs">0</div>
+          <div class="stat-label">Abonnés</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="val-views-total">0</div>
+          <div class="stat-label">Vues (Total)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="val-views-30d">0</div>
+          <div class="stat-label">Vues (30j)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="val-watchtime-30d">0</div>
+          <div class="stat-label">Min. Visionnées (30j)</div>
+        </div>
+      </div>
+
+      <!-- Graphique -->
+      <div class="glass-panel">
+        <h3 style="margin-bottom:20px;">Évolution (30 derniers jours)</h3>
+        <canvas id="ytChart" height="100"></canvas>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../app.js?v=6" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMsg = urlParams.get('error');
+      const successMsg = urlParams.get('success');
+
+      if (errorMsg) {
+        const el = document.getElementById('error-message');
+        el.style.display = 'block';
+        el.textContent = "Erreur d'authentification : " + errorMsg;
+      }
+      if (successMsg) {
+        const el = document.getElementById('success-message');
+        el.style.display = 'block';
+        el.textContent = "✅ Compte YouTube connecté avec succès !";
+      }
+
+      // Attendre que Auth soit prêt
+      const checkAuth = setInterval(async () => {
+        if (window.ElRamon && window.ElRamon.Auth) {
+          clearInterval(checkAuth);
+          await loadStats();
+        }
+      }, 100);
+
+      document.getElementById('btn-connect-youtube').addEventListener('click', async () => {
+        try {
+          const session = await window.ElRamon.Auth.getSession();
+          if (!session) throw new Error("Session invalide");
+          
+          const res = await fetch('/api/youtube/login-url?token=' + session.access_token);
+          const data = await res.json();
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            alert(data.error || "Erreur lors de la génération de l'URL.");
+          }
+        } catch (e) {
+          alert(e.message);
+        }
+      });
+    });
+
+    async function loadStats() {
+      const loadingArea = document.getElementById('loading-area');
+      const loginArea = document.getElementById('login-area');
+      const dashboardArea = document.getElementById('dashboard-area');
+
+      try {
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const res = await fetch('/api/youtube/stats', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        const data = await res.json();
+        loadingArea.style.display = 'none';
+
+        if (res.status === 403 && data.needsLogin) {
+          loginArea.style.display = 'block';
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur lors du chargement des statistiques.");
+        }
+
+        // Afficher les données
+        dashboardArea.style.display = 'block';
+
+        document.getElementById('yt-title').textContent = data.channel.title;
+        document.getElementById('yt-avatar').src = data.channel.thumbnail;
+        document.getElementById('yt-videos').textContent = `${data.channel.videoCount} vidéos`;
+
+        document.getElementById('val-subs').textContent = data.channel.subscriberCount.toLocaleString('fr-FR');
+        document.getElementById('val-views-total').textContent = data.channel.viewCount.toLocaleString('fr-FR');
+        document.getElementById('val-views-30d').textContent = data.analytics.viewsLast30Days.toLocaleString('fr-FR');
+        document.getElementById('val-watchtime-30d').textContent = data.analytics.estimatedMinutesWatched.toLocaleString('fr-FR');
+
+        // Initialiser le graphique
+        if (data.analytics.chartData && data.analytics.chartData.length > 0) {
+          const ctx = document.getElementById('ytChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.analytics.chartData.map(d => d.date),
+              datasets: [{
+                label: 'Vues',
+                data: data.analytics.chartData.map(d => d.views),
+                borderColor: '#00CED1',
+                backgroundColor: 'rgba(0, 206, 209, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } },
+                y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } }
+              }
+            }
+          });
+        }
+
+      } catch (e) {
+        loadingArea.style.display = 'none';
+        const el = document.getElementById('error-message');
+        el.style.display = 'block';
+        el.textContent = e.message;
+      }
+    }
+  </script>
+</body>
+</html>

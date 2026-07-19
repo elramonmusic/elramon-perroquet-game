@@ -342,16 +342,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   updateBalanceUI();
 
-  toggleBtn.addEventListener('click', () => {
-    chatbox.classList.toggle('hidden');
-    if (!chatbox.classList.contains('hidden')) {
-      inputEl.focus();
-    }
-  });
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      chatbox.classList.toggle('hidden');
+      if (!chatbox.classList.contains('hidden')) {
+        inputEl.focus();
+      }
+    });
+  }
 
-  closeBtn.addEventListener('click', () => {
-    chatbox.classList.add('hidden');
-  });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      chatbox.classList.add('hidden');
+    });
+  }
 
   function addMessage(text, role) {
     const div = document.createElement('div');
@@ -672,13 +676,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.removeEventListener('touchend', onDragEnd);
   }
 
-  header.addEventListener('mousedown', onDragStart);
-  header.addEventListener('touchstart', onDragStart, { passive: true });
-  toggleBtn.addEventListener('mousedown', onDragStart);
-  toggleBtn.addEventListener('touchstart', onDragStart, { passive: true });
+  if (header) {
+    header.addEventListener('mousedown', onDragStart);
+    header.addEventListener('touchstart', onDragStart, { passive: true });
+  }
+  if (toggleBtn) {
+    toggleBtn.addEventListener('mousedown', onDragStart);
+    toggleBtn.addEventListener('touchstart', onDragStart, { passive: true });
+  }
 
-  sendBtn.addEventListener('click', handleSend);
-  inputEl.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSend();
-  });
+  if (sendBtn) {
+    sendBtn.addEventListener('click', handleSend);
+  }
+  if (inputEl) {
+    inputEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+  }
 });
