@@ -201,6 +201,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      background: rgba(0, 206, 209, 0.1);
+      border-radius: 12px;
+      border-bottom-left-radius: 2px;
+      border-left: 3px solid var(--turquoise);
+      width: fit-content;
+      align-self: flex-start;
+      margin-bottom: 10px;
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--turquoise);
+      border-radius: 50%;
+      animation: typing-bounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing-bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
     .ramonito-input-area {
       padding: 12px;
       background: rgba(0, 0, 0, 0.2);
@@ -324,6 +349,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let freeQuestionsUsed = member.free_questions_used || 0;
   let bananas = member.bananas_balance || 0;
+  let chatHistory = [];
+  let typingIndicator = null;
 
   function updateBalanceUI() {
     let freeQuestionsLeft = Math.max(0, 3 - freeQuestionsUsed);
@@ -365,6 +392,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  function showTyping() {
+    if (typingIndicator) return;
+    typingIndicator = document.createElement('div');
+    typingIndicator.className = 'typing-indicator';
+    typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    messagesEl.appendChild(typingIndicator);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTyping() {
+    if (typingIndicator) {
+      typingIndicator.remove();
+      typingIndicator = null;
+    }
+  }
+
   async function handleSend() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -378,12 +421,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Afficher message utilisateur
     addMessage(text, 'user');
+    chatHistory.push({ role: 'user', content: text });
     inputEl.value = '';
     
     // Désactiver l'input pendant le chargement
     inputEl.disabled = true;
     sendBtn.disabled = true;
     sendBtn.textContent = '💬';
+
+    showTyping();
 
     try {
       const { data: sessionData } = await window.supabaseClient.auth.getSession();
@@ -398,11 +444,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ question: text })
+        body: JSON.stringify({ question: text, history: chatHistory })
       });
 
       const result = await res.json();
+      removeTyping();
+
       if (res.ok) {
+        chatHistory.push({ role: 'assistant', content: result.answer });
         await addAssistantResponse(result);
         freeQuestionsUsed = result.free_questions_used;
         bananas = result.remaining_bananas;
@@ -412,6 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
     } catch (e) {
+      removeTyping();
       addMessage("Erreur réseau, je ne t'ai pas entendu amigo !", 'assistant');
     } finally {
       inputEl.disabled = false;
@@ -500,9 +550,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const handleUnlock = async (e) => {
               e.preventDefault();
-              if (window.ElRamon && window.ElRamon.Toast) {
-                window.ElRamon.Toast.show("Déblocage demandé... 🍌", "info");
-              }
               if (btn.classList.contains('disabled')) return;
               
               if (bananas < product.banana_cost) {
@@ -512,6 +559,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   alert("Il te manque quelques bananes 🍌");
                 }
                 return;
+              }
+
+              if (!confirm(`Souhaites-tu dépenser ${product.banana_cost} 🍌 pour débloquer le lien exclusif : ${product.name} ?`)) {
+                return;
+              }
+
+              if (window.ElRamon && window.ElRamon.Toast) {
+                window.ElRamon.Toast.show("Déblocage demandé... 🍌", "info");
               }
               
               btn.classList.add('disabled');

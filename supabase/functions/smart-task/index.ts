@@ -35,9 +35,9 @@ serve(async (req) => {
       throw new Error('Non autorisé: Jeton invalide');
     }
 
-    // 2. Récupérer la question
+    // 2. Récupérer la question et l'historique
     const body = await req.json();
-    const { question } = body;
+    const { question, history } = body;
     if (!question) {
       throw new Error('Question manquante');
     }
@@ -68,27 +68,14 @@ serve(async (req) => {
       });
     }
 
-    // 4. Recherche de produits d'affiliation actifs
+    // 4. Récupérer tous les produits d'affiliation actifs pour l'IA
     const { data: products } = await supabaseServiceClient
       .from('affiliate_products')
       .select('id, name, category, keywords, description, is_premium, banana_cost, disclosure, image_url, url')
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .limit(10); // Limite au cas où il y a trop de produits pour le prompt
 
-    const questionLower = question.toLowerCase();
-    const matchedProducts = [];
-    if (products) {
-      for (const p of products) {
-        const keywords = p.keywords || [];
-        const matchesKeyword = keywords.some((kw: string) => questionLower.includes(kw.toLowerCase()));
-        const matchesCategory = questionLower.includes(p.category.toLowerCase());
-        if (matchesKeyword || matchesCategory) {
-          matchedProducts.push(p);
-        }
-      }
-    }
-    
-    // Garder jusqu'à 3 produits pertinents
-    const selectedProducts = matchedProducts.slice(0, 3);
+    const selectedProducts = products || [];
 
     // 5. Configurer le prompt système et appeler Groq
     const groqApiKey = Deno.env.get('GROQ_API_KEY');
@@ -96,17 +83,26 @@ serve(async (req) => {
       throw new Error('GROQ_API_KEY non configurée');
     }
 
-    let systemPrompt = `Tu es Ramonito, le perroquet mascotte officiel du El Ramon Music Club. Tu parles avec un ton enjoué, parfois tu lâches des expressions en espagnol ou relatives aux fruits tropicaux. Réponds de façon concise et amusante (maximum 2-3 phrases) à l'utilisateur : ${userName}.`;
-    
+    let systemPrompt = `Tu es Ramonito, le perroquet mascotte officiel du El Ramon Music Club, l'empire tropical du créateur El Ramon Music. 
+Tu adores la musique tropicale, la chaleur, et tu lâches souvent des expressions en espagnol ou relatives aux fruits (bananes, ananas, cocotiers).
+Ton but est d'animer le club, de conseiller les membres, et de faire la promotion des musiques et créations de ton boss El Ramon Music.
+Tu es fun, drôle, parfois un peu espiègle. Réponds de façon très concise et vivante (maximum 2 à 3 phrases courtes). 
+Tu parles à l'utilisateur : ${userName}.`;
+
     if (selectedProducts.length > 0) {
-      systemPrompt += `\n\nTu as accès aux produits d'affiliation suivants du club qui sont très pertinents pour la conversation en cours. Si (et seulement si) la conversation s'y prête de façon extrêmement naturelle et sans forcer, tu peux recommander l'un de ces produits de manière utile et transparente.
-      Consignes de recommandation :
-      - N'invente JAMAIS d'autres produits ou liens.
-      - Si le produit est premium (is_premium: true), tu ne dois pas donner son lien direct dans ton texte. Tease-le en disant qu'il s'agit d'une recommandation premium secrète tropicale déblocable pour ${selectedProducts[0].banana_cost} bananes 🍌, et demande-lui s'il souhaite l'ouvrir.
-      - Si le produit est gratuit, mentionne simplement que c'est une recommandation/sélection partenaire du club.
-      - Pour chaque produit recommandé, tu DOIS obligatoirement accoler la balise textuelle exacte [PRODUCT:${selectedProducts[0].id}] à la fin de ta réponse (sans espaces additionnels).
-      Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} | Nom: ${p.name} | Premium: ${p.is_premium} | Coût: ${p.banana_cost} bananes | Description: ${p.description} | Mention: ${p.disclosure}`).join('\n');
+      systemPrompt += `\n\nTu as accès au catalogue de recommandations du club. Si (et seulement si) la conversation s'y prête de façon extrêmement naturelle, recommande UN des produits ci-dessous pour aider l'utilisateur.
+Consignes de recommandation :
+- N'invente JAMAIS d'autres produits ou liens.
+- Si le produit est premium (is_premium: true), tease-le (ex: "J'ai un secret tropical exclusif pour toi contre X bananes 🍌") et demande s'il veut le débloquer. Ne donne pas son lien.
+- Tu DOIS obligatoirement ajouter la balise textuelle exacte [PRODUCT:id] à la toute fin de ta réponse pour déclencher l'affichage visuel du produit. (ex: [PRODUCT:1234-5678]).
+Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} | Nom: ${p.name} | Coût: ${p.banana_cost} bananes | Description: ${p.description}`).join('\n');
     }
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...(history || []).slice(-6), // Garde les 6 derniers messages de contexte
+      { role: 'user', content: question }
+    ];
 
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -116,10 +112,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question }
-        ],
+        messages: messages,
         temperature: 0.7,
         max_tokens: 250
       })
