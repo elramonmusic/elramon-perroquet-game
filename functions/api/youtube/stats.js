@@ -116,15 +116,21 @@ export async function onRequestGet(context) {
     const topVideosUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=views,estimatedMinutesWatched,likes&dimensions=video&sort=-views&maxResults=5`;
     const demographicsUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=viewerPercentage&dimensions=ageGroup,gender&sort=ageGroup`;
     const trafficUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=views&dimensions=insightTrafficSourceType&sort=-views&maxResults=5`;
+    const geoUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=views&dimensions=country&sort=-views&maxResults=5`;
+    const revenueUrl = `${baseUrl}&startDate=${startDate}&endDate=${endDate}&metrics=estimatedRevenue`;
+    const prevRevenueUrl = `${baseUrl}&startDate=${prevStartDate}&endDate=${prevEndDate}&metrics=estimatedRevenue`;
 
     const fetchConfig = { headers: { 'Authorization': `Bearer ${accessToken}` } };
 
-    const [currentRes, prevRes, topVidRes, demogRes, trafficRes] = await Promise.all([
+    const [currentRes, prevRes, topVidRes, demogRes, trafficRes, geoRes, revRes, prevRevRes] = await Promise.all([
       fetch(currentStatsUrl, fetchConfig),
       fetch(prevStatsUrl, fetchConfig),
       fetch(topVideosUrl, fetchConfig),
       fetch(demographicsUrl, fetchConfig),
-      fetch(trafficUrl, fetchConfig)
+      fetch(trafficUrl, fetchConfig),
+      fetch(geoUrl, fetchConfig),
+      fetch(revenueUrl, fetchConfig),
+      fetch(prevRevenueUrl, fetchConfig)
     ]);
 
     let analyticsMetrics = { 
@@ -134,11 +140,14 @@ export async function onRequestGet(context) {
       comments: 0,
       shares: 0,
       averageViewDuration: 0,
+      estimatedRevenue: 0,
+      prevEstimatedRevenue: 0,
       chartData: [],
       prevViews: 0,
       topVideos: [],
       demographics: [],
-      trafficSources: []
+      trafficSources: [],
+      geography: []
     };
 
     if (currentRes.ok) {
@@ -213,6 +222,32 @@ export async function onRequestGet(context) {
           source: row[0],
           views: row[1]
         }));
+      }
+    }
+
+    if (geoRes.ok) {
+      const data = await geoRes.json();
+      if (data.rows) {
+        analyticsMetrics.geography = data.rows.map(row => ({
+          country: row[0],
+          views: row[1]
+        }));
+      }
+    }
+
+    if (revRes.ok) {
+      const data = await revRes.json();
+      if (data.rows) {
+        analyticsMetrics.estimatedRevenue = data.rows.reduce((sum, row) => sum + (row[0]||0), 0);
+      }
+    } else {
+      console.warn('Revenue API failed (might not be monetized):', await revRes.text());
+    }
+
+    if (prevRevRes.ok) {
+      const data = await prevRevRes.json();
+      if (data.rows) {
+        analyticsMetrics.prevEstimatedRevenue = data.rows.reduce((sum, row) => sum + (row[0]||0), 0);
       }
     }
 

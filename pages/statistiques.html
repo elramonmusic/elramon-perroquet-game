@@ -204,6 +204,9 @@
           <div>
             <h2 id="yt-title" style="color:var(--yellow-sun); margin-bottom:5px;">Chaîne</h2>
             <p id="yt-videos" style="color:#ccc;">0 vidéos publiées</p>
+            <div style="margin-top:5px; font-size:1.2rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+              🔴 En direct : <span id="live-subs">---</span> abonnés
+            </div>
           </div>
         </div>
         
@@ -244,8 +247,9 @@
             <div class="stat-label">Min. Visionnées</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value" id="val-engagement">0</div>
-            <div class="stat-label">Engagements (Likes/Coms)</div>
+            <div class="stat-value" id="val-revenue">0 €</div>
+            <div class="stat-label">Revenus Estimés</div>
+            <div id="trend-revenue" class="trend neutral">--</div>
           </div>
         </div>
 
@@ -259,7 +263,7 @@
 
       <!-- TAB 2 : AUDIENCE -->
       <div id="tab-audience" class="tab-content">
-        <div class="charts-row">
+        <div class="charts-row" style="grid-template-columns: 1fr 1fr 1fr;">
           <div class="glass-panel">
             <h3 style="margin-bottom:20px;">Démographie (Âge)</h3>
             <div style="height:300px;">
@@ -270,6 +274,12 @@
             <h3 style="margin-bottom:20px;">Sources de Trafic</h3>
             <div style="height:300px;">
               <canvas id="trafficChart"></canvas>
+            </div>
+          </div>
+          <div class="glass-panel">
+            <h3 style="margin-bottom:20px;">Top Pays (Vues)</h3>
+            <div style="height:300px;">
+              <canvas id="geoChart"></canvas>
             </div>
           </div>
         </div>
@@ -389,7 +399,12 @@
         document.getElementById('val-subs').textContent = data.channel.subscriberCount.toLocaleString('fr-FR');
         document.getElementById('val-views-30d').textContent = data.analytics.viewsLast30Days.toLocaleString('fr-FR');
         document.getElementById('val-watchtime-30d').textContent = data.analytics.estimatedMinutesWatched.toLocaleString('fr-FR');
-        document.getElementById('val-engagement').textContent = (data.analytics.likes + data.analytics.comments + data.analytics.shares).toLocaleString('fr-FR');
+        
+        // Revenue formatting
+        const formatter = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+        document.getElementById('val-revenue').textContent = data.analytics.estimatedRevenue > 0 
+          ? formatter.format(data.analytics.estimatedRevenue) 
+          : '0 €';
 
         // Trend Views
         const tViews = calcTrend(data.analytics.viewsLast30Days, data.analytics.prevViews);
@@ -397,10 +412,16 @@
         trendEl.textContent = tViews.text;
         trendEl.className = 'trend ' + tViews.class;
 
+        const tRev = calcTrend(data.analytics.estimatedRevenue, data.analytics.prevEstimatedRevenue);
+        const trendRevEl = document.getElementById('trend-revenue');
+        trendRevEl.textContent = tRev.text;
+        trendRevEl.className = 'trend ' + tRev.class;
+
         // Destroy previous chart if exists
         if(window.mainChartInst) window.mainChartInst.destroy();
         if(window.demogChartInst) window.demogChartInst.destroy();
         if(window.trafficChartInst) window.trafficChartInst.destroy();
+        if(window.geoChartInst) window.geoChartInst.destroy();
 
         // 3. MAIN CHART
         if (data.analytics.chartData && data.analytics.chartData.length > 0) {
@@ -470,6 +491,21 @@
           });
         }
 
+        if (data.analytics.geography && data.analytics.geography.length > 0) {
+          window.geoChartInst = new Chart(document.getElementById('geoChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+              labels: data.analytics.geography.map(g => g.country),
+              datasets: [{
+                data: data.analytics.geography.map(g => g.views),
+                backgroundColor: ['#1E90FF', '#FFD700', '#32CD32', '#FF4500', '#8A2BE2'],
+                borderWidth: 0
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } }
+          });
+        }
+
         // 5. TOP VIDEOS
         const topListEl = document.getElementById('top-videos-list');
         if (data.analytics.topVideos && data.analytics.topVideos.length > 0) {
@@ -494,6 +530,30 @@
         document.getElementById('loading-area').style.display = 'none';
         showAlert(e.message, 'error');
       }
+
+      startLiveSubCounter();
+    }
+
+    let liveSubInterval = null;
+    async function startLiveSubCounter() {
+      if (liveSubInterval) clearInterval(liveSubInterval);
+      
+      const updateLiveCount = async () => {
+        try {
+          const session = await window.ElRamon.Auth.getSession();
+          if (!session) return;
+          const res = await fetch('/api/youtube/live', { headers: { 'Authorization': `Bearer ${session.access_token}` } });
+          if (res.ok) {
+            const data = await res.json();
+            document.getElementById('live-subs').textContent = data.subscriberCount.toLocaleString('fr-FR');
+          }
+        } catch (e) { console.warn("Erreur Live Subs:", e); }
+      };
+
+      // Call once immediately
+      await updateLiveCount();
+      // Then every 15 seconds
+      liveSubInterval = setInterval(updateLiveCount, 15000);
     }
 
     // PDF Export
