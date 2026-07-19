@@ -377,7 +377,7 @@ RESEND_API_KEY=re_xxx...
 - [ ] Dashboard admin
 
 ### 🔮 V3 — Futur
-- [ ] Vérification avancée YouTube (API)
+- [x] Vérification avancée YouTube (API)
 - [ ] Classement du mini-jeu
 - [ ] Contenus premium payants
 - [ ] Boutique / affiliation / sponsors
