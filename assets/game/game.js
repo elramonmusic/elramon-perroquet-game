@@ -1492,7 +1492,11 @@ class VictoryScene extends Phaser.Scene {
 // SAUVEGARDE SCORE API (Supabase)
 // ============================================================
 async function saveGameScore(scene, bossDefeated, data) {
-  if (!window.ElRamon || !window.ElRamon.Auth || !window.ElRamon.Auth.supabase) return;
+  if (!window.ElRamon || !window.ElRamon.Auth) return;
+  
+  await window.ElRamon.Auth.init();
+  if (!window.supabaseClient) return;
+
   const member = await window.ElRamon.Auth.getMember();
   if (!member) return;
 
@@ -1505,7 +1509,7 @@ async function saveGameScore(scene, bossDefeated, data) {
     const playerName = member.pseudo || member.full_name || member.email.split('@')[0];
 
     // Insert into Supabase
-    const { data: insertData, error } = await window.ElRamon.Auth.supabase
+    const { data: insertData, error } = await window.supabaseClient
       .from('scores')
       .insert([
         {

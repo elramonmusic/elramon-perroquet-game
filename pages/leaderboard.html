@@ -255,8 +255,16 @@
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
   <script>
-    function loadLeaderboard() {
-      if (!window.ElRamon || !window.ElRamon.Auth || !window.ElRamon.Auth.supabase) {
+    async function loadLeaderboard() {
+      // Attendre que l'auth s'initialise
+      if (!window.ElRamon || !window.ElRamon.Auth) {
+        setTimeout(loadLeaderboard, 100);
+        return;
+      }
+      
+      await window.ElRamon.Auth.init();
+
+      if (!window.supabaseClient) {
         setTimeout(loadLeaderboard, 100);
         return;
       }
@@ -266,7 +274,7 @@
     async function fetchScores() {
       const scoreList = document.getElementById('scoreList');
       try {
-        const { data: scores, error } = await window.ElRamon.Auth.supabase
+        const { data: scores, error } = await window.supabaseClient
           .from('scores')
           .select('player_name, score')
           .order('score', { ascending: false })

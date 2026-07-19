@@ -38,32 +38,38 @@ window.ElRamon = window.ElRamon || {};
 window.supabaseClient = null;
 
 const Auth = {
+  initPromise: null,
   /**
    * Initialise le client Supabase
    */
   async init() {
     if (window.supabaseClient) return true;
-    try {
-      const res = await fetch('/config');
-      if (res.ok) {
-        const config = await res.json();
-        if (window.supabase) {
-          window.supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
-          
-          // Abonnement aux changements d'état
-          window.supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT') {
-              localStorage.removeItem(CONFIG.STORAGE_KEY);
-              window.location.href = '/';
-            }
-          });
-          return true;
+    if (this.initPromise) return this.initPromise;
+
+    this.initPromise = (async () => {
+      try {
+        const res = await fetch('/config');
+        if (res.ok) {
+          const config = await res.json();
+          if (window.supabase) {
+            window.supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+            
+            // Abonnement aux changements d'état
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
+              if (event === 'SIGNED_OUT') {
+                localStorage.removeItem(CONFIG.STORAGE_KEY);
+                window.location.href = '/';
+              }
+            });
+            return true;
+          }
         }
+      } catch (e) {
+        console.error("Erreur init Supabase", e);
       }
-    } catch (e) {
-      console.error("Erreur init Supabase", e);
-    }
-    return false;
+      return false;
+    })();
+    return this.initPromise;
   },
 
   /**
