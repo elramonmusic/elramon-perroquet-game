@@ -34,6 +34,42 @@
                   radial-gradient(ellipse at 70% 50%, rgba(255,215,0,0.1) 0%, transparent 50%);
       pointer-events: none;
     }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A1A2E" />
+  <title>Playlists & Recommandations — El Ramon Music Club</title>
+  <meta name="description" content="Les playlists officielles et recommandations musicales d'El Ramon Music Club. Afrobeat, Zouk, Compas, Tropical Soul et plus." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta property="og:title" content="Playlists & Recommandations — El Ramon Music Club" />
+  <meta property="og:description" content="Retrouve les playlists officielles et les meilleures recommandations tropicales du Club." />
+  <link rel="icon" href="../assets/images/logo.webp" type="image/webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    .bonus-hero {
+      min-height: 35vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px var(--space-md) var(--space-xl);
+      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--mid-purple) 50%, var(--deep-purple) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .bonus-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,0,0,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 50%, rgba(255,215,0,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
     .bonus-hero-icon {
       font-size: 4rem;
       display: block;
@@ -57,11 +93,95 @@
       aspect-ratio: 16/9;
       display: block;
     }
+    
+    /* Styles Glassmorphism pour les Bonus Cards */
+    .bonus-card {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--white-light);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .bonus-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(255, 215, 0, 0.4);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3), 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+    .bonus-card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bonus-card-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .bonus-card-category {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--turquoise);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .bonus-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+      font-family: 'Outfit', sans-serif;
+    }
+    .bonus-card p {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .bonus-card-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bonus-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .bonus-card:hover .bonus-btn {
+      background: var(--turquoise);
+      color: #000;
+      border-color: var(--turquoise);
+    }
+    .bonus-btn.premium {
+      background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%);
+      color: #000;
+      border: none;
+    }
+    .bonus-card.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      pointer-events: none;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-</head>
-<body data-protect>
-  <a href="#main-content" class="skip-link">Aller au contenu</a>
 
   <header class="site-header" id="site-header">
     <nav class="nav">
@@ -143,54 +263,15 @@
         <p class="section-subtitle">Nos sélections thématiques pour chaque ambiance.</p>
       </div>
 
-      <div class="playlist-grid reveal">
-
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">🔥</span>
-          <h3>Best of Afrobeat 2026</h3>
-          <p>Le meilleur de l'Afrobeat : rythmes entraînants, mélodies captivantes et vibes qui bougent. La sélection El Ramon Music.</p>
-          <span class="playlist-card-badge">Afrobeat</span>
-        </a>
-
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">🌊</span>
-          <h3>Tropical Soul Essentials</h3>
-          <p>Des voix envoûtantes et des mélodies douces. Pour les moments de détente sous le soleil.</p>
-          <span class="playlist-card-badge">Tropical Soul</span>
-        </a>
-
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">💃</span>
-          <h3>Zouk & Compas à danser</h3>
-          <p>Les rythmes des Caraïbes et de l'Afrique francophone. impossible de rester immobile sur ces titres.</p>
-          <span class="playlist-card-badge">Zouk & Compas</span>
-        </a>
-
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">🥁</span>
-          <h3>Ambiance Djembé & Percussions</h3>
-          <p>Le souffle du rythme africain. Percussions traditionnelles et modernes pour une énergie pure.</p>
-          <span class="playlist-card-badge">Percussions</span>
-        </a>
-
-        <a href="https://www.youtube.com/@El-Ramon-Music/shorts" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">⚡</span>
-          <h3>Shorts Tropicaux</h3>
-          <p>Les meilleurs moments en 60 secondes. Rires, musique et bonne humeur guaranteed.</p>
-          <span class="playlist-card-badge turquoise">Shorts</span>
-        </a>
-
-        <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA" target="_blank" rel="noopener" class="playlist-card">
-          <span class="playlist-card-icon">🌴</span>
-          <h3>Ça fait chanter le soleil</h3>
-          <p>Le clip phare d'El Ramon Music + toutes les chansons de la playlist stratégique.</p>
-          <span class="playlist-card-badge turquoise">El Ramon Music</span>
-        </a>
-
+      <div class="playlist-grid reveal" id="bonusContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+        <!-- Loading spinner -->
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+          <div style="border: 4px solid rgba(255,215,0,0.3); border-top: 4px solid #FFD700; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+          <p style="color: rgba(255,255,255,0.7);">Chargement des playlists & recommandations...</p>
+        </div>
       </div>
     </div>
   </section>
-
   <!-- CTA FOOTER -->
   <section class="section-sm section-darker">
     <div class="container">
