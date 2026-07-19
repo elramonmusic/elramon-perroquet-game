@@ -149,6 +149,157 @@
       margin-top: 20px;
       text-decoration: none;
       font-size: 1rem;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classement Perroquet Tropical - El Ramon Music Club</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Styles spécifiques Leaderboard */
+    body { 
+      background-image: url('../assets/images/game/victory_bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-color: #0F172A; 
+      color: #F8FAFC; 
+    }
+    .leaderboard-container {
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 40px;
+      background: rgba(15, 23, 42, 0.75);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .leaderboard-header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #FFD700, #FF8C00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .leaderboard-header p {
+      color: #94A3B8;
+      font-size: 1rem;
+    }
+    .score-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .score-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 12px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .score-item:hover {
+      transform: translateX(5px) scale(1.02);
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Top 3 Styles */
+    .score-item.rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(255, 215, 0, 0.5); }
+    .score-item.rank-2 { background: linear-gradient(90deg, rgba(192, 192, 192, 0.2), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(192, 192, 192, 0.4); }
+    .score-item.rank-3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.2), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(205, 127, 50, 0.4); }
+
+    .score-rank {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #FFD700;
+      min-width: 50px;
+      text-align: center;
+    }
+    .score-item.rank-1 .score-rank { font-size: 2.2rem; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+    .score-item.rank-2 .score-rank { font-size: 1.8rem; color: #C0C0C0; }
+    .score-item.rank-3 .score-rank { font-size: 1.5rem; color: #CD7F32; }
+    
+    .score-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-left: 15px;
+    }
+    .score-pseudo {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #F8FAFC;
+      letter-spacing: 0.5px;
+    }
+    .score-item.rank-1 .score-pseudo { color: #FFD700; font-size: 1.4rem; }
+    .score-item.rank-2 .score-pseudo { color: #E2E8F0; font-size: 1.2rem; }
+    .score-item.rank-3 .score-pseudo { color: #E2E8F0; font-size: 1.1rem; }
+
+    .score-badge {
+      font-size: 0.85rem;
+      color: #FFF;
+      background: rgba(46, 204, 113, 0.3);
+      padding: 3px 8px;
+      border-radius: 10px;
+      display: inline-block;
+      width: fit-content;
+      margin-top: 6px;
+      border: 1px solid rgba(46, 204, 113, 0.5);
+    }
+    .score-item.rank-1 .score-badge { background: rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.5); color: #FFD700; }
+
+    .score-points {
+      font-size: 1.5rem;
+      font-weight: 900;
+      font-family: 'Outfit', sans-serif;
+      color: #FFD700;
+      text-align: right;
+    }
+    .score-item.rank-1 .score-points { font-size: 2rem; color: #FFD700; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    .loading-scores {
+      text-align: center;
+      color: #94A3B8;
+      padding: 40px;
+    }
+    .btn-play {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(135deg, #FF8C00, #E53935);
+      color: white;
+      padding: 16px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-decoration: none;
+      margin-top: 40px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-play:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(229, 57, 53, 0.6);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    .btn-back {
+      display: block;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 20px;
+      text-decoration: none;
+      font-size: 1rem;
       font-weight: bold;
     }
     .btn-back:hover { color: #FFD700; }
@@ -202,55 +353,8 @@
       <a href="./espace-membre.html" class="btn-back">Retour à l'espace membre</a>
     </div>
   </main>
-</head>
-<body data-protect="true">
-  <a href="#main-content" class="skip-link">Aller au contenu</a>
-  <header class="site-header" id="site-header">
-    <nav class="nav">
-      <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
-        <span>El Ramon Music Club</span>
-      </a>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="../index.html" class="nav-link">🏠 Accueil</a></li>
-        <li><a href="./club.html" class="nav-link">🌴 Le Club</a></li>
-        <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
-        <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
-        <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
-        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
-        <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
-      </ul>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
-        <span></span><span></span><span></span>
-      </button>
-    </nav>
-    <nav class="nav-mobile" id="nav-mobile">
-      <a href="../index.html" class="nav-link">🏠 Accueil</a>
-      <a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a>
-      <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
-      <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
-      <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
-      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
-      <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
-    </nav>
-  </header>
 
-  <main id="main-content" style="padding-top: 80px;">
-    <div class="leaderboard-container">
-      <div class="leaderboard-header">
-        <h1>🏆 Classement Tropical</h1>
-        <p>Les meilleurs joueurs du Perroquet Tropical</p>
-      </div>
-
-      <ul class="score-list" id="scoreList">
-        <div class="loading-scores">Chargement des scores... 🦜</div>
-      </ul>
-
-      <a href="./jeu.html" class="btn-play">🎮 Jouer et battre un record</a>
-      <a href="./espace-membre.html" class="btn-back">Retour à l'espace membre</a>
-    </div>
-  </main>
-
+  <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const scoreList = document.getElementById('scoreList');
       try {
