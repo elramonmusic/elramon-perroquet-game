@@ -403,11 +403,6 @@
           <a href="./guides-suno.html" class="btn btn-turquoise btn-lg">📖 Packs PDF Premium</a>
         </div>
       </div>
-    </div>
-  </section>
-
-  </main>
-
 <footer style="background:var(--deep-purple); border-top:1px solid rgba(255,255,255,0.08); padding:var(--space-xl) var(--space-md); text-align:center;">
     <div class="container">
       <p class="font-tropical text-gradient-warm" style="font-size:1.4rem; margin-bottom:0.5rem;">El Ramon Music Club</p>
@@ -480,6 +475,180 @@
           });
         });
       });
+    });
+
+    // === Logique Niveau PRO ===
+    let passProItem = null;
+    let proPrompts = [];
+
+    async function loadProData() {
+      const container = document.getElementById('pro-content-container');
+      try {
+        if (!window.ElRamon || !window.ElRamon.Auth) {
+          setTimeout(loadProData, 100);
+          return;
+        }
+
+        await window.ElRamon.Auth.init();
+        const session = await window.ElRamon.Auth.getSession();
+
+        if (!session) {
+          renderLockedProState("Connecte-toi pour voir les options du Niveau Pro.");
+          return;
+        }
+
+        const res = await fetch('/api/bonus/list', {
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+
+        if (!res.ok) throw new Error("Erreur de chargement des données Pro.");
+        const allItems = await res.json();
+
+        passProItem = allItems.find(i => i.title === 'Accès Niveau Pro (Prompts)' && i.category === 'Pass');
+        proPrompts = allItems.filter(i => i.category === 'Prompt IA');
+
+        if (!passProItem) {
+          container.innerHTML = '<p style="text-align:center;">Le Pass Pro n\'est pas encore configuré sur ce serveur.</p>';
+          return;
+        }
+
+        if (!passProItem.is_unlocked) {
+          renderLockedProState();
+        } else {
+          renderUnlockedProState();
+        }
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p style="text-align:center; color:red;">Erreur de connexion au serveur.</p>';
+      }
+    }
+
+    function renderLockedProState(customMessage) {
+      const container = document.getElementById('pro-content-container');
+      container.innerHTML = `
+        <div class="prompts-grid" style="filter: blur(4px); pointer-events: none; opacity: 0.6; user-select: none;">
+          <div class="prompt-card"><div class="prompt-card-header"><span class="prompt-card-title">🏆 Exemple de Prompt Complexe</span></div><div class="prompt-card-text">"Prompt caché..."</div></div>
+          <div class="prompt-card"><div class="prompt-card-header"><span class="prompt-card-title">🏆 Fusion Multi-Genre</span></div><div class="prompt-card-text">"Prompt caché..."</div></div>
+          <div class="prompt-card"><div class="prompt-card-header"><span class="prompt-card-title">🏆 Hit de l'été</span></div><div class="prompt-card-text">"Prompt caché..."</div></div>
+        </div>
+
+        <div class="pro-unlock-cta" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 10;">
+          <h3>🚀 Débloquer le Niveau Pro</h3>
+          <p>${customMessage || `Accède à la base de données secrète des prompts professionnels pour ${passProItem.banana_cost} 🍌.`}</p>
+          <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap; margin-top: 20px;">
+            ${customMessage ? '' : `<button class="btn btn-primary btn-lg" onclick="unlockBonus('${passProItem.id}', ${passProItem.banana_cost})">🔓 Débloquer pour ${passProItem.banana_cost} 🍌</button>`}
+          </div>
+        </div>
+      `;
+      document.getElementById('panel-pro').style.position = 'relative';
+    }
+
+    function renderUnlockedProState() {
+      const container = document.getElementById('pro-content-container');
+      
+      if (proPrompts.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding: 40px;">Aucun prompt pro disponible pour le moment.</p>';
+        return;
+      }
+
+      let html = '<div class="prompts-grid">';
+
+      proPrompts.forEach(p => {
+        let desc = p.description || '';
+        let tagsHtml = '';
+        const hashtags = desc.match(/#[a-zA-Z0-9_À-ÿ]+/g);
+        if (hashtags) {
+          hashtags.forEach(tag => {
+            desc = desc.replace(tag, ''); 
+            tagsHtml += `<span class="prompt-meta-chip">${tag.substring(1)}</span>`;
+          });
+        }
+        
+        const isSuperPremium = p.is_premium && p.banana_cost > 0;
+        const needsUnlocking = isSuperPremium && !p.is_unlocked;
+
+        html += `
+          <div class="prompt-card ${needsUnlocking ? 'locked' : ''}">
+            <div class="prompt-card-header">
+              <span class="prompt-card-title">${p.title}</span>
+              ${isSuperPremium ? '<span class="prompt-card-tag" style="background:#FFD700; color:#000;">Premium</span>' : '<span class="prompt-card-tag tag-pro" style="background:linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);">Pro</span>'}
+            </div>
+            
+            ${needsUnlocking 
+              ? `<div class="prompt-card-text" style="filter:blur(4px); user-select:none;">"Ce contenu premium est caché..."</div>`
+              : `<div class="prompt-card-text">"${p.url || ''}"</div>`
+            }
+            
+            <div class="prompt-card-desc" style="margin-top:10px; color:rgba(255,255,255,0.8);">${desc.trim()}</div>
+            
+            ${tagsHtml ? `<div class="prompt-card-meta">${tagsHtml}</div>` : ''}
+            
+            <div class="prompt-card-actions" style="display:flex; justify-content:flex-end; align-items:center;">
+              ${needsUnlocking
+                ? `<button class="btn btn-primary" onclick="unlockBonus('${p.id}', ${p.banana_cost})">🔒 Débloquer (${p.banana_cost} 🍌)</button>`
+                : `<button class="btn-copy" onclick="copyPrompt(this)">📋 Copier</button>`
+              }
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+      document.getElementById('panel-pro').style.position = '';
+    }
+
+    window.unlockBonus = async (id, cost) => {
+      if (!confirm(`Veux-tu dépenser ${cost} bananes 🍌 pour débloquer cet élément ?`)) return;
+
+      if (window.ElRamon && window.ElRamon.Toast) {
+        window.ElRamon.Toast.show("⏳ Traitement de l'achat...", "info");
+      }
+
+      try {
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session) throw new Error("Non connecté");
+
+        const res = await fetch('/api/bonus/unlock', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ bonus_id: id })
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur lors de l'achat");
+        }
+
+        if (window.ElRamon && window.ElRamon.Toast) {
+          window.ElRamon.Toast.show("✅ Débloqué avec succès !", "success");
+        } else {
+          alert("✅ Débloqué avec succès !");
+        }
+
+        loadProData();
+        
+        if (window.ElRamon.User && window.ElRamon.User.refreshProfile) {
+          window.ElRamon.User.refreshProfile();
+        }
+
+      } catch (err) {
+        console.error(err);
+        if (window.ElRamon && window.ElRamon.Toast) {
+          window.ElRamon.Toast.show("❌ " + err.message, "error");
+        } else {
+          alert("Erreur : " + err.message);
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProData();
     });
   </script>
 </body>
