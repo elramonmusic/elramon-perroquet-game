@@ -363,68 +363,23 @@
       </div>
 
       <!-- ============================================ -->
-      <!-- NIVEAU 3 : PRO (bloqué, teaser)             -->
+      <!-- NIVEAU 3 : PRO                               -->
       <!-- ============================================ -->
       <div class="level-panel" id="panel-pro" role="tabpanel">
 
         <div class="level-banner level-banner-pro">
           <span class="level-banner-icon">🔒</span>
           <div class="level-banner-text">
-            <h3>Niveau Pro — Bientôt disponible</h3>
+            <h3>Niveau Pro</h3>
             <p>Prompts de niveau professionnel : mastering, structures complexes, fusions de genres, techniques de production avancées.</p>
           </div>
         </div>
 
-        <div class="prompts-grid">
-
-          <div class="prompt-card-locked">
-            <div class="prompt-card-header">
-              <span class="prompt-locked-title">🏆 Mastering Afrobeat Orchestral</span>
-              <span class="prompt-card-tag tag-afrobeat">Afrobeat</span>
-            </div>
-            <div class="prompt-locked-blur">"Full orchestral afrobeat arrangement, 30-piece string section, 5-piece horn section, 3 percussionists, mixed at Abbey Road quality, LUFs -14, dynamic mastering, cinematic..."</div>
-            <div class="prompt-locked-desc">Arrangement orchestral complet avec mastering professionnel.</div>
-            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
-          </div>
-
-          <div class="prompt-card-locked">
-            <div class="prompt-card-header">
-              <span class="prompt-locked-title">🏆 Fusion Tropicale Multi-Genre</span>
-              <span class="prompt-card-tag tag-tropical">Tropical</span>
-            </div>
-            <div class="prompt-locked-blur">"Genre fusion experiment: zouk verse, compas pre-chorus, afrobeat chorus, reggaeton bridge. Tempo morphing 90→110 BPM. Polyphonic vocal arrangement. Advanced harmonic structure..."</div>
-            <div class="prompt-locked-desc">Fusion de 4 genres avec modulation de tempo.</div>
-            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
-          </div>
-
-          <div class="prompt-card-locked">
-            <div class="prompt-card-header">
-              <span class="prompt-locked-title">🏆 Production Cinématique Épique</span>
-              <span class="prompt-card-tag tag-instrumental">Instrumental</span>
-            </div>
-            <div class="prompt-locked-blur">"Epic cinematic tropical score, 5-act structure, full orchestra meets electronic, 120 BPM building to 140. Hans Zimmer-style production. Dolby Atmos mixing. Feature film trailer energy..."</div>
-            <div class="prompt-locked-desc">Score cinématique épique en 5 actes pour bande-annonce.</div>
-            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
-          </div>
-
-          <div class="prompt-card-locked">
-            <div class="prompt-card-header">
-              <span class="prompt-locked-title">🏆 Album Cohérent 10 Titres</span>
-              <span class="prompt-card-tag tag-zouk">Zouk</span>
-            </div>
-            <div class="prompt-locked-blur">"Concept album, 10 tracks, cohesive sonic identity, recurring melodic motifs, key relationships between tracks, narrative arc, interludes, unified production aesthetic..."</div>
-            <div class="prompt-locked-desc">Génération d'un album cohérent de 10 titres avec identité sonore.</div>
-            <span class="prompt-locked-badge">🔒 Bientôt — Niveau Pro</span>
-          </div>
-
-        </div>
-
-        <div class="pro-unlock-cta">
-          <h3>🚀 Le Niveau Pro arrive bientôt</h3>
-          <p>Prompts de niveau professionnel : mastering orchestral, fusions multi-genres, production cinématique, albums complets. En attendant, profite des niveaux Découverte et Studio !</p>
-          <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
-            <button class="btn btn-primary btn-lg" onclick="switchLevel('discover')">🌱 Voir les prompts Découverte</button>
-            <button class="btn btn-turquoise btn-lg" onclick="switchLevel('studio')">🎛️ Voir les prompts Studio</button>
+        <div id="pro-content-container">
+          <!-- Ce contenu sera géré par JS -->
+          <div style="text-align:center; padding: 40px;">
+            <div class="spinner"></div>
+            <p>Vérification de l'accès Pro...</p>
           </div>
         </div>
 
@@ -492,17 +447,14 @@
 
     // === Changement de niveau (onglets) ===
     function switchLevel(level) {
-      // Onglets
       document.querySelectorAll('.level-tab').forEach(t => {
         const active = t.dataset.level === level;
         t.classList.toggle('active', active);
         t.setAttribute('aria-selected', active ? 'true' : 'false');
       });
-      // Panneaux
       document.querySelectorAll('.level-panel').forEach(p => {
         p.classList.toggle('active', p.id === 'panel-' + level);
       });
-      // Reset filtres
       const panel = document.getElementById('panel-' + level);
       if (panel) {
         panel.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -516,7 +468,6 @@
       tab.addEventListener('click', () => switchLevel(tab.dataset.level));
     });
 
-    // === Filtres par catégorie (par panneau) ===
     document.querySelectorAll('.category-filter').forEach(filterGroup => {
       const panel = filterGroup.closest('.level-panel');
       filterGroup.querySelectorAll('.filter-btn').forEach(btn => {

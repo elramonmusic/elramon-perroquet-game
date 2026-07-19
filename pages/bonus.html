@@ -393,7 +393,9 @@
       return;
     }
 
-    bonuses.forEach(b => {
+    const filteredBonuses = bonuses.filter(b => b.category !== 'Prompt IA' && b.category !== 'Pass');
+
+    filteredBonuses.forEach(b => {
       const card = document.createElement('div');
       card.className = 'bonus-card' + (b.is_premium && !b.is_unlocked ? ' locked' : '');
       
