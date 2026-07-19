@@ -251,44 +251,26 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../app.js?v=6" defer></script>
-  <script src="../assets/js/ramonito.js?v=13" defer></script>
-  <script>
-    async function loadLeaderboard() {
-      // Attendre que l'auth s'initialise
-      if (!window.ElRamon || !window.ElRamon.Auth) {
-        setTimeout(loadLeaderboard, 100);
-        return;
-      }
-      
-      await window.ElRamon.Auth.init();
-
-      if (!window.supabaseClient) {
-        setTimeout(loadLeaderboard, 100);
-        return;
-      }
-      fetchScores();
-    }
-
-    async function fetchScores() {
+    document.addEventListener('DOMContentLoaded', async () => {
       const scoreList = document.getElementById('scoreList');
       try {
-        const { data: scores, error } = await window.supabaseClient
-          .from('scores')
-          .select('player_name, score')
-          .order('score', { ascending: false })
-          .limit(10);
-
-        if (error) throw error;
+        const res = await fetch('/game-score');
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Erreur serveur (${res.status}): ${errText}`);
+        }
+        const scores = await res.json();
 
         scoreList.innerHTML = '';
-        if (!scores || scores.length === 0) {
+        if (scores.length === 0) {
           scoreList.innerHTML = '<div class="loading-scores">Aucun score pour le moment. Sois le premier !</div>';
           return;
         }
 
-        scores.forEach((s, index) => {
+        // Keep only top 10 for the UI
+        const top10 = scores.slice(0, 10);
+
+        top10.forEach((s, index) => {
           const rank = index + 1;
           const li = document.createElement('li');
           li.className = `score-item rank-${rank}`;
@@ -298,15 +280,11 @@
           if (rank === 2) rankDisplay = '🥈';
           if (rank === 3) rankDisplay = '🥉';
 
-          let badge = "Plume Tropicale";
-          if (s.score > 500) badge = "Couronne Solaire";
-          if (s.score > 1000) badge = "Perroquet d'Or";
-
           li.innerHTML = `
             <div class="score-rank">${rankDisplay}</div>
             <div class="score-info">
-              <div class="score-pseudo">${DOMPurify.sanitize(s.player_name)}</div>
-              <div class="score-badge">🦜 ${badge}</div>
+              <div class="score-pseudo">${DOMPurify.sanitize(s.pseudo)}</div>
+              <div class="score-badge">${s.badge || '🦜 Explorateur'}</div>
             </div>
             <div class="score-points">${s.score.toLocaleString('fr-FR')} <span style="font-size:0.8rem;color:#94A3B8;">pts</span></div>
           `;
@@ -317,9 +295,7 @@
         console.error(err);
         scoreList.innerHTML = `<div class="loading-scores" style="color:#E53935;">Impossible de charger le classement :<br/><br/>${err.message}</div>`;
       }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadLeaderboard);
+    });
   </script>
 </body>
 </html>
