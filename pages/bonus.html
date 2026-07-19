@@ -397,9 +397,16 @@
       const card = document.createElement('div');
       card.className = 'bonus-card' + (b.is_premium && !b.is_unlocked ? ' locked' : '');
       
-      const imageHtml = b.image_url 
-        ? `<img src="${b.image_url}" alt="${b.title}" class="bonus-card-img" loading="lazy">` 
-        : `<div class="bonus-card-img" style="display:flex; align-items:center; justify-content:center; font-size:3rem;">🎵</div>`;
+      let imageHtml = '';
+      if (b.image_url) {
+        if (b.image_url.endsWith('.mp4') || b.image_url.endsWith('.webm')) {
+          imageHtml = `<video src="${b.image_url}" class="bonus-card-img" autoplay loop muted playsinline style="object-fit:cover;"></video>`;
+        } else {
+          imageHtml = `<img src="${b.image_url}" alt="${b.title}" class="bonus-card-img" loading="lazy">`;
+        }
+      } else {
+        imageHtml = `<div class="bonus-card-img" style="display:flex; align-items:center; justify-content:center; font-size:3rem;">🎵</div>`;
+      }
       
       let buttonHtml = '';
       if (b.is_premium && !b.is_unlocked) {
