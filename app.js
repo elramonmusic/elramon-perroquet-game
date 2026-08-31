@@ -1,6 +1,6 @@
 /**
  * El Ramon Music Club — app.js
- * Global JS: navigation, auth (localStorage V1), scroll reveal, utils
+ * Global JS: navigation, authentification Supabase, scroll reveal, utilitaires
  * Version 1.0
  */
 
@@ -129,7 +129,7 @@ const Auth = {
   /**
    * Envoi du Magic Link (Connexion/Inscription)
    */
-  async sendMagicLink(email, metadata = {}) {
+  async sendMagicLink(email, metadata = {}, shouldCreateUser = true) {
     if (!window.supabaseClient) await this.init();
     const redirectUrl = window.location.origin + '/pages/espace-membre.html';
     
@@ -137,7 +137,8 @@ const Auth = {
       email: email,
       options: {
         emailRedirectTo: redirectUrl,
-        data: metadata
+        data: metadata,
+        shouldCreateUser
       }
     });
     return { data, error };
@@ -202,6 +203,14 @@ function initNavigation() {
 
   // Update nav based on auth state
   updateNavAuth();
+}
+
+function initAccessibleNames() {
+  document.querySelectorAll('a[title], button[title]').forEach(element => {
+    if (!element.hasAttribute('aria-label') && element.textContent.trim().length <= 2) {
+      element.setAttribute('aria-label', element.getAttribute('title'));
+    }
+  });
 }
 
 async function updateNavAuth() {
@@ -447,15 +456,14 @@ async function handleInscription(event) {
     // Envoi vers Cloudflare Pages Function
     const payload = { email, pseudo, prenom, newsletter, abonne, rgpd, turnstile: window._turnstileToken || '' };
 
-    // Tentative d'envoi vers le backend
-    try {
-      await fetch('/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } catch (fetchError) {
-      console.warn('Backend unavailable:', fetchError.message);
+    const subscribeResponse = await fetch('/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const subscribeResult = await subscribeResponse.json().catch(() => ({}));
+    if (!subscribeResponse.ok) {
+      throw new Error(subscribeResult.error || 'Impossible de finaliser l’inscription. Réessaie.');
     }
 
     // Appel Supabase pour envoyer le Magic Link avec les métadonnées
@@ -469,11 +477,15 @@ async function handleInscription(event) {
     // Afficher le message de succès chaleureux et les confettis
     const successEl = document.querySelector('.form-success');
     if (successEl) {
-      const safeEmail = window.DOMPurify ? window.DOMPurify.sanitize(email) : email;
-      successEl.innerHTML = `
-        <h3 style="font-size:1.3rem; margin-bottom:1rem;">Bienvenue dans le Club ! 🌴</h3>
-        <p>Vérifie ta boîte mail pour <strong>${safeEmail}</strong> et clique sur le lien magique pour te connecter à ton espace membre.</p>
-      `;
+      const title = document.createElement('h3');
+      title.style.cssText = 'font-size:1.3rem; margin-bottom:1rem;';
+      title.textContent = 'Bienvenue dans le Club ! 🌴';
+      const message = document.createElement('p');
+      message.append('Vérifie ta boîte mail pour ');
+      const emailStrong = document.createElement('strong');
+      emailStrong.textContent = email;
+      message.append(emailStrong, ' et clique sur le lien magique pour te connecter à ton espace membre.');
+      successEl.replaceChildren(title, message);
       form.style.display = 'none';
       successEl.classList.add('visible');
       if (typeof fireConfetti === 'function') fireConfetti();
@@ -708,6 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initNavigation();
+  initAccessibleNames();
   initScrollReveal();
   initParticles();
   initHomeFeatures();
@@ -732,20 +745,37 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initProtectedDownloads() {
   try {
     const downloadLinks = document.querySelectorAll('a[href*="/download"]');
-    if (downloadLinks.length > 0) {
-      const session = await Auth.getSession();
-      if (session && session.access_token) {
-        downloadLinks.forEach(link => {
-          try {
-            const url = new URL(link.href, window.location.origin);
-            url.searchParams.set('token', session.access_token);
-            link.href = url.pathname + url.search;
-          } catch (e) {
-            console.error('Error rewriting download link:', e);
-          }
-        });
-      }
-    }
+    downloadLinks.forEach(link => {
+      link.addEventListener('click', async event => {
+        event.preventDefault();
+        const session = await Auth.getSession();
+        if (!session?.access_token) {
+          window.location.href = '/pages/login.html';
+          return;
+        }
+
+        try {
+          const response = await fetch(link.href, {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+          if (!response.ok) throw new Error('Téléchargement refusé');
+
+          const disposition = response.headers.get('Content-Disposition') || '';
+          const filenameMatch = disposition.match(/filename="?([^";]+)"?/i);
+          const filename = filenameMatch?.[1] || 'el-ramon-download.pdf';
+          const objectUrl = URL.createObjectURL(await response.blob());
+          const download = document.createElement('a');
+          download.href = objectUrl;
+          download.download = filename;
+          document.body.appendChild(download);
+          download.click();
+          download.remove();
+          setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        } catch (error) {
+          Toast.show(error.message || 'Téléchargement impossible', 'error');
+        }
+      });
+    });
   } catch (e) {
     console.error('Error initializing protected downloads:', e);
   }

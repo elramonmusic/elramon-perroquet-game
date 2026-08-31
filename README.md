@@ -297,9 +297,11 @@ Cloudflare Pages → ton projet → **Settings** → **Environment variables** :
 | Variable | Valeur |
 |----------|--------|
 | `SUPABASE_URL` | `https://xxx.supabase.co` |
+| `SUPABASE_ANON_KEY` | `eyJhbGci...` (anon public) |
 | `SUPABASE_SERVICE_KEY` | `eyJhbGci...` (service_role) |
 
-Puis mets à jour `app.js` (ligne `CONFIG`) avec `SUPABASE_URL` et `SUPABASE_ANON_KEY`.
+Le navigateur récupère automatiquement les deux valeurs publiques via la fonction `/config`.
+Après les migrations historiques, exécute aussi `supabase/security_hardening.sql` pour appliquer les transactions et politiques de sécurité actuelles.
 
 ---
 
@@ -310,14 +312,19 @@ Puis mets à jour `app.js` (ligne `CONFIG`) avec `SUPABASE_URL` et `SUPABASE_ANO
 | Variable | Description | Requis |
 |----------|-------------|--------|
 | `SUPABASE_URL` | URL du projet Supabase | V2 |
+| `SUPABASE_ANON_KEY` | Clé publique Supabase utilisée par `/config` | Oui |
 | `SUPABASE_SERVICE_KEY` | Clé service_role Supabase (secrète) | V2 |
+| `TURNSTILE_SECRET_KEY` | Secret Cloudflare Turnstile ; les formulaires échouent s'il manque | Oui |
 | `RESEND_API_KEY` | Clé API Resend pour les emails | V2 (optionnel) |
+| `RAMONITO_FUNCTION_URL` | URL de la fonction Supabase Ramonito | Ramonito |
 
 Crée un fichier `.dev.vars` à la racine pour le développement local avec Wrangler :
 
 ```
 SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_ANON_KEY=eyJhbGci...
 SUPABASE_SERVICE_KEY=eyJhbGci...
+TURNSTILE_SECRET_KEY=0x...
 RESEND_API_KEY=re_xxx...
 ```
 
@@ -329,7 +336,7 @@ RESEND_API_KEY=re_xxx...
 - ✅ Validation côté client (`app.js`) et côté serveur (`functions/`)
 - ✅ Case RGPD obligatoire sur tous les formulaires
 - ✅ Logs anti-spam via Cloudflare (IP tracking)
-- 🔜 **Cloudflare Turnstile** (anti-bot) — à activer en production
+- ✅ **Cloudflare Turnstile** obligatoire en production
 
 ### Protection des données
 - ✅ HTTPS forcé via Cloudflare
@@ -357,7 +364,7 @@ RESEND_API_KEY=re_xxx...
 ### ✅ V1 — Actuelle
 - [x] Site vitrine tropical premium
 - [x] 14 pages complètes
-- [x] Inscription email + pseudo (localStorage)
+- [x] Inscription et connexion par lien magique Supabase
 - [x] Espace membre simulé
 - [x] Pages verrouillées (auth gate)
 - [x] Formulaires (contact, collaboration)

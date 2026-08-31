@@ -218,7 +218,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -227,7 +227,7 @@
         <li><a href="./espace-membre.html" class="nav-link text-turquoise" style="color:var(--turquoise);">🎵 Dashboard</a></li>
         <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
         <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
-        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-cta">▶ YouTube</a></li>
         <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
       </ul>
       <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
@@ -240,7 +240,7 @@
       <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
       <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
       <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
-      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
       <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
     </nav>
   </header>
@@ -272,9 +272,10 @@
               <button id="edit-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--turquoise); padding:0; line-height:1; display:flex; align-items:center;" title="Modifier mon prénom">✏️</button>
             </div>
             <div id="edit-name-container" style="display: none; align-items: center; gap: 8px; margin-bottom: 0.5rem; flex-wrap: wrap;">
-              <input type="text" id="edit-name-input" maxlength="20" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(0,206,209,0.3); color:#fff; border-radius:8px; padding:5px 12px; font-size:1rem; outline:none;" />
-              <button id="save-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:#2ECC71;" title="Enregistrer">✔️</button>
-              <button id="cancel-name-btn" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--coral-red);" title="Annuler">❌</button>
+              <label for="edit-name-input" class="sr-only">Prénom ou nom d’artiste</label>
+              <input type="text" id="edit-name-input" maxlength="20" autocomplete="name" aria-label="Prénom ou nom d’artiste" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(0,206,209,0.3); color:#fff; border-radius:8px; padding:5px 12px; font-size:1rem; outline:none;" />
+              <button id="save-name-btn" aria-label="Enregistrer le prénom" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:#2ECC71;" title="Enregistrer">✔️</button>
+              <button id="cancel-name-btn" aria-label="Annuler la modification" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--coral-red);" title="Annuler">❌</button>
             </div>
             <p class="profile-sub" id="member-since" style="margin-top: 4px; margin-bottom: 0.8rem;">Prêt pour l'aventure !</p>
             <div class="profile-badges">
@@ -362,7 +363,9 @@
             <h3 class="card-title">Sélection Tropicale</h3>
             <p class="card-desc">Accessoires, chemises et instruments recommandés par le Club.</p>
             <span class="card-tag tag-play" style="background:rgba(255,255,255,0.1); color:#FFF; border-color:rgba(255,255,255,0.2);">Voir la boutique</span>
-          <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="glass-card interactive">
+          </a>
+
+          <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="glass-card interactive">
             <span class="card-icon">▶️</span>
             <h3 class="card-title">Chaîne YouTube</h3>
             <p class="card-desc">Rejoins-nous sur YouTube pour les derniers clips et courts-métrages.</p>
@@ -399,7 +402,7 @@
         <a href="../index.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Accueil</a>
         <a href="./bonus.html" class="nav-link" style="color:var(--turquoise);">🎧 Playlists</a>
         <a href="./prompts.html" class="nav-link" style="color:rgba(255,255,255,0.6);">Prompts IA</a>
-        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+        <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
       </div>
       <p style="color:rgba(255,255,255,0.55); font-size:0.78rem; margin-top:var(--space-lg);">&copy; 2026 El Ramon Music Club · <a href="mailto:elramonmusic@gmail.com" style="color:rgba(255,255,255,0.6);">elramonmusic@gmail.com</a></p>
     </div>
@@ -429,14 +432,14 @@
       <button id="audio-mute-btn" class="player-btn" aria-label="Mute">🔊</button>
     </div>
     <div class="player-actions" style="min-width: 150px; text-align:right;">
-      <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA" target="_blank" style="color:rgba(255,255,255,0.7); text-decoration:none; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px; font-size:0.85rem;">
+      <a href="https://www.youtube.com/watch?v=rgA6sLPfglY&list=PL50zfi8zZ2CorecPWocK3z7DEvtQTIYMA" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.7); text-decoration:none; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px; font-size:0.85rem;">
         YouTube ↗
       </a>
     </div>
     <div id="yt-audio-player" style="position: absolute; left: -9999px; width: 200px; height: 200px; pointer-events: none;"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
   <script>
@@ -480,9 +483,7 @@
 
           saveBtn.disabled = true;
           const { error } = await window.supabaseClient
-            .from('members')
-            .update({ prenom: newName })
-            .eq('id', member.id);
+            .rpc('update_own_profile', { p_prenom: newName });
 
           if (error) {
             if (window.ElRamon.Toast) {

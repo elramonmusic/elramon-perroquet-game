@@ -1,178 +1,109 @@
-/**
- * Cloudflare Pages Function — /functions/collaboration
- * Gère les demandes de collaboration commerciale
- *
- * POST /functions/collaboration
- * Body: { company, contact, email, website, type, product, budget, message }
- */
-
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json',
-};
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import {
+  anonymizedClientHash,
+  cleanString,
+  enforceRateLimit,
+  fetchWithTimeout,
+  isSameOriginRequest,
+  isValidEmail,
+  jsonResponse,
+  optionsResponse,
+  verifyTurnstile,
+} from './utils/security.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  if (!isSameOriginRequest(request)) return jsonResponse({ error: 'Origine non autorisée' }, 403);
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY || !env.TURNSTILE_SECRET_KEY) {
+    return jsonResponse({ error: 'Service de collaboration temporairement indisponible' }, 503);
+  }
+  if (!(await enforceRateLimit(context, 'collaboration', 3, 3600))) {
+    return jsonResponse({ error: 'Trop de demandes envoyées. Réessaie plus tard.' }, 429, { 'Retry-After': '3600' });
+  }
 
   let data;
   try {
     data = await request.json();
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'JSON invalide' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
+  } catch {
+    return jsonResponse({ error: 'JSON invalide' }, 400);
   }
 
-  const { company, contact, email, website, type, product, budget, message } = data;
+  if (!(await verifyTurnstile(request, env, cleanString(data.turnstile, 2048)))) {
+    return jsonResponse({ error: 'Vérification anti-bot échouée' }, 400);
+  }
 
-  // Vérification Turnstile anti-bot
-  if (env.TURNSTILE_SECRET_KEY) {
-    const turnstileToken = data.turnstile;
-    if (!turnstileToken) {
-      return new Response(JSON.stringify({ error: 'Vérification anti-bot requise' }), {
-        status: 400,
-        headers: CORS_HEADERS,
-      });
-    }
+  const company = cleanString(data.company, 120);
+  const contactName = cleanString(data.contact, 100);
+  const email = cleanString(data.email, 254).toLowerCase();
+  const website = cleanString(data.website, 500);
+  const collabType = cleanString(data.type, 80) || 'non_specifie';
+  const product = cleanString(data.product, 200);
+  const budget = cleanString(data.budget, 80) || 'non_specifie';
+  const message = cleanString(data.message, 8000);
+
+  if (company.length < 2) return jsonResponse({ error: 'Nom d’entreprise requis' }, 400);
+  if (!isValidEmail(email)) return jsonResponse({ error: 'Adresse email invalide' }, 400);
+  if (message.length < 20) return jsonResponse({ error: 'Message trop court (minimum 20 caractères)' }, 400);
+  if (website) {
     try {
-      const cfResp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          secret: env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-        }),
-      });
-      const cfResult = await cfResp.json();
-      if (!cfResult.success) {
-        return new Response(JSON.stringify({ error: 'Vérification anti-bot échouée' }), {
-          status: 400,
-          headers: CORS_HEADERS,
-        });
-      }
-    } catch (err) {
-      console.error('Turnstile verification error:', err.message);
-      return new Response(JSON.stringify({ error: 'Service anti-bot indisponible. Réessayez dans un instant.' }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
+      const parsed = new URL(website);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('protocol');
+    } catch {
+      return jsonResponse({ error: 'Adresse du site web invalide' }, 400);
     }
   }
 
-  // Validation
-  if (!company || company.length < 2) {
-    return new Response(JSON.stringify({ error: "Nom d'entreprise requis" }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  if (!email || !isValidEmail(email)) {
-    return new Response(JSON.stringify({ error: 'Adresse email invalide' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  if (!message || message.length < 20) {
-    return new Response(JSON.stringify({ error: 'Message trop court (min. 20 caractères)' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  // Construction de la demande
   const collaboration = {
-    company: company.trim(),
-    contact_name: contact ? contact.trim() : '',
-    email: email.toLowerCase().trim(),
-    website: website ? website.trim() : '',
-    collab_type: type || 'non_specifie',
-    product: product ? product.trim() : '',
-    budget: budget || 'non_specifie',
-    message: message.trim(),
+    company,
+    contact_name: contactName,
+    email,
+    website,
+    collab_type: collabType,
+    product,
+    budget,
+    message,
     status: 'nouveau',
-    created_at: new Date().toISOString(),
-    ip: request.headers.get('cf-connecting-ip') || 'unknown',
+    ip: await anonymizedClientHash(request),
   };
 
-  if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
-    try {
-      const response = await fetch(`${env.SUPABASE_URL}/rest/v1/collaborations`, {
-        method: 'POST',
-        headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(collaboration),
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-    } catch (err) {
-      console.error('Supabase error:', err.message);
-      return new Response(JSON.stringify({ error: "Erreur de base de données lors de l'enregistrement." }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
-    }
+  try {
+    const response = await fetchWithTimeout(`${env.SUPABASE_URL}/rest/v1/collaborations`, {
+      method: 'POST',
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(collaboration),
+    });
+    if (!response.ok) throw new Error(`Supabase ${response.status}`);
+  } catch (error) {
+    console.error('Collaboration database error:', error.message);
+    return jsonResponse({ error: 'Impossible d’enregistrer la demande' }, 500);
   }
 
-  // Notification email via Resend
-  // ⚠️ Domaine non vérifié : on utilise le sandbox onboarding@resend.dev
-  //     Le from temporaire ne peut envoyer QUE vers elramonmusic@gmail.com
-  //     TODO V2 : vérifier un vrai domaine (notifications.elramonmusicclub.fr)
   if (env.RESEND_API_KEY) {
-    const resendFrom = 'El Ramon Music Club <onboarding@resend.dev>';
-    const adminEmail = 'elramonmusic@gmail.com';
-
-    // Email admin — notification de collaboration
     try {
-      await fetch('https://api.resend.com/emails', {
+      const response = await fetchWithTimeout('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: resendFrom,
-          to: [adminEmail],
-          reply_to: collaboration.email,
-          subject: `[Collaboration] ${collaboration.company} — ${collaboration.collab_type}`,
-          text: `Nouvelle demande de collaboration\n\nEntreprise: ${collaboration.company}\nContact: ${collaboration.contact_name}\nEmail: ${collaboration.email}\nSite: ${collaboration.website}\nType: ${collaboration.collab_type}\nProduit: ${collaboration.product}\nBudget: ${collaboration.budget}\n\nMessage:\n${collaboration.message}\n\nℹ️ L'accusé de réception au collaborateur sera activé quand le domaine sera vérifié dans Resend.`,
+          from: 'El Ramon Music Club <onboarding@resend.dev>',
+          to: ['elramonmusic@gmail.com'],
+          reply_to: email,
+          subject: `[Collaboration] ${company} — ${collabType}`,
+          text: `Nouvelle demande de collaboration\n\nEntreprise : ${company}\nContact : ${contactName}\nEmail : ${email}\nSite : ${website}\nType : ${collabType}\nProduit : ${product}\nBudget : ${budget}\n\n${message}`,
         }),
       });
-    } catch (err) {
-      console.error('Resend admin email error:', err.message);
+      if (!response.ok) console.error('Resend collaboration notification failed:', response.status);
+    } catch (error) {
+      console.error('Resend collaboration notification error:', error.message);
     }
-
-    // TODO V2 : Accusé de réception au collaborateur (désactivé tant que le domaine n'est pas vérifié)
-    // Pour l'instant, onboarding@resend.dev ne peut envoyer qu'à elramonmusic@gmail.com
   }
 
-  console.log(`Demande collaboration: ${collaboration.company} (${collaboration.email})`);
-
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Demande de collaboration envoyée',
-  }), {
-    status: 200,
-    headers: CORS_HEADERS,
-  });
+  return jsonResponse({ success: true, message: 'Demande de collaboration envoyée' });
 }
 
 export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: CORS_HEADERS,
-  });
+  return optionsResponse('POST, OPTIONS');
 }

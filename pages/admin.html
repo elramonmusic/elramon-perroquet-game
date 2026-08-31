@@ -203,7 +203,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -342,7 +342,7 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
   
@@ -423,34 +423,33 @@
 
     function renderTable(members) {
       const tbody = document.getElementById('membersTableBody');
-      tbody.innerHTML = '';
+      tbody.replaceChildren();
 
       if (members.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">Aucun membre trouvé.</td></tr>';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 7; cell.style.cssText = 'text-align:center; padding:30px;'; cell.textContent = 'Aucun membre trouvé.';
+        row.append(cell); tbody.append(row);
         return;
       }
 
       members.forEach(m => {
         const tr = document.createElement('tr');
-        
         const dateStr = m.created_at ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
-        const bossStatus = m.toucan_defeated ? '<span class="badge-status active">Oui</span>' : '<span class="badge-status inactive">Non</span>';
-
-        tr.innerHTML = `
-          <td class="pseudo-cell">${DOMPurify.sanitize(m.pseudo || 'Anonyme')}</td>
-          <td class="email-cell">${DOMPurify.sanitize(m.email)}</td>
-          <td style="color:#FFD700; font-weight:bold;">${(m.best_score || 0).toLocaleString('fr-FR')}</td>
-          <td style="display:flex; align-items:center; gap:8px;">
-            <span id="bananas-${m.id}">${m.bananas_balance || 0}</span>
-            <button onclick="updateBananas('${m.id}', 10)" style="background:rgba(46,204,113,0.2); color:#2ecc71; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;" title="Donner 10 bananes">+</button>
-            <button onclick="updateBananas('${m.id}', -10)" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;" title="Retirer 10 bananes">-</button>
-          </td>
-          <td>${bossStatus}</td>
-          <td style="color:#94A3B8; font-size:0.85rem;">${dateStr}</td>
-          <td>
-            <button onclick="resetScore('${m.id}', '${DOMPurify.sanitize(m.pseudo || 'Anonyme')}')" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid rgba(231,76,60,0.5); border-radius:6px; cursor:pointer; padding:4px 8px; font-size:0.8rem;" title="Remettre le score à 0">🗑️ Reset Score</button>
-          </td>
-        `;
+        const cell = (text, className = '') => { const td = document.createElement('td'); td.className = className; td.textContent = text; return td; };
+        const pseudo = String(m.pseudo || 'Anonyme').slice(0, 80);
+        const pseudoCell = cell(pseudo, 'pseudo-cell');
+        const emailCell = cell(String(m.email || '').slice(0, 254), 'email-cell');
+        const scoreCell = cell((Number(m.best_score) || 0).toLocaleString('fr-FR')); scoreCell.style.cssText = 'color:#FFD700; font-weight:bold;';
+        const bananasCell = cell(''); bananasCell.style.cssText = 'display:flex; align-items:center; gap:8px;';
+        const balance = document.createElement('span'); balance.id = `bananas-${m.id}`; balance.textContent = String(Number(m.bananas_balance) || 0);
+        const plus = document.createElement('button'); plus.textContent = '+'; plus.title = 'Donner 10 bananes'; plus.style.cssText = 'background:rgba(46,204,113,0.2); color:#2ecc71; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;'; plus.addEventListener('click', () => updateBananas(m.id, 10));
+        const minus = document.createElement('button'); minus.textContent = '-'; minus.title = 'Retirer 10 bananes'; minus.style.cssText = 'background:rgba(231,76,60,0.2); color:#e74c3c; border:none; border-radius:4px; cursor:pointer; padding:2px 6px;'; minus.addEventListener('click', () => updateBananas(m.id, -10));
+        bananasCell.append(balance, plus, minus);
+        const bossCell = cell(''); const boss = document.createElement('span'); boss.className = `badge-status ${m.toucan_defeated ? 'active' : 'inactive'}`; boss.textContent = m.toucan_defeated ? 'Oui' : 'Non'; bossCell.append(boss);
+        const dateCell = cell(dateStr); dateCell.style.cssText = 'color:#94A3B8; font-size:0.85rem;';
+        const actionCell = cell(''); const reset = document.createElement('button'); reset.textContent = '🗑️ Reset Score'; reset.title = 'Remettre le score à 0'; reset.style.cssText = 'background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid rgba(231,76,60,0.5); border-radius:6px; cursor:pointer; padding:4px 8px; font-size:0.8rem;'; reset.addEventListener('click', () => resetScore(m.id, pseudo)); actionCell.append(reset);
+        tr.append(pseudoCell, emailCell, scoreCell, bananasCell, bossCell, dateCell, actionCell);
         tbody.appendChild(tr);
       });
     }
@@ -626,20 +625,19 @@
     function renderBonusTable(bonuses) {
       const tbody = document.getElementById('bonusTableBody');
       if (!tbody) return;
-      tbody.innerHTML = '';
+      tbody.replaceChildren();
       
       bonuses.forEach(b => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${b.image_url ? `<img src="${b.image_url}" width="40" height="40" style="border-radius:5px; object-fit:cover;">` : '📄'}</td>
-          <td style="font-weight:bold;">${b.title}</td>
-          <td>${b.category}</td>
-          <td>${b.is_premium ? `🔒 ${b.banana_cost} 🍌` : 'Gratuit'}</td>
-          <td>
-            <button onclick="editBonus('${b.id}')" style="background:#f39c12; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✏️ Éditer</button>
-            <button onclick="deleteBonus('${b.id}')" style="background:#e74c3c; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">🗑️ Suppr.</button>
-          </td>
-        `;
+        const mediaCell = document.createElement('td');
+        if (b.image_url) { const img = document.createElement('img'); img.src = String(b.image_url); img.alt = ''; img.width = 40; img.height = 40; img.style.cssText = 'border-radius:5px; object-fit:cover;'; mediaCell.append(img); } else mediaCell.textContent = '📄';
+        const titleCell = document.createElement('td'); titleCell.style.fontWeight = 'bold'; titleCell.textContent = String(b.title || '');
+        const categoryCell = document.createElement('td'); categoryCell.textContent = String(b.category || '');
+        const priceCell = document.createElement('td'); priceCell.textContent = b.is_premium ? `🔒 ${Number(b.banana_cost) || 0} 🍌` : 'Gratuit';
+        const actions = document.createElement('td');
+        const edit = document.createElement('button'); edit.textContent = '✏️ Éditer'; edit.style.cssText = 'background:#f39c12; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;'; edit.addEventListener('click', () => editBonus(b.id));
+        const remove = document.createElement('button'); remove.textContent = '🗑️ Suppr.'; remove.style.cssText = 'background:#e74c3c; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;'; remove.addEventListener('click', () => deleteBonus(b.id));
+        actions.append(edit, remove); tr.append(mediaCell, titleCell, categoryCell, priceCell, actions);
         tbody.appendChild(tr);
       });
     }

@@ -1,214 +1,95 @@
-/**
- * Cloudflare Pages Function — /functions/subscribe
- * Gère les inscriptions au El Ramon Music Club
- * Clés Supabase : env.SUPABASE_URL + env.SUPABASE_SERVICE_KEY (via Cloudflare env vars)
- *
- * POST /subscribe
- * Body: { email, pseudo, prenom, newsletter, abonne, rgpd }
- *
- * V2 : stockage en variable d'environnement (KV ou D1 à venir)
- *      → intégration Supabase (via env.SUPABASE_URL + env.SUPABASE_SERVICE_KEY)
- */
-
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json',
-};
-
-import { createSessionCookie } from './utils/session.js';
-
-// Simple validation d'email
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import {
+  cleanString,
+  enforceRateLimit,
+  fetchWithTimeout,
+  isSameOriginRequest,
+  isValidEmail,
+  jsonResponse,
+  optionsResponse,
+  verifyTurnstile,
+} from './utils/security.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-
-  // Validation du content-type
-  const contentType = request.headers.get('content-type') || '';
-  if (!contentType.includes('application/json')) {
-    return new Response(JSON.stringify({ error: 'Content-Type doit être application/json' }), {
-      status: 415,
-      headers: CORS_HEADERS,
-    });
+  if (!isSameOriginRequest(request)) return jsonResponse({ error: 'Origine non autorisée' }, 403);
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY || !env.TURNSTILE_SECRET_KEY) {
+    return jsonResponse({ error: 'Service d’inscription temporairement indisponible' }, 503);
+  }
+  if (!(request.headers.get('content-type') || '').includes('application/json')) {
+    return jsonResponse({ error: 'Content-Type doit être application/json' }, 415);
+  }
+  if (!(await enforceRateLimit(context, 'subscribe', 5, 600))) {
+    return jsonResponse({ error: 'Trop de tentatives. Réessaie dans quelques minutes.' }, 429, { 'Retry-After': '600' });
   }
 
   let data;
   try {
     data = await request.json();
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'JSON invalide' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
+  } catch {
+    return jsonResponse({ error: 'JSON invalide' }, 400);
   }
 
-  const { email, pseudo, prenom, newsletter, abonne, rgpd } = data;
-
-  // Vérification Turnstile anti-bot
-  if (env.TURNSTILE_SECRET_KEY) {
-    const turnstileToken = data.turnstile;
-    if (!turnstileToken) {
-      return new Response(JSON.stringify({ error: 'Vérification anti-bot requise' }), {
-        status: 400,
-        headers: CORS_HEADERS,
-      });
-    }
-    try {
-      const cfResp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          secret: env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-        }),
-      });
-      const cfResult = await cfResp.json();
-      if (!cfResult.success) {
-        return new Response(JSON.stringify({ error: 'Vérification anti-bot échouée' }), {
-          status: 400,
-          headers: CORS_HEADERS,
-        });
-      }
-    } catch (err) {
-      console.error('Turnstile verification error:', err.message);
-      return new Response(JSON.stringify({ error: 'Service anti-bot indisponible. Réessayez dans un instant.' }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
-    }
+  if (!(await verifyTurnstile(request, env, cleanString(data.turnstile, 2048)))) {
+    return jsonResponse({ error: 'Vérification anti-bot échouée' }, 400);
   }
 
-  // Validation des champs obligatoires
-  if (!email || !isValidEmail(email)) {
-    return new Response(JSON.stringify({ error: 'Adresse email invalide ou manquante' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
+  const email = cleanString(data.email, 254).toLowerCase();
+  const pseudo = cleanString(data.pseudo, 40);
+  const prenom = cleanString(data.prenom, 60);
+  if (!isValidEmail(email)) return jsonResponse({ error: 'Adresse email invalide' }, 400);
+  if (pseudo.length < 2) return jsonResponse({ error: 'Pseudo requis (2 à 40 caractères)' }, 400);
+  if (data.rgpd !== true) return jsonResponse({ error: 'Consentement RGPD obligatoire' }, 400);
 
-  if (!pseudo || pseudo.length < 2) {
-    return new Response(JSON.stringify({ error: 'Pseudo requis (min. 2 caractères)' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  if (!rgpd) {
-    return new Response(JSON.stringify({ error: 'Consentement RGPD obligatoire' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  // Construction de l'enregistrement membre
   const member = {
-    email: email.toLowerCase().trim(),
-    pseudo: pseudo.trim(),
-    prenom: prenom ? prenom.trim() : '',
-    newsletter: !!newsletter,
-    abonne: !!abonne,
-    role: 'member',
-    created_at: new Date().toISOString(),
+    email,
+    pseudo,
+    prenom,
+    newsletter: data.newsletter === true,
+    abonne: data.abonne === true,
     source: 'elramon-music-club',
   };
 
-  if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
-    try {
-      const supabaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/members`, {
-        method: 'POST',
-        headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates',
-        },
-        body: JSON.stringify(member),
-      });
-
-      if (!supabaseResponse.ok) {
-        throw new Error(await supabaseResponse.text());
-      }
-    } catch (err) {
-      console.error('Supabase fetch error:', err.message);
-      return new Response(JSON.stringify({ error: "Erreur de base de données lors de l'inscription." }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
-    }
+  try {
+    const response = await fetchWithTimeout(`${env.SUPABASE_URL}/rest/v1/members?on_conflict=email`, {
+      method: 'POST',
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=ignore-duplicates,return=minimal',
+      },
+      body: JSON.stringify(member),
+    });
+    if (!response.ok) throw new Error(`Supabase ${response.status}`);
+  } catch (error) {
+    console.error('Subscribe database error:', error.message);
+    return jsonResponse({ error: 'Impossible de finaliser l’inscription' }, 500);
   }
 
-  // Notification email via Resend
-  // ⚠️ Domaine non vérifié : on utilise le sandbox onboarding@resend.dev
-  //     Le from temporaire ne peut envoyer QUE vers elramonmusic@gmail.com
-  //     TODO V2 : vérifier un vrai domaine (notifications.elramonmusicclub.fr)
   if (env.RESEND_API_KEY) {
-    const resendFrom = 'El Ramon Music Club <onboarding@resend.dev>';
-    const adminEmail = 'elramonmusic@gmail.com';
-
-    // Email 1 — Notification admin (nouveau membre)
     try {
-      await fetch('https://api.resend.com/emails', {
+      const response = await fetchWithTimeout('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          Authorization: `Bearer ${env.RESEND_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: resendFrom,
-          to: [adminEmail],
-          subject: `[Nouveau membre] ${member.pseudo} (${member.email})`,
-          text: `Nouveau membre inscrit
-
-Pseudo : ${member.pseudo}
-Email : ${member.email}
-Prénom : ${member.prenom || 'Non renseigné'}
-Newsletter : ${member.newsletter ? 'Oui' : 'Non'}
-Abonné YouTube : ${member.abonne ? 'Oui' : 'Non'}
-Date : ${member.created_at}
-
-ℹ️ L'email de bienvenue au membre sera activé quand le domaine sera vérifié dans Resend.`,
+          from: 'El Ramon Music Club <onboarding@resend.dev>',
+          to: ['elramonmusic@gmail.com'],
+          subject: '[Nouveau membre] Inscription au Club',
+          text: `Nouvelle inscription\n\nPseudo : ${pseudo}\nEmail : ${email}\nPrénom : ${prenom || 'Non renseigné'}\nNewsletter : ${member.newsletter ? 'Oui' : 'Non'}\nAbonné YouTube : ${member.abonne ? 'Oui' : 'Non'}`,
         }),
       });
-    } catch (err) {
-      console.error('Resend admin notification error:', err.message);
+      if (!response.ok) console.error('Resend subscribe notification failed:', response.status);
+    } catch (error) {
+      console.error('Resend subscribe notification error:', error.message);
     }
-
-    // TODO V2 : Email de bienvenue au membre (désactivé tant que le domaine n'est pas vérifié)
-    // Pour l'instant, onboarding@resend.dev ne peut envoyer qu'à elramonmusic@gmail.com
   }
 
-  console.log(`Nouvelle inscription: ${member.email} (${member.pseudo})`);
-  
-  // Générer le cookie de session sécurisé
-  let headers = new Headers(CORS_HEADERS);
-  if (env.SESSION_SECRET) {
-    const cookieHeader = await createSessionCookie(
-      { email: member.email, pseudo: member.pseudo, role: member.role || 'member' },
-      env.SESSION_SECRET
-    );
-    headers.append('Set-Cookie', cookieHeader);
-  } else {
-    console.error('SESSION_SECRET manquant. Le cookie ne sera pas généré.');
-  }
-
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Bienvenue dans le El Ramon Music Club !',
-    member: { email: member.email, pseudo: member.pseudo, role: member.role },
-  }), {
-    status: 200,
-    headers: headers
-  });
+  return jsonResponse({ success: true, message: 'Inscription enregistrée' });
 }
 
-// Gestion des requêtes OPTIONS (CORS preflight)
 export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: CORS_HEADERS,
-  });
+  return optionsResponse('POST, OPTIONS');
 }

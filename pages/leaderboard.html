@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Classement Perroquet Tropical - El Ramon Music Club</title>
+  <meta name="description" content="Classement privé des membres du mini-jeu Le Perroquet Tropical d’El Ramon Music Club.">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="../styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
@@ -311,7 +313,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -320,7 +322,7 @@
         <li><a href="./espace-membre.html" class="nav-link">🎵 Dashboard</a></li>
         <li><a href="./bonus.html" class="nav-link">🎧 Playlists</a></li>
         <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
-        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-cta">▶ YouTube</a></li>
         <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
       </ul>
       <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
@@ -333,7 +335,7 @@
       <a href="./bonus.html" class="nav-link">🎧 Playlists & Bonus</a>
       <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
       <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
-      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
       <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
     </nav>
   </header>
@@ -354,20 +356,30 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
+  <script src="../app.js?v=6" defer></script>
+  <script src="../assets/js/ramonito.js?v=13" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const scoreList = document.getElementById('scoreList');
       try {
-        const res = await fetch('/game-score');
+        const session = await window.ElRamon.Auth.getSession();
+        if (!session?.access_token) throw new Error('Session invalide');
+        const res = await fetch('/game-score', {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
         if (!res.ok) {
           const errText = await res.text();
           throw new Error(`Erreur serveur (${res.status}): ${errText}`);
         }
         const scores = await res.json();
 
-        scoreList.innerHTML = '';
+        scoreList.replaceChildren();
         if (scores.length === 0) {
-          scoreList.innerHTML = '<div class="loading-scores">Aucun score pour le moment. Sois le premier !</div>';
+          const empty = document.createElement('div');
+          empty.className = 'loading-scores';
+          empty.textContent = 'Aucun score pour le moment. Sois le premier !';
+          scoreList.appendChild(empty);
           return;
         }
 
@@ -384,20 +396,36 @@
           if (rank === 2) rankDisplay = '🥈';
           if (rank === 3) rankDisplay = '🥉';
 
-          li.innerHTML = `
-            <div class="score-rank">${rankDisplay}</div>
-            <div class="score-info">
-              <div class="score-pseudo">${DOMPurify.sanitize(s.pseudo)}</div>
-              <div class="score-badge">${s.badge || '🦜 Explorateur'}</div>
-            </div>
-            <div class="score-points">${s.score.toLocaleString('fr-FR')} <span style="font-size:0.8rem;color:#94A3B8;">pts</span></div>
-          `;
+          const rankEl = document.createElement('div');
+          rankEl.className = 'score-rank';
+          rankEl.textContent = rankDisplay;
+          const info = document.createElement('div');
+          info.className = 'score-info';
+          const pseudo = document.createElement('div');
+          pseudo.className = 'score-pseudo';
+          pseudo.textContent = String(s.pseudo || '').slice(0, 40);
+          const badge = document.createElement('div');
+          badge.className = 'score-badge';
+          badge.textContent = String(s.badge || '🦜 Explorateur').slice(0, 40);
+          info.append(pseudo, badge);
+          const points = document.createElement('div');
+          points.className = 'score-points';
+          points.append(document.createTextNode(`${Number.isInteger(s.score) ? s.score : 0} `));
+          const unit = document.createElement('span');
+          unit.style.cssText = 'font-size:0.8rem;color:#94A3B8;';
+          unit.textContent = 'pts';
+          points.appendChild(unit);
+          li.append(rankEl, info, points);
           scoreList.appendChild(li);
         });
 
       } catch (err) {
         console.error(err);
-        scoreList.innerHTML = `<div class="loading-scores" style="color:#E53935;">Impossible de charger le classement :<br/><br/>${err.message}</div>`;
+        const errorEl = document.createElement('div');
+        errorEl.className = 'loading-scores';
+        errorEl.style.color = '#E53935';
+        errorEl.textContent = 'Impossible de charger le classement. Réessaie dans quelques instants.';
+        scoreList.replaceChildren(errorEl);
       }
     });
   </script>

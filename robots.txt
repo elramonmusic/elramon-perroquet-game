@@ -21,13 +21,12 @@ Disallow: /pages/tablatures.html
 Disallow: /pages/merci.html
 Disallow: /pages/login.html
 Disallow: /pages/dashboard.html
+Disallow: /pages/leaderboard.html
+Disallow: /protected-downloads/
 
 # Fonctions serveur
 Disallow: /subscribe
 Disallow: /contact
 Disallow: /collaboration
-
-# Assets statiques
-Disallow: /assets/
 
 Sitemap: https://elramon-music-club.pages.dev/sitemap.xml

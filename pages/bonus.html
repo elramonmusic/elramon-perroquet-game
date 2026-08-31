@@ -186,7 +186,7 @@
   <header class="site-header" id="site-header">
     <nav class="nav">
       <a href="../index.html" class="nav-logo">
-        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" onerror="this.style.display='none'" loading="lazy" />
+        <img src="../assets/images/parrot-mascot.webp" alt="Mascotte perroquet tropical El Ramon Music" loading="lazy" />
         <span>El Ramon Music Club</span>
       </a>
       <ul class="nav-links" id="nav-links">
@@ -195,7 +195,7 @@
         <li><a href="./espace-membre.html" class="nav-link text-turquoise" style="color:var(--turquoise);">🎵 Dashboard</a></li>
         <li><a href="./bonus.html" class="nav-link" style="color:var(--turquoise);">🎧 Playlists</a></li>
         <li><a href="./prompts.html" class="nav-link">🤖 Prompts</a></li>
-        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-cta">▶ YouTube</a></li>
+        <li><a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-cta">▶ YouTube</a></li>
         <li><a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a></li>
       </ul>
       <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-mobile">
@@ -208,7 +208,7 @@
       <a href="./bonus.html" class="nav-link" style="color:var(--turquoise);">🎧 Playlists & Bonus</a>
       <a href="./prompts.html" class="nav-link">🤖 Prompts IA</a>
       <a href="./guides-suno.html" class="nav-link">📖 Guides Suno</a>
-      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
+      <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener" class="nav-link" style="color:var(--coral-red);">▶ YouTube</a>
       <a href="#" class="nav-link" data-logout style="color:var(--coral-red);">Déconnexion</a>
     </nav>
   </header>
@@ -346,7 +346,7 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
   <script src="../app.js?v=6" defer></script>
   <script src="../assets/js/ramonito.js?v=13" defer></script>
 
@@ -380,16 +380,22 @@
       renderBonuses(bonuses);
     } catch (e) {
       console.error(e);
-      container.innerHTML = '<p style="text-align:center; color:red;">Erreur lors du chargement des recommandations.</p>';
+      const message = document.createElement('p');
+      message.style.cssText = 'text-align:center; color:red;';
+      message.textContent = 'Erreur lors du chargement des recommandations.';
+      container.replaceChildren(message);
     }
   }
 
   function renderBonuses(bonuses) {
     const container = document.getElementById('bonusContainer');
-    container.innerHTML = '';
+    container.replaceChildren();
     
     if (bonuses.length === 0) {
-      container.innerHTML = '<p style="grid-column: 1/-1; text-align:center;">Aucune recommandation disponible pour le moment.</p>';
+      const empty = document.createElement('p');
+      empty.style.cssText = 'grid-column:1/-1; text-align:center;';
+      empty.textContent = 'Aucune recommandation disponible pour le moment.';
+      container.append(empty);
       return;
     }
 
@@ -399,36 +405,44 @@
       const card = document.createElement('div');
       card.className = 'bonus-card' + (b.is_premium && !b.is_unlocked ? ' locked' : '');
       
-      let imageHtml = '';
+      let media;
       if (b.image_url) {
         if (b.image_url.endsWith('.mp4') || b.image_url.endsWith('.webm')) {
-          imageHtml = `<video src="${b.image_url}" class="bonus-card-img" autoplay loop muted playsinline style="object-fit:cover;"></video>`;
+          media = document.createElement('video');
+          media.autoplay = true; media.loop = true; media.muted = true; media.playsInline = true;
         } else {
-          imageHtml = `<img src="${b.image_url}" alt="${b.title}" class="bonus-card-img" loading="lazy">`;
+          media = document.createElement('img');
+          media.alt = String(b.title || 'Bonus tropical');
+          media.loading = 'lazy';
         }
+        media.src = String(b.image_url);
+        media.className = 'bonus-card-img';
       } else {
-        imageHtml = `<div class="bonus-card-img" style="display:flex; align-items:center; justify-content:center; font-size:3rem;">🎵</div>`;
-      }
-      
-      let buttonHtml = '';
-      if (b.is_premium && !b.is_unlocked) {
-        buttonHtml = `<button class="bonus-btn premium" onclick="unlockBonus('${b.id}', ${b.banana_cost})">🔒 Débloquer (${b.banana_cost} 🍌)</button>`;
-      } else {
-        buttonHtml = `<a href="${b.url}" target="_blank" rel="noopener" class="bonus-btn">▶️ Accéder</a>`;
+        media = document.createElement('div');
+        media.className = 'bonus-card-img';
+        media.style.cssText = 'display:flex; align-items:center; justify-content:center; font-size:3rem;';
+        media.textContent = '🎵';
       }
 
-      card.innerHTML = `
-        ${imageHtml}
-        <div class="bonus-card-content">
-          <span class="bonus-card-category">${b.category}</span>
-          <h3>${b.title}</h3>
-          <p>${b.description || ''}</p>
-          <div class="bonus-card-footer">
-            ${b.is_premium ? `<span style="color:#FFD700; font-size:0.9rem;">⭐ Premium</span>` : `<span style="color:rgba(255,255,255,0.5); font-size:0.9rem;">Gratuit</span>`}
-            ${buttonHtml}
-          </div>
-        </div>
-      `;
+      const content = document.createElement('div');
+      content.className = 'bonus-card-content';
+      const category = document.createElement('span'); category.className = 'bonus-card-category'; category.textContent = String(b.category || 'Bonus');
+      const title = document.createElement('h3'); title.textContent = String(b.title || 'Bonus');
+      const description = document.createElement('p'); description.textContent = String(b.description || '');
+      const footer = document.createElement('div'); footer.className = 'bonus-card-footer';
+      const status = document.createElement('span'); status.style.cssText = `color:${b.is_premium ? '#FFD700' : 'rgba(255,255,255,0.5)'}; font-size:0.9rem;`; status.textContent = b.is_premium ? '⭐ Premium' : 'Gratuit';
+      let action;
+      if (b.is_premium && !b.is_unlocked) {
+        action = document.createElement('button'); action.className = 'bonus-btn premium';
+        action.textContent = `🔒 Débloquer (${Number(b.banana_cost) || 0} 🍌)`;
+        action.addEventListener('click', () => unlockBonus(b.id, Number(b.banana_cost) || 0));
+      } else {
+        action = document.createElement('a'); action.className = 'bonus-btn'; action.textContent = '▶️ Accéder';
+        action.href = String(b.url || '#'); action.target = '_blank'; action.rel = 'noopener';
+      }
+      footer.append(status, action);
+      content.append(category, title, description, footer);
+      card.append(media, content);
       container.appendChild(card);
     });
   }

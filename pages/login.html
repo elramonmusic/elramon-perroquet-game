@@ -224,7 +224,7 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
   <script src="../app.js?v=6" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -255,7 +255,7 @@
           btn.dataset.submitting = '1';
           window.ElRamon.Form.setLoading(btn, true);
 
-          window.ElRamon.Auth.sendMagicLink(email)
+          window.ElRamon.Auth.sendMagicLink(email, {}, false)
           .then(({ error }) => {
             if (error) {
               let errMsg = error.message;
@@ -267,10 +267,15 @@
               // Succès : demander à l'utilisateur de vérifier ses emails
               const successEl = document.querySelector('.form-success');
               if (successEl) {
-                successEl.innerHTML = `
-                  <h3 style="font-size:1.3rem; margin-bottom:1rem;">Lien envoyé ! ✉️</h3>
-                  <p>Vérifie ta boîte mail (et tes spams) pour <strong>${email}</strong> et clique sur le lien magique pour te connecter.</p>
-                `;
+                const title = document.createElement('h3');
+                title.style.cssText = 'font-size:1.3rem; margin-bottom:1rem;';
+                title.textContent = 'Lien envoyé ! ✉️';
+                const message = document.createElement('p');
+                message.append('Vérifie ta boîte mail (et tes spams) pour ');
+                const emailStrong = document.createElement('strong');
+                emailStrong.textContent = email;
+                message.append(emailStrong, ' et clique sur le lien magique pour te connecter.');
+                successEl.replaceChildren(title, message);
                 successEl.classList.add('visible');
               }
               loginForm.style.display = 'none';

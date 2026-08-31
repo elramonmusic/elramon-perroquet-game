@@ -11,6 +11,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-4ORGlNMIfyoD8eGYA/PgVfXsNkVGl3tdTHJPfx4z0WI=' 'sha256-56TOVuKhh9TSaNQgj7keYvnIrbMXGiYX96G1g5VZXog=' 'sha256-7tvX4NbNl8i8sEzrfiYo5WjPSTpyZ3VQGZWQuVmweUc=' 'sha256-nWb+w0oQRtz9zLX3uIRU4tJW1qozRYm4MrlHxRWaXtM=' 'sha256-ofOkWFKus0Hk/QBjggFKBErBP04tp1sRLdz6d7k7fVE=' 'sha256-Q3P49wxWFmm6e0RFTRhLurO4sxu9kRZvhvAivGrKrX0=' 'sha256-Qf5iVq698nGfB/Xl3ETE8CC5RJSNffGFiVgR83q5NfA=' 'sha256-R25OyXMAu5/4OEUXcwEAoV6E375wCbC8cKH7WlmmQIc=' 'sha256-SIfdMscZw4NNvzCegcBzVIToq8KJ7OxZbZLylMHmNII=' 'sha256-UKKFiWMcmUTbF0UMlwqQlnC1RfoF4p31D3Z2M77AsL0=' 'sha256-Ygutrnfrpftz3dyOFOlAz/LOxm3TzLPgnaFVSV6VIpo=' 'sha256-yj+ssCzRVnzKclJHclwgXNoqRC+WySIBMqBujg97tVc=' 'sha256-ZHAD5Sy8ztGKQZzCG8QsNqkOB65cwB0g7MtUNPtouhQ=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; connect-src 'self' https://*.supabase.co; frame-src https://www.youtube.com https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
 
 # --- Pages HTML : pas de cache (contenu peut évoluer) ---
 /*.html
@@ -46,6 +47,12 @@
   X-Robots-Tag: noindex, nofollow
 /pages/login.html
   X-Robots-Tag: noindex, nofollow
+/pages/leaderboard.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
+/protected-downloads/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache, no-store, must-revalidate
 
 # --- Pages légales : indexables mais cache court ---
 /pages/mentions-legales.html

@@ -459,7 +459,6 @@
           src="https://img.youtube.com/vi/rgA6sLPfglY/maxresdefault.jpg" 
           alt="Miniature Clip Officiel El Ramon Music" 
           style="width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover;" 
-          onerror="this.src='https://img.youtube.com/vi/rgA6sLPfglY/hqdefault.jpg'"
         >
         <div class="play-button-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255,215,0,0.4); border: 2px solid var(--yellow-sun);">
           <svg viewBox="0 0 24 24" fill="var(--yellow-sun)" width="40" height="40" style="margin-left: 5px;"><path d="M8 5v14l11-7z"/></svg>
@@ -728,7 +727,7 @@
           <div class="form-checkbox-group">
             <input type="checkbox" id="abonne" name="abonne" class="form-checkbox" />
             <label for="abonne" class="form-checkbox-label">
-              Je suis abonné(e) ou je souhaite suivre la chaîne <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank">El Ramon Music</a>
+              Je suis abonné(e) ou je souhaite suivre la chaîne <a href="https://www.youtube.com/@El-Ramon-Music" target="_blank" rel="noopener">El Ramon Music</a>
             </label>
           </div>
 
@@ -885,7 +884,7 @@
 <div class="toast" id="global-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.7.1"></script>
 <script src="app.js?v=6" defer></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
+import { fetchWithTimeout } from './utils/security.js';
+
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
@@ -17,7 +18,7 @@ export async function onRequestGet(context) {
     return new Response(JSON.stringify({ error: 'Non autorisé' }), { status: 401, headers: CORS_HEADERS });
   }
 
-  const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+  const userRes = await fetchWithTimeout(`${env.SUPABASE_URL}/auth/v1/user`, {
     method: 'GET',
     headers: {
       'Authorization': authHeader,
@@ -38,7 +39,7 @@ export async function onRequestGet(context) {
       queryUrl += `&member_email=eq.${encodeURIComponent(email)}`;
     }
 
-    const response = await fetch(queryUrl, {
+    const response = await fetchWithTimeout(queryUrl, {
       method: 'GET',
       headers: {
         'apikey': env.SUPABASE_SERVICE_KEY,
@@ -59,7 +60,8 @@ export async function onRequestGet(context) {
 
     return new Response(JSON.stringify(stats[0]), { status: 200, headers: CORS_HEADERS });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: CORS_HEADERS });
+    console.error('Member stats error:', err.message);
+    return new Response(JSON.stringify({ error: 'Impossible de charger les statistiques' }), { status: 500, headers: CORS_HEADERS });
   }
 }
 

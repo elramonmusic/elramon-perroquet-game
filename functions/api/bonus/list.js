@@ -52,9 +52,13 @@ export async function onRequestGet(context) {
       unlockedBonusIds = unlocks.map(u => u.bonus_id);
     }
 
-    // Sécuriser les URLs pour les contenus premium non débloqués
+    const proPass = allBonuses.find(b => b.category === 'Pass' && b.title === 'Accès Niveau Pro (Prompts)');
+    const hasProPass = Boolean(proPass && unlockedBonusIds.includes(proPass.id));
+
+    // Sécuriser les URLs premium et les prompts réservés au Pass Pro.
     const sanitizedBonuses = allBonuses.map(b => {
       const isUnlocked = unlockedBonusIds.includes(b.id);
+      const isProPromptLocked = b.category === 'Prompt IA' && !hasProPass;
       return {
         id: b.id,
         title: b.title,
@@ -65,7 +69,7 @@ export async function onRequestGet(context) {
         banana_cost: b.banana_cost,
         is_unlocked: isUnlocked,
         // Si premium et pas débloqué, on cache l'URL
-        url: (b.is_premium && !isUnlocked) ? null : b.url
+        url: isProPromptLocked || (b.is_premium && !isUnlocked) ? null : b.url
       };
     });
 

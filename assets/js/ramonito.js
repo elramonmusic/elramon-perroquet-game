@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!member) return;
 
   // Création du widget HTML (Glassmorphism)
+  const safeBananas = Number.isFinite(Number(member.bananas_balance)) ? Number(member.bananas_balance) : 0;
   const widgetHTML = `
     <div id="ramonito-widget" class="ramonito-widget-container">
       <div id="ramonito-chatbox" class="ramonito-chatbox hidden">
@@ -18,19 +19,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="ramonito-title">🦜 Ramonito</div>
           <div class="ramonito-balance">
             <span id="ramonito-free-badge" class="badge-free hidden">Gratuit</span>
-            <span id="ramonito-bananas-count">🍌 ${member.bananas_balance || 0}</span>
+            <span id="ramonito-bananas-count">🍌 ${safeBananas}</span>
           </div>
-          <button id="ramonito-close" class="ramonito-close-btn">&times;</button>
+          <button id="ramonito-close" class="ramonito-close-btn" aria-label="Fermer Ramonito">&times;</button>
         </div>
         <div id="ramonito-messages" class="ramonito-messages">
           <div class="message assistant">Salut, moi c’est Ramonito 🦜 Je suis la mascotte du El Ramon Music Club. Tu as 3 questions gratuites, puis tu pourras utiliser tes bananes gagnées dans le jeu pour continuer à discuter avec moi 🍌☀️</div>
         </div>
         <div class="ramonito-input-area">
-          <input type="text" id="ramonito-input" placeholder="Pose ta question..." autocomplete="off">
-          <button id="ramonito-send" title="Envoyer">💋</button>
+          <input type="text" id="ramonito-input" placeholder="Pose ta question..." autocomplete="off" aria-label="Question pour Ramonito" maxlength="1000">
+          <button id="ramonito-send" title="Envoyer" aria-label="Envoyer la question">💋</button>
         </div>
       </div>
-      <button id="ramonito-toggle" class="ramonito-toggle-btn">
+      <button id="ramonito-toggle" class="ramonito-toggle-btn" aria-label="Ouvrir Ramonito">
         🦜
       </button>
     </div>

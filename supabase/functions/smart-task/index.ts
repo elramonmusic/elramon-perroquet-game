@@ -1,15 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const allowedOrigin = Deno.env.get('SITE_URL') || 'https://elramon-music-club.pages.dev';
+
+function corsHeaders(req: Request) {
+  const origin = req.headers.get('Origin');
+  return {
+    ...(origin === allowedOrigin ? { 'Access-Control-Allow-Origin': origin } : {}),
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Vary': 'Origin'
+  };
+}
 
 serve(async (req) => {
+  const responseHeaders = corsHeaders(req);
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: responseHeaders });
   }
 
   try {
@@ -35,11 +42,33 @@ serve(async (req) => {
       throw new Error('Non autorisé: Jeton invalide');
     }
 
-    // 2. Récupérer la question et l'historique
+    const { data: rateAllowed, error: rateError } = await supabaseServiceClient
+      .rpc('check_rate_limit', {
+        p_key_hash: user.id,
+        p_action: 'smart-task-user',
+        p_limit: 30,
+        p_window_seconds: 300
+      });
+    if (rateError || rateAllowed !== true) {
+      return new Response(JSON.stringify({ error: 'Trop de questions. Réessaie dans quelques minutes.' }), {
+        status: 429,
+        headers: { ...responseHeaders, 'Content-Type': 'application/json', 'Retry-After': '300' }
+      });
+    }
+
+    // 2. Récupérer la question et l'historique récent
     const body = await req.json();
-    const { question, history } = body;
-    if (!question) {
-      throw new Error('Question manquante');
+    const question = typeof body.question === 'string' ? body.question.trim() : '';
+    const history = Array.isArray(body.history)
+      ? body.history.slice(-6).flatMap((entry: unknown) => {
+          if (!entry || typeof entry !== 'object') return [];
+          const item = entry as { role?: unknown; content?: unknown };
+          if (!['user', 'assistant'].includes(String(item.role)) || typeof item.content !== 'string') return [];
+          return [{ role: String(item.role), content: item.content.slice(0, 1000) }];
+        })
+      : [];
+    if (!question || question.length > 1000) {
+      throw new Error('Question invalide (1 à 1000 caractères)');
     }
 
     // 3. Récupérer le profil membre
@@ -64,7 +93,7 @@ serve(async (req) => {
         message: 'Ton panier de bananes est vide 🍌 Va jouer au Perroquet Tropical pour en gagner, puis reviens me poser ta question 🦜☀️' 
       }), {
         status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...responseHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -110,6 +139,7 @@ Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} |
         'Authorization': `Bearer ${groqApiKey}`,
         'Content-Type': 'application/json'
       },
+      signal: AbortSignal.timeout(15000),
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
         messages: messages,
@@ -125,29 +155,28 @@ Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} |
     const groqData = await groqResponse.json();
     const answer = groqData.choices[0].message.content;
 
-    // 6. Débiter l'utilisateur
-    if (isFree) {
-      freeQuestionsUsed += 1;
-      await supabaseServiceClient.from('members')
-        .update({ free_questions_used: freeQuestionsUsed })
-        .eq('id', user.id);
-    } else {
-      bananas -= 1;
-      await supabaseServiceClient.from('members')
-        .update({ bananas_balance: bananas })
-        .eq('id', user.id);
-        
-      await supabaseServiceClient.from('banana_ledger')
-        .insert({ 
-          user_id: user.id, 
-          amount: -1, 
-          reason: 'Question à Ramonito', 
-          type: 'spend' 
-        });
+    // 6. Débiter atomiquement l'utilisateur après une réponse IA réussie.
+    const { data: credit, error: creditError } = await supabaseServiceClient
+      .rpc('consume_ramonito_credit', { p_user_id: user.id });
+    if (creditError) {
+      console.error('consume_ramonito_credit failed:', creditError.message);
+      throw new Error('Impossible de mettre à jour ton solde');
     }
+    if (!credit?.allowed) {
+      return new Response(JSON.stringify({
+        error: credit?.error || 'solde_insuffisant',
+        message: 'Ton panier de bananes est vide 🍌 Va jouer pour en gagner.'
+      }), {
+        status: 403,
+        headers: { ...responseHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    isFree = credit.isFree === true;
+    freeQuestionsUsed = Number(credit.freeQuestionsUsed || 0);
+    bananas = Number(credit.bananasBalance || 0);
 
     // 7. Enregistrer le message
-    await supabaseServiceClient.from('ramonito_messages')
+    const { error: messageError } = await supabaseServiceClient.from('ramonito_messages')
       .insert({
         user_id: user.id,
         question: question,
@@ -157,6 +186,7 @@ Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} |
         provider: 'Groq',
         model: 'llama-3.1-8b-instant'
       });
+    if (messageError) console.error('Ramonito message log failed:', messageError.message);
 
     // 8. Retourner la réponse et la liste des produits pour le widget (en masquant l'URL des produits premium pour la sécurité)
     const sanitizedProducts = selectedProducts.map(p => ({
@@ -178,13 +208,17 @@ Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} |
       matched_products: sanitizedProducts
     }), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...responseHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('smart-task error:', error?.message || 'unknown');
+    const publicMessage = String(error?.message || '').startsWith('Non autorisé')
+      ? 'Session invalide ou expirée'
+      : 'Ramonito est momentanément indisponible';
+    return new Response(JSON.stringify({ error: publicMessage }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...responseHeaders, 'Content-Type': 'application/json' }
     });
   }
 });

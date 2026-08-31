@@ -1,173 +1,91 @@
-/**
- * Cloudflare Pages Function — /functions/contact
- * Gère les messages de contact du formulaire de la page /contact
- *
- * POST /functions/contact
- * Body: { nom, email, sujet, message }
- */
-
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json',
-};
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import {
+  anonymizedClientHash,
+  cleanString,
+  enforceRateLimit,
+  fetchWithTimeout,
+  isSameOriginRequest,
+  isValidEmail,
+  jsonResponse,
+  optionsResponse,
+  verifyTurnstile,
+} from './utils/security.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  if (!isSameOriginRequest(request)) return jsonResponse({ error: 'Origine non autorisée' }, 403);
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY || !env.TURNSTILE_SECRET_KEY) {
+    return jsonResponse({ error: 'Service de contact temporairement indisponible' }, 503);
+  }
+  if (!(await enforceRateLimit(context, 'contact', 5, 3600))) {
+    return jsonResponse({ error: 'Trop de messages envoyés. Réessaie plus tard.' }, 429, { 'Retry-After': '3600' });
+  }
 
   let data;
   try {
     data = await request.json();
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'JSON invalide' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
+  } catch {
+    return jsonResponse({ error: 'JSON invalide' }, 400);
   }
 
-  const { nom, email, sujet, message } = data;
-
-  // Vérification Turnstile anti-bot
-  if (env.TURNSTILE_SECRET_KEY) {
-    const turnstileToken = data.turnstile;
-    if (!turnstileToken) {
-      return new Response(JSON.stringify({ error: 'Vérification anti-bot requise' }), {
-        status: 400,
-        headers: CORS_HEADERS,
-      });
-    }
-    try {
-      const cfResp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          secret: env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-        }),
-      });
-      const cfResult = await cfResp.json();
-      if (!cfResult.success) {
-        return new Response(JSON.stringify({ error: 'Vérification anti-bot échouée' }), {
-          status: 400,
-          headers: CORS_HEADERS,
-        });
-      }
-    } catch (err) {
-      console.error('Turnstile verification error:', err.message);
-      return new Response(JSON.stringify({ error: 'Service anti-bot indisponible. Réessayez dans un instant.' }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
-    }
+  if (!(await verifyTurnstile(request, env, cleanString(data.turnstile, 2048)))) {
+    return jsonResponse({ error: 'Vérification anti-bot échouée' }, 400);
   }
 
-  // Validation
-  if (!nom || nom.length < 2) {
-    return new Response(JSON.stringify({ error: 'Nom requis' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
+  const nom = cleanString(data.nom, 80);
+  const email = cleanString(data.email, 254).toLowerCase();
+  const sujet = cleanString(data.sujet, 120) || 'Non spécifié';
+  const message = cleanString(data.message, 5000);
+  if (nom.length < 2) return jsonResponse({ error: 'Nom requis (2 à 80 caractères)' }, 400);
+  if (!isValidEmail(email)) return jsonResponse({ error: 'Adresse email invalide' }, 400);
+  if (message.length < 20) return jsonResponse({ error: 'Message trop court (minimum 20 caractères)' }, 400);
 
-  if (!email || !isValidEmail(email)) {
-    return new Response(JSON.stringify({ error: 'Adresse email invalide' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  if (!message || message.length < 20) {
-    return new Response(JSON.stringify({ error: 'Message trop court (min. 20 caractères)' }), {
-      status: 400,
-      headers: CORS_HEADERS,
-    });
-  }
-
-  // Construction du message
   const contactMessage = {
-    nom: nom.trim(),
-    email: email.toLowerCase().trim(),
-    sujet: sujet || 'Non spécifié',
-    message: message.trim(),
-    created_at: new Date().toISOString(),
-    ip: request.headers.get('cf-connecting-ip') || 'unknown',
+    nom,
+    email,
+    sujet,
+    message,
+    ip: await anonymizedClientHash(request),
   };
 
-  if (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY) {
-    try {
-      const response = await fetch(`${env.SUPABASE_URL}/rest/v1/contact_messages`, {
-        method: 'POST',
-        headers: {
-          'apikey': env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(contactMessage),
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-    } catch (err) {
-      console.error('Supabase error:', err.message);
-      return new Response(JSON.stringify({ error: "Erreur de base de données lors de l'enregistrement." }), {
-        status: 500,
-        headers: CORS_HEADERS,
-      });
-    }
+  try {
+    const response = await fetchWithTimeout(`${env.SUPABASE_URL}/rest/v1/contact_messages`, {
+      method: 'POST',
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(contactMessage),
+    });
+    if (!response.ok) throw new Error(`Supabase ${response.status}`);
+  } catch (error) {
+    console.error('Contact database error:', error.message);
+    return jsonResponse({ error: 'Impossible d’enregistrer le message' }, 500);
   }
 
-  // Notification email via Resend
-  // ⚠️ Domaine non vérifié : on utilise le sandbox onboarding@resend.dev
-  //     Le from temporaire ne peut envoyer QUE vers elramonmusic@gmail.com
-  //     TODO V2 : vérifier un vrai domaine (notifications.elramonmusicclub.fr)
   if (env.RESEND_API_KEY) {
-    const resendFrom = 'El Ramon Music Club <onboarding@resend.dev>';
-    const adminEmail = 'elramonmusic@gmail.com';
-
-    // Email admin — notification du message de contact
     try {
-      await fetch('https://api.resend.com/emails', {
+      const response = await fetchWithTimeout('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: resendFrom,
-          to: [adminEmail],
-          reply_to: contactMessage.email,
-          subject: `[Contact] ${contactMessage.sujet} — ${contactMessage.nom}`,
-          text: `Nouveau message de contact\n\nDe: ${contactMessage.nom} <${contactMessage.email}>\nSujet: ${contactMessage.sujet}\n\n${contactMessage.message}\n\nℹ️ L'auto-réponse au contacteur sera activée quand le domaine sera vérifié dans Resend.`,
+          from: 'El Ramon Music Club <onboarding@resend.dev>',
+          to: ['elramonmusic@gmail.com'],
+          reply_to: email,
+          subject: `[Contact] ${sujet} — ${nom}`,
+          text: `Nouveau message de contact\n\nDe : ${nom} <${email}>\nSujet : ${sujet}\n\n${message}`,
         }),
       });
-    } catch (err) {
-      console.error('Resend admin email error:', err.message);
+      if (!response.ok) console.error('Resend contact notification failed:', response.status);
+    } catch (error) {
+      console.error('Resend contact notification error:', error.message);
     }
-
-    // TODO V2 : Auto-réponse au contacteur (désactivée tant que le domaine n'est pas vérifié)
-    // Pour l'instant, onboarding@resend.dev ne peut envoyer qu'à elramonmusic@gmail.com
   }
 
-  console.log(`Message de contact: ${contactMessage.email} - ${contactMessage.sujet}`);
-
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Message envoyé avec succès',
-  }), {
-    status: 200,
-    headers: CORS_HEADERS,
-  });
+  return jsonResponse({ success: true, message: 'Message envoyé avec succès' });
 }
 
 export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: CORS_HEADERS,
-  });
+  return optionsResponse('POST, OPTIONS');
 }

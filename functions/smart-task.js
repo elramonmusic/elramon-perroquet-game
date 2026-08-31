@@ -1,47 +1,58 @@
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json'
-};
+import {
+  enforceRateLimit,
+  fetchWithTimeout,
+  getAuthenticatedUser,
+  isSameOriginRequest,
+  jsonResponse,
+  optionsResponse,
+} from './utils/security.js';
 
 export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
+  return optionsResponse('POST, OPTIONS');
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const targetUrl = env.RAMONITO_FUNCTION_URL || `${env.SUPABASE_URL}/functions/v1/smart-task`;
+  if (!isSameOriginRequest(request)) return jsonResponse({ error: 'Origine non autorisée' }, 403);
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY || !env.SUPABASE_ANON_KEY) {
+    return jsonResponse({ error: 'Service temporairement indisponible' }, 503);
+  }
+  if (!(await enforceRateLimit(context, 'smart-task', 30, 300))) {
+    return jsonResponse({ error: 'Trop de questions. Réessaie dans quelques minutes.' }, 429, { 'Retry-After': '300' });
+  }
 
+  const user = await getAuthenticatedUser(request, env);
+  if (!user?.id) return jsonResponse({ error: 'Session invalide ou expirée' }, 401);
+
+  let payload;
   try {
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json');
-    
-    const authHeader = request.headers.get('Authorization');
-    if (authHeader) {
-      headers.set('Authorization', authHeader);
-    }
-    
-    // Si la clé anon est dispo, on la passe aussi
-    if (env.SUPABASE_ANON_KEY) {
-      headers.set('apikey', env.SUPABASE_ANON_KEY);
-    }
+    payload = await request.json();
+  } catch {
+    return jsonResponse({ error: 'JSON invalide' }, 400);
+  }
+  const question = typeof payload.question === 'string' ? payload.question.trim() : '';
+  if (!question || question.length > 1000) {
+    return jsonResponse({ error: 'Question invalide (1 à 1000 caractères)' }, 400);
+  }
 
-    const response = await fetch(targetUrl, {
+  const targetUrl = env.RAMONITO_FUNCTION_URL || `${env.SUPABASE_URL}/functions/v1/smart-task`;
+  try {
+    const response = await fetchWithTimeout(targetUrl, {
       method: 'POST',
-      headers: headers,
-      body: request.body
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: request.headers.get('Authorization'),
+        apikey: env.SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ question }),
     });
-
     const body = await response.text();
     return new Response(body, {
       status: response.status,
-      headers: CORS_HEADERS
+      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Erreur de communication avec le cerveau de Ramonito." }), {
-      status: 500,
-      headers: CORS_HEADERS
-    });
+    console.error('Smart-task proxy error:', error.message);
+    return jsonResponse({ error: 'Ramonito est momentanément indisponible' }, 502);
   }
 }

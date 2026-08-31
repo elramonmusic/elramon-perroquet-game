@@ -1493,31 +1493,25 @@ class VictoryScene extends Phaser.Scene {
 // ============================================================
 async function saveGameScore(scene, bossDefeated, data) {
   if (!window.ElRamon || !window.ElRamon.Auth) return;
-  const member = await window.ElRamon.Auth.getMember();
-  if (!member) return;
+  const session = await window.ElRamon.Auth.getSession();
+  if (!session?.access_token) return;
 
   try {
+    const level = String(scene.levelKey || 'level1').toLowerCase() === 'level2' ? 'Level2' : 'Level1';
     const payload = {
-      member_email: member.email,
-      pseudo: member.pseudo,
+      run_id: crypto.randomUUID(),
       score: data.score || 0,
-      level: scene.levelKey || 'Level1',
-      fruits_collected: data.fruits || 0,
+      level,
+      fruits_collected: data.fruitsCollected ?? data.fruits ?? 0,
       boss_defeated: bossDefeated,
-      lives_remaining: data.lives || 0,
-      time_seconds: 0
+      lives_remaining: data.lives || 0
     };
-
-    const session = await window.ElRamon.Auth.getSession();
-    const token = session?.access_token;
-    
-    if (!token) return;
 
     const res = await fetch('/game-score', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${session.access_token}`
       },
       body: JSON.stringify(payload)
     });

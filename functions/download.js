@@ -1,4 +1,4 @@
-import { verifySessionCookie } from './utils/session.js';
+import { enforceRateLimit, fetchWithTimeout, getAuthenticatedUser, jsonResponse } from './utils/security.js';
 
 const FILES_WHITELIST = {
   "suno-starter": {
@@ -37,44 +37,18 @@ export async function onRequestGet(context) {
     return new Response(JSON.stringify({ error: 'Configuration serveur manquante' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
-  let email = null;
-
-  // 2. Lecture du token d'accès Supabase (URL parameter)
-  const token = url.searchParams.get('token');
-  if (token) {
-    const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'apikey': env.SUPABASE_SERVICE_KEY
-      }
-    });
-    if (userRes.ok) {
-      const user = await userRes.json();
-      email = user.email;
-    }
+  if (!(await enforceRateLimit(context, 'download', 30, 3600))) {
+    return jsonResponse({ error: 'Trop de téléchargements. Réessaie plus tard.' }, 429, { 'Retry-After': '3600' });
   }
 
-  // 3. Lecture du cookie de session (Fallback)
-  if (!email) {
-    const cookieHeader = request.headers.get('Cookie');
-    if (cookieHeader && cookieHeader.includes('erm_session=')) {
-      if (env.SESSION_SECRET) {
-        const session = await verifySessionCookie(cookieHeader, env.SESSION_SECRET);
-        if (session) {
-          email = session.email;
-        }
-      }
-    }
-  }
+  // 2. Le jeton Supabase est transmis dans l'en-tête Authorization et jamais dans l'URL.
+  const user = await getAuthenticatedUser(request, env);
+  const email = user?.email;
+  if (!email) return jsonResponse({ error: 'Session invalide ou expirée' }, 401);
 
-  if (!email) {
-    return Response.redirect(`${url.origin}/pages/login.html`, 302);
-  }
-
-  // 4. Vérification du membre dans Supabase
+  // 3. Vérification du membre dans Supabase
   try {
-    const supabaseResp = await fetch(`${env.SUPABASE_URL}/rest/v1/members?email=eq.${encodeURIComponent(email)}&select=role`, {
+    const supabaseResp = await fetchWithTimeout(`${env.SUPABASE_URL}/rest/v1/members?email=eq.${encodeURIComponent(email)}&select=role`, {
       headers: {
         'apikey': env.SUPABASE_SERVICE_KEY,
         'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`
@@ -93,12 +67,12 @@ export async function onRequestGet(context) {
 
     const memberRole = members[0].role || 'member';
 
-    // 5. Vérification du rôle
+    // 4. Vérification du rôle
     if (!ALLOWED_ROLES.includes(memberRole)) {
       return new Response(JSON.stringify({ error: 'Accès réservé aux membres' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // 6. Journalisation du téléchargement (optionnelle, fire and forget)
+    // 5. Journalisation du téléchargement (optionnelle, fire and forget)
     const ip = request.headers.get('cf-connecting-ip') || '';
     const ua = request.headers.get('user-agent') || '';
     
@@ -116,7 +90,7 @@ export async function onRequestGet(context) {
 
     // Fire and forget, pas de await bloquant
     context.waitUntil(
-      fetch(`${env.SUPABASE_URL}/rest/v1/download_logs`, {
+      fetchWithTimeout(`${env.SUPABASE_URL}/rest/v1/download_logs`, {
         method: 'POST',
         headers: {
           'apikey': env.SUPABASE_SERVICE_KEY,
@@ -127,7 +101,7 @@ export async function onRequestGet(context) {
       }).catch(err => console.error('Erreur logging download:', err.message))
     );
 
-    // 7. Servir le PDF
+    // 6. Servir le PDF
     // Utiliser env.ASSETS.fetch pour accéder aux fichiers internes statiques de Pages
     const assetUrl = new URL(fileInfo.path, request.url);
     const assetRequest = new Request(assetUrl);
