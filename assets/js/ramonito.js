@@ -210,11 +210,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     .ramonito-voice-mount {
       width: 100%;
-      min-height: 120px;
+      min-height: 320px;
     }
     .ramonito-voice-mount elevenlabs-convai {
       display: block;
       width: 100%;
+      min-height: 320px;
+      height: 320px;
     }
     .ramonito-messages {
       flex: 1;
@@ -455,7 +457,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const script = document.createElement('script');
-      script.src = 'https://elevenlabs.io/convai-widget/index.js';
+      script.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed@0.17.1';
       script.async = true;
       script.dataset.elevenlabsWidget = 'true';
       script.addEventListener('load', resolve, { once: true });
@@ -498,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await loadElevenLabsWidget();
       const widget = document.createElement('elevenlabs-convai');
       widget.setAttribute('signed-url', result.signedUrl);
-      widget.setAttribute('variant', 'expanded');
+      widget.setAttribute('variant', 'full');
       widget.setAttribute('dismissible', 'false');
       widget.setAttribute('action-text', 'Parler à Ramonito');
       widget.setAttribute('start-call-text', 'Démarrer');
