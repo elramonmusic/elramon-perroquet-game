@@ -15,8 +15,26 @@
 // PRELOAD SCENE — Chargement des assets réels (images et audio)
 // ============================================================
 class PreloadScene extends Phaser.Scene {
-  constructor() { super({ key: 'Preload' }); }
+  constructor() {
+    super({ key: 'Preload' });
+    this.failedVisualAssets = [];
+  }
+
   preload() {
+    window.updateGameLoadingProgress?.(0);
+
+    this.load.on('progress', (value) => {
+      window.updateGameLoadingProgress?.(value);
+    });
+
+    this.load.on('loaderror', (file) => {
+      const failedKey = file?.key || file?.src || 'ressource inconnue';
+      console.error('Échec du chargement du jeu :', failedKey);
+      if (file?.type === 'image' || file?.type === 'spritesheet') {
+        this.failedVisualAssets.push(failedKey);
+      }
+    });
+
     this.load.spritesheet('real_parrot', '../assets/images/game/parrot.png?v=5', { frameWidth: 250, frameHeight: 250 });
     
     // Fonds Parallax HD
@@ -31,7 +49,7 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('lvl2_plage', '../assets/images/game/level2/bg_plage_temple.png?v=1');
     this.load.image('lvl2_feuilles', '../assets/images/game/level2/bg_feuilles_temple.png?v=1');
     this.load.image('mushroom', '../assets/images/game/level2/mushroom.png?v=1');
-    this.load.spritesheet('boss_singe', '../assets/images/game/level2/boss_singe_maracasse.png?v=1', { frameWidth: 250, frameHeight: 250 });
+    this.load.spritesheet('boss_singe', '../assets/images/game/level2/boss_singe_maracasse.png?v=2', { frameWidth: 288, frameHeight: 288 });
     this.load.image('victory_bg', '../assets/images/game/victory_bg.png?v=2');
     this.load.image('platform_tex', '../assets/images/game/platform.png?v=51');
     this.load.spritesheet('fruits_sheet', '../assets/images/game/fruit.png?v=51', { frameWidth: 120, frameHeight: 180 });
@@ -53,7 +71,22 @@ class PreloadScene extends Phaser.Scene {
     this.load.audio('sfx_shoot', '../assets/audio/game/sfx_shoot.mp3?v=1');
     this.load.audio('sfx_victory', '../assets/audio/game/sfx_victory.mp3?v=1');
   }
+
   create() {
+    const requiredTextures = [
+      'real_parrot', 'parallax_ciel', 'parallax_montagnes', 'parallax_plage',
+      'parallax_feuilles', 'lvl2_ciel', 'lvl2_montagnes', 'lvl2_plage',
+      'lvl2_feuilles', 'mushroom', 'boss_singe', 'victory_bg', 'platform_tex',
+      'fruits_sheet', 'enemy_crab', 'enemy_snake', 'boss_toucan'
+    ];
+    const missingTextures = requiredTextures.filter((key) => !this.textures.exists(key));
+    const failures = [...new Set([...this.failedVisualAssets, ...missingTextures])];
+
+    if (failures.length > 0) {
+      window.showGameLoadError?.(failures);
+      return;
+    }
+
     this.scene.start('Boot');
   }
 }
@@ -293,6 +326,7 @@ class StartScene extends Phaser.Scene {
     btnBack.on('pointerdown', () => window.location.href = './espace-membre.html');
 
     this.input.keyboard.once('keydown-ENTER', () => this.scene.start('Level1'));
+    window.showGameReady?.();
   }
 }
 
@@ -1060,11 +1094,13 @@ class BaseLevelScene extends Phaser.Scene {
     // Hitbox ajustée pour que les pieds (y=224) touchent le sol sans s'enfoncer
     this.boss.body.setSize(150, 174).setOffset(50, 50);
     
-    const bossAnimKey = 'boss_anim_' + (bossCfg.spriteKey || 'boss_toucan');
+    const bossSpriteKey = bossCfg.spriteKey || 'boss_toucan';
+    const bossAnimKey = 'boss_anim_' + bossSpriteKey;
+    const bossLastFrame = bossSpriteKey === 'boss_singe' ? 2 : 3;
     if (!this.anims.exists(bossAnimKey)) {
       this.anims.create({
         key: bossAnimKey,
-        frames: this.anims.generateFrameNumbers(bossCfg.spriteKey || 'boss_toucan', { start: 0, end: 3 }),
+        frames: this.anims.generateFrameNumbers(bossSpriteKey, { start: 0, end: bossLastFrame }),
         frameRate: 8,
         repeat: -1
       });
@@ -1536,6 +1572,10 @@ const gameConfig = {
   width: 800,
   height: 450,
   backgroundColor: '#87CEEB',
+  loader: {
+    // Évite les URL blob: bloquées par la politique de sécurité du site.
+    imageLoadType: 'HTMLImageElement',
+  },
   physics: {
     default: 'arcade',
     arcade: {
@@ -1552,7 +1592,13 @@ const gameConfig = {
   roundPixels: true,
 };
 
-const game = new Phaser.Game(gameConfig);
+let game = null;
+
+window.startElRamonGame = function() {
+  if (game || window.stopPhaser) return game;
+  game = new Phaser.Game(gameConfig);
+  return game;
+};
 
 window.showCoffreTropical = function(score, isVictory) {
   const overlay = document.getElementById('coffre-overlay');

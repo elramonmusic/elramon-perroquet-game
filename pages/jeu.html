@@ -212,12 +212,33 @@
       width: 0%; height: 100%;
       background: linear-gradient(90deg, #FFD700, #2ECC71);
       border-radius: 2px;
-      animation: loadingAnim 1.5s ease-in-out forwards;
+      transition: width 0.2s ease;
     }
-    @keyframes loadingAnim {
-      0% { width: 0%; }
-      50% { width: 70%; }
-      100% { width: 100%; }
+    .game-loading-detail {
+      display: none;
+      max-width: 460px;
+      margin-top: 0.8rem;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .game-retry-btn {
+      display: none;
+      margin-top: 1.2rem;
+      padding: 0.7rem 1.25rem;
+      border: 0;
+      border-radius: 999px;
+      background: #FF8C00;
+      color: #FFF;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .game-retry-btn:hover,
+    .game-retry-btn:focus-visible {
+      background: #FFA726;
+      outline: 2px solid #FFD700;
+      outline-offset: 3px;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
@@ -250,7 +271,7 @@
     <h1 style="color: #FFD700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem;">Jeu réservé aux membres</h1>
     <p style="color: rgba(255,255,255,0.7); max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">Le mini-jeu tropical est exclusif aux membres du Club. Rejoins-nous gratuitement pour jouer, battre ton score et débloquer ton Coffre Tropical !</p>
     <a href="inscription.html" style="background: #FF8C00; color: #FFF; text-decoration: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-family: 'Outfit', sans-serif; margin-bottom: 1rem;">✨ Rejoindre le Club gratuitement</a>
-    <a href="inscription.html" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem;">Déjà membre ? Accéder au jeu</a>
+    <a href="login.html" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem;">Déjà membre ? Se connecter</a>
   </div>
 
   <!-- Jeu -->
@@ -277,10 +298,12 @@
 
     <div id="game-container" style="position:relative;">
       <button class="fullscreen-btn" id="btn-fullscreen" aria-label="Plein écran">⛶</button>
-      <div class="game-loading" id="game-loading">
+      <div class="game-loading" id="game-loading" role="status" aria-live="polite">
         <span>🦜</span>
         <p>Chargement du Perroquet Tropical...</p>
         <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+        <p class="game-loading-detail" id="game-loading-detail"></p>
+        <button class="game-retry-btn" id="game-retry" type="button">Réessayer</button>
       </div>
     </div>
 
@@ -303,7 +326,7 @@
   <script src="../assets/js/ramonito.js?v=16" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
   <script src="../assets/game/config.js?v=55"></script>
-  <script src="../assets/game/game.js?v=57"></script>
+  <script src="../assets/game/game.js?v=58"></script>
 
   <!-- Contrôles mobile + loading + Check Membre -->
   <script>
@@ -312,26 +335,65 @@
     const memberGate = document.getElementById('member-gate');
     const loadingText = document.querySelector('#game-loading p');
     const gameLoading = document.getElementById('game-loading');
+    const loadingBar = document.querySelector('.loading-bar-inner');
+    const loadingDetail = document.getElementById('game-loading-detail');
+    const retryButton = document.getElementById('game-retry');
+    let authCheckAttempts = 0;
+
+    window.stopPhaser = true;
+
+    function resetLoadingUi(message) {
+      if (gameLoading) gameLoading.style.display = 'flex';
+      if (loadingText) loadingText.innerText = message;
+      if (loadingDetail) {
+        loadingDetail.style.display = 'none';
+        loadingDetail.innerText = '';
+      }
+      if (retryButton) retryButton.style.display = 'none';
+      if (loadingBar) loadingBar.style.width = '0%';
+    }
+
+    window.updateGameLoadingProgress = function(value) {
+      const progress = Math.max(0, Math.min(1, Number(value) || 0));
+      if (loadingBar) loadingBar.style.width = `${Math.round(progress * 100)}%`;
+      if (loadingText && progress > 0) {
+        loadingText.innerText = `Chargement du Perroquet Tropical... ${Math.round(progress * 100)} %`;
+      }
+    };
+
+    window.showGameReady = function() {
+      if (loadingBar) loadingBar.style.width = '100%';
+      if (gameLoading) gameLoading.style.display = 'none';
+    };
+
+    window.showGameLoadError = function(failures) {
+      window.stopPhaser = true;
+      if (gameLoading) gameLoading.style.display = 'flex';
+      if (loadingText) loadingText.innerText = 'Le jeu n’a pas pu terminer son chargement.';
+      if (loadingDetail) {
+        const count = Array.isArray(failures) ? failures.length : 0;
+        loadingDetail.innerText = count
+          ? `${count} ressource${count > 1 ? 's' : ''} indispensable${count > 1 ? 's' : ''} n’ont pas été chargées. Vérifie ta connexion puis réessaie.`
+          : 'Une erreur inattendue est survenue. Vérifie ta connexion puis réessaie.';
+        loadingDetail.style.display = 'block';
+      }
+      if (retryButton) retryButton.style.display = 'inline-flex';
+    };
+
+    retryButton?.addEventListener('click', () => window.location.reload());
 
     function showAccessLoading() {
       gameWrapper.style.display = 'block';
       memberGate.style.display = 'none';
-      if (loadingText) loadingText.innerText = "Vérification de ton accès membre...";
+      resetLoadingUi('Vérification de ton accès membre...');
     }
 
     function showGame() {
       gameWrapper.style.display = 'block';
       memberGate.style.display = 'none';
-      if (loadingText) loadingText.innerText = "Chargement du Perroquet Tropical...";
       window.stopPhaser = false;
-      
-      // On déclenche manuellement la suppression du loading si Phaser a déjà loadé, 
-      // ou on laisse le timeout original faire son travail.
-      if (document.readyState === 'complete') {
-        setTimeout(() => {
-          if (gameLoading) gameLoading.style.display = 'none';
-        }, 2000);
-      }
+      resetLoadingUi('Chargement du Perroquet Tropical...');
+      window.startElRamonGame?.();
     }
 
     function showMemberOnlyScreen() {
@@ -343,31 +405,25 @@
     async function checkGameAccess() {
       showAccessLoading();
 
-      // Wait for app.js to initialize window.ElRamon.Auth
-      // Since checkGameAccess is called immediately, we delay it until DOMContentLoaded
       if (!window.ElRamon || !window.ElRamon.Auth) {
-        // Fallback for immediate execution
-        const hasV1Key = localStorage.getItem("elramon_member") !== null;
-        const hasClubMemberKey = localStorage.getItem("elramonClubMember") === "true";
-        if (hasV1Key || hasClubMemberKey) {
-          showGame();
-          return;
+        authCheckAttempts += 1;
+        if (authCheckAttempts <= 20) {
+          setTimeout(checkGameAccess, 250);
+        } else {
+          showMemberOnlyScreen();
         }
-        
-        // Listen for initialization
-        window.addEventListener('elramon_auth_ready', checkGameAccess);
-        // also check on load just in case
-        window.addEventListener('load', checkGameAccess);
         return;
       }
 
-      const member = await window.ElRamon.Auth.getMember();
-      
-      if (member) {
-        localStorage.setItem("elramonClubMember", "true");
-        showGame();
-      } else {
-        localStorage.removeItem("elramonClubMember");
+      try {
+        const member = await window.ElRamon.Auth.getMember();
+        if (member) {
+          showGame();
+        } else {
+          showMemberOnlyScreen();
+        }
+      } catch (error) {
+        console.error('Vérification membre impossible :', error);
         showMemberOnlyScreen();
       }
     }
@@ -376,14 +432,6 @@
 
     // Lancer la vérif
     checkGameAccess();
-
-    // Supprimer le loading une fois Phaser prêt (fallback global)
-    window.addEventListener('load', () => {
-      if (window.stopPhaser) return;
-      setTimeout(() => {
-        if (gameLoading) gameLoading.style.display = 'none';
-      }, 2000);
-    });
 
     // Contrôles mobile tactiles
     (function() {
