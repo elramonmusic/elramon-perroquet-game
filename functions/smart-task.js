@@ -36,6 +36,7 @@ export async function onRequestPost(context) {
   }
 
   const targetUrl = env.RAMONITO_FUNCTION_URL || `${env.SUPABASE_URL}/functions/v1/smart-task`;
+  const history = Array.isArray(payload.history) ? payload.history.slice(-8) : [];
   try {
     const response = await fetchWithTimeout(targetUrl, {
       method: 'POST',
@@ -44,7 +45,7 @@ export async function onRequestPost(context) {
         Authorization: request.headers.get('Authorization'),
         apikey: env.SUPABASE_ANON_KEY,
       },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history }),
     });
     const body = await response.text();
     return new Response(body, {

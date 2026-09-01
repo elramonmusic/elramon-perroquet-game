@@ -13,6 +13,19 @@ function corsHeaders(req: Request) {
   };
 }
 
+function normalizeText(value: unknown) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function queryTerms(question: string) {
+  return normalizeText(question).split(' ').filter((term) => term.length > 1);
+}
+
 serve(async (req) => {
   const responseHeaders = corsHeaders(req);
   if (req.method === 'OPTIONS') {
@@ -60,7 +73,7 @@ serve(async (req) => {
     const body = await req.json();
     const question = typeof body.question === 'string' ? body.question.trim() : '';
     const history = Array.isArray(body.history)
-      ? body.history.slice(-6).flatMap((entry: unknown) => {
+      ? body.history.slice(-8).flatMap((entry: unknown) => {
           if (!entry || typeof entry !== 'object') return [];
           const item = entry as { role?: unknown; content?: unknown };
           if (!['user', 'assistant'].includes(String(item.role)) || typeof item.content !== 'string') return [];
@@ -97,14 +110,59 @@ serve(async (req) => {
       });
     }
 
-    // 4. Récupérer tous les produits d'affiliation actifs pour l'IA
-    const { data: products } = await supabaseServiceClient
-      .from('affiliate_products')
-      .select('id, name, category, keywords, description, is_premium, banana_cost, disclosure, image_url, url')
-      .eq('is_active', true)
-      .limit(10); // Limite au cas où il y a trop de produits pour le prompt
+    // 4. Chercher uniquement la connaissance et les produits pertinents.
+    const [{ data: knowledge }, { data: products }] = await Promise.all([
+      supabaseServiceClient
+        .from('agent_knowledge')
+        .select('title, category, content, canonical_url, keywords, access_level, priority')
+        .eq('is_active', true)
+        .limit(100),
+      supabaseServiceClient
+        .from('affiliate_products')
+        .select('id, name, category, keywords, description, is_premium, banana_cost, disclosure, image_url, url, priority, use_cases, audience, recommendation_notes, merchant, link_status')
+        .eq('is_active', true)
+        .eq('link_status', 'active')
+        .limit(100)
+    ]);
 
-    const selectedProducts = products || [];
+    const terms = queryTerms(question);
+    const selectedKnowledge = (knowledge || []).map((entry: any) => {
+      const title = normalizeText(entry.title);
+      const category = normalizeText(entry.category);
+      const keywords = normalizeText((entry.keywords || []).join(' '));
+      const content = normalizeText(entry.content);
+      let score = Number(entry.priority || 0) / 100;
+      for (const term of terms) {
+        if (title.includes(term)) score += 8;
+        if (keywords.includes(term)) score += 6;
+        if (category.includes(term)) score += 4;
+        if (content.includes(term)) score += 2;
+      }
+      return { ...entry, score };
+    }).filter((entry: any) => entry.score > 1)
+      .sort((a: any, b: any) => b.score - a.score)
+      .slice(0, 5);
+
+    const selectedProducts = (products || []).map((product: any) => {
+      const name = normalizeText(product.name);
+      const category = normalizeText(product.category);
+      const keywords = normalizeText((product.keywords || []).join(' '));
+      const uses = normalizeText((product.use_cases || []).join(' '));
+      const audience = normalizeText((product.audience || []).join(' '));
+      const description = normalizeText(product.description);
+      let score = Number(product.priority || 0) / 10;
+      for (const term of terms) {
+        if (name.includes(term)) score += 8;
+        if (keywords.includes(term)) score += 7;
+        if (uses.includes(term)) score += 6;
+        if (audience.includes(term)) score += 5;
+        if (category.includes(term)) score += 4;
+        if (description.includes(term)) score += 2;
+      }
+      return { ...product, score };
+    }).filter((product: any) => product.score > 2)
+      .sort((a: any, b: any) => b.score - a.score)
+      .slice(0, 3);
 
     // 5. Configurer le prompt système et appeler Groq
     const groqApiKey = Deno.env.get('GROQ_API_KEY');
@@ -115,21 +173,37 @@ serve(async (req) => {
     let systemPrompt = `Tu es Ramonito, le perroquet mascotte officiel du El Ramon Music Club, l'empire tropical du créateur El Ramon Music. 
 Tu adores la musique tropicale, la chaleur, et tu lâches souvent des expressions en espagnol ou relatives aux fruits (bananes, ananas, cocotiers).
 Ton but est d'animer le club, de conseiller les membres, et de faire la promotion des musiques et créations de ton boss El Ramon Music.
-Tu es fun, drôle, parfois un peu espiègle. Réponds de façon très concise et vivante (maximum 2 à 3 phrases courtes). 
-Tu parles à l'utilisateur : ${userName}.`;
+Tu es fun, drôle, parfois un peu espiègle. Réponds de façon concise, claire et utile, généralement en 3 à 5 phrases courtes.
+Tu parles à l'utilisateur : ${userName}.
+
+Règles absolues :
+- Utilise uniquement les informations et liens officiels fournis ci-dessous.
+- N'invente jamais une page, un lien, un prix, une promotion, un stock, une garantie ou une fonctionnalité.
+- Indique quand une page est réservée aux membres.
+- Si l'information manque, dis-le simplement puis oriente vers la page Contact.
+- Ne demande jamais de mot de passe, de code OTP, de clé API ni de donnée bancaire.`;
+
+    if (selectedKnowledge.length > 0) {
+      systemPrompt += `\n\nConnaissance officielle pertinente :\n` + selectedKnowledge.map((entry: any) =>
+        `- ${entry.title} [${entry.access_level}] : ${entry.content}${entry.canonical_url ? ` | Lien officiel : ${entry.canonical_url}` : ''}`
+      ).join('\n');
+    }
 
     if (selectedProducts.length > 0) {
-      systemPrompt += `\n\nTu as accès au catalogue de recommandations du club. Si (et seulement si) la conversation s'y prête de façon extrêmement naturelle, recommande UN des produits ci-dessous pour aider l'utilisateur.
+      systemPrompt += `\n\nTu as accès aux produits pertinents du catalogue du Club. Recommande au maximum DEUX produits, uniquement si l'utilisateur demande un conseil commercial ou si cela répond directement à son besoin.
 Consignes de recommandation :
 - N'invente JAMAIS d'autres produits ou liens.
+- Explique brièvement pourquoi le produit correspond au besoin.
+- Indique clairement qu'il s'agit d'un lien partenaire ou affilié qui peut soutenir le Club.
+- Ne donne jamais de prix ni de disponibilité : invite à les vérifier chez le marchand.
 - Si le produit est premium (is_premium: true), tease-le (ex: "J'ai un secret tropical exclusif pour toi contre X bananes 🍌") et demande s'il veut le débloquer. Ne donne pas son lien.
 - Tu DOIS obligatoirement ajouter la balise textuelle exacte [PRODUCT:id] à la toute fin de ta réponse pour déclencher l'affichage visuel du produit. (ex: [PRODUCT:1234-5678]).
-Voici les produits disponibles :\n` + selectedProducts.map(p => `- ID: ${p.id} | Nom: ${p.name} | Coût: ${p.banana_cost} bananes | Description: ${p.description}`).join('\n');
+Produits disponibles :\n` + selectedProducts.map((p: any) => `- ID: ${p.id} | Nom: ${p.name} | Catégorie: ${p.category} | Marchand: ${p.merchant || 'partenaire'} | Coût premium: ${p.banana_cost} bananes | Description: ${p.description} | Mention: ${p.disclosure || 'Lien partenaire'}`).join('\n');
     }
 
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...(history || []).slice(-6), // Garde les 6 derniers messages de contexte
+      ...(history || []).slice(-8),
       { role: 'user', content: question }
     ];
 
