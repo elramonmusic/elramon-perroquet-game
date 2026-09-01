@@ -501,6 +501,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const widget = document.createElement('elevenlabs-convai');
       widget.setAttribute('signed-url', result.signedUrl);
       widget.setAttribute('variant', 'full');
+      widget.setAttribute('worklet-path-raw-audio-processor', '/assets/vendor/elevenlabs/rawAudioProcessor.js');
+      widget.setAttribute('worklet-path-audio-concat-processor', '/assets/vendor/elevenlabs/audioConcatProcessor.js');
       widget.setAttribute('dismissible', 'false');
       widget.setAttribute('action-text', 'Parler à Ramonito');
       widget.setAttribute('start-call-text', 'Démarrer');
