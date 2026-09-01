@@ -21,11 +21,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span id="ramonito-free-badge" class="badge-free hidden">Gratuit</span>
             <span id="ramonito-bananas-count">🍌 ${safeBananas}</span>
           </div>
+          <button id="ramonito-voice" class="ramonito-voice-btn" aria-label="Parler à Ramonito" title="Parler à Ramonito">🎙️</button>
           <button id="ramonito-close" class="ramonito-close-btn" aria-label="Fermer Ramonito">&times;</button>
         </div>
         <div id="ramonito-messages" class="ramonito-messages">
           <div class="message assistant">Salut, moi c’est Ramonito 🦜 Je suis la mascotte du El Ramon Music Club. Tu as 3 questions gratuites, puis tu pourras utiliser tes bananes gagnées dans le jeu pour continuer à discuter avec moi 🍌☀️</div>
         </div>
+        <section id="ramonito-voice-panel" class="ramonito-voice-panel hidden" aria-label="Conversation vocale avec Ramonito">
+          <div class="ramonito-voice-panel-header">
+            <strong>🎙️ Ramonito vocal</strong>
+            <button id="ramonito-voice-close" class="ramonito-close-btn" aria-label="Fermer la conversation vocale">&times;</button>
+          </div>
+          <p>En démarrant, tu autoriseras ElevenLabs à utiliser ton microphone pendant la conversation (5 minutes maximum). Le chat texte reste disponible.</p>
+          <button id="ramonito-voice-start" class="ramonito-voice-start-btn">Démarrer la conversation vocale</button>
+          <p id="ramonito-voice-status" class="ramonito-voice-status" role="status" aria-live="polite"></p>
+          <div id="ramonito-voice-mount" class="ramonito-voice-mount"></div>
+        </section>
         <div class="ramonito-input-area">
           <input type="text" id="ramonito-input" placeholder="Pose ta question..." autocomplete="off" aria-label="Question pour Ramonito" maxlength="1000">
           <button id="ramonito-send" title="Envoyer" aria-label="Envoyer la question">💋</button>
@@ -81,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       flex-direction: column;
       box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
       overflow: hidden;
+      position: relative;
       transform-origin: bottom right;
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
@@ -134,6 +146,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     .ramonito-close-btn:hover {
       color: #FFF;
+    }
+    .ramonito-voice-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(0, 206, 209, 0.5);
+      border-radius: 50%;
+      background: rgba(0, 206, 209, 0.12);
+      color: #FFF;
+      cursor: pointer;
+      font-size: 1rem;
+      flex: 0 0 auto;
+    }
+    .ramonito-voice-btn:hover,
+    .ramonito-voice-btn:focus-visible {
+      background: rgba(0, 206, 209, 0.3);
+      outline: 2px solid var(--yellow-sun, #FFD700);
+      outline-offset: 2px;
+    }
+    .ramonito-voice-panel {
+      position: absolute;
+      inset: 57px 0 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      overflow-y: auto;
+      background: rgba(20, 12, 35, 0.99);
+      color: #FFF;
+    }
+    .ramonito-voice-panel.hidden {
+      display: none;
+    }
+    .ramonito-voice-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--turquoise, #00CED1);
+    }
+    .ramonito-voice-panel p {
+      margin: 0;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .ramonito-voice-start-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, var(--turquoise, #00CED1), #FF8C00);
+      color: #101426;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .ramonito-voice-start-btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+    .ramonito-voice-status {
+      min-height: 1.2em;
+      text-align: center;
+    }
+    .ramonito-voice-mount {
+      width: 100%;
+      min-height: 120px;
+    }
+    .ramonito-voice-mount elevenlabs-convai {
+      display: block;
+      width: 100%;
     }
     .ramonito-messages {
       flex: 1;
@@ -347,11 +428,96 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sendBtn = document.getElementById('ramonito-send');
   const freeBadge = document.getElementById('ramonito-free-badge');
   const bananasCount = document.getElementById('ramonito-bananas-count');
+  const voiceBtn = document.getElementById('ramonito-voice');
+  const voicePanel = document.getElementById('ramonito-voice-panel');
+  const voiceCloseBtn = document.getElementById('ramonito-voice-close');
+  const voiceStartBtn = document.getElementById('ramonito-voice-start');
+  const voiceStatus = document.getElementById('ramonito-voice-status');
+  const voiceMount = document.getElementById('ramonito-voice-mount');
 
   let freeQuestionsUsed = member.free_questions_used || 0;
   let bananas = member.bananas_balance || 0;
   let chatHistory = [];
   let typingIndicator = null;
+  let elevenLabsLoader = null;
+  let voiceSessionTimer = null;
+
+  function loadElevenLabsWidget() {
+    if (customElements.get('elevenlabs-convai')) return Promise.resolve();
+    if (elevenLabsLoader) return elevenLabsLoader;
+
+    elevenLabsLoader = new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-elevenlabs-widget]');
+      if (existing) {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', () => reject(new Error('Chargement vocal impossible')), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://elevenlabs.io/convai-widget/index.js';
+      script.async = true;
+      script.dataset.elevenlabsWidget = 'true';
+      script.addEventListener('load', resolve, { once: true });
+      script.addEventListener('error', () => reject(new Error('Chargement vocal impossible')), { once: true });
+      document.head.appendChild(script);
+    });
+
+    return elevenLabsLoader;
+  }
+
+  function closeVoicePanel() {
+    if (voiceSessionTimer) {
+      clearTimeout(voiceSessionTimer);
+      voiceSessionTimer = null;
+    }
+    voiceMount.replaceChildren();
+    voiceStartBtn.hidden = false;
+    voiceStartBtn.disabled = false;
+    voiceStatus.textContent = '';
+    voicePanel.classList.add('hidden');
+  }
+
+  async function startVoiceConversation() {
+    voiceStartBtn.disabled = true;
+    voiceStatus.textContent = 'Préparation de la voix de Ramonito…';
+
+    try {
+      const session = await window.ElRamon.Auth.getSession();
+      if (!session?.access_token) throw new Error('Ta session a expiré. Reconnecte-toi.');
+
+      const response = await fetch('/elevenlabs-session', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.signedUrl) {
+        throw new Error(result.error || 'Ramonito vocal est indisponible.');
+      }
+
+      await loadElevenLabsWidget();
+      const widget = document.createElement('elevenlabs-convai');
+      widget.setAttribute('signed-url', result.signedUrl);
+      widget.setAttribute('variant', 'expanded');
+      widget.setAttribute('dismissible', 'false');
+      widget.setAttribute('action-text', 'Parler à Ramonito');
+      widget.setAttribute('start-call-text', 'Démarrer');
+      widget.setAttribute('end-call-text', 'Terminer');
+      widget.setAttribute('listening-text', 'Ramonito écoute…');
+      widget.setAttribute('speaking-text', 'Ramonito parle…');
+      widget.setAttribute('avatar-orb-color-1', '#00CED1');
+      widget.setAttribute('avatar-orb-color-2', '#FFD700');
+      voiceMount.replaceChildren(widget);
+      voiceStartBtn.hidden = true;
+      voiceStatus.textContent = 'Utilise le bouton du widget pour autoriser le microphone et commencer.';
+      voiceSessionTimer = setTimeout(() => {
+        closeVoicePanel();
+      }, 5 * 60 * 1000);
+    } catch (error) {
+      voiceStatus.textContent = error.message || 'Ramonito vocal est momentanément indisponible.';
+      voiceStartBtn.disabled = false;
+    }
+  }
 
   function updateBalanceUI() {
     let freeQuestionsLeft = Math.max(0, 3 - freeQuestionsUsed);
@@ -381,9 +547,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
+      closeVoicePanel();
       chatbox.classList.add('hidden');
     });
   }
+
+  if (voiceBtn) {
+    voiceBtn.addEventListener('click', () => {
+      voicePanel.classList.remove('hidden');
+      voiceStartBtn.focus();
+    });
+  }
+
+  if (voiceCloseBtn) voiceCloseBtn.addEventListener('click', closeVoicePanel);
+  if (voiceStartBtn) voiceStartBtn.addEventListener('click', startVoiceConversation);
 
   function addMessage(text, role) {
     const div = document.createElement('div');

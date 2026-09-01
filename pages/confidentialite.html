@@ -132,9 +132,10 @@
         <li><strong>Prénom ou nom d'artiste</strong> — facultatif, pour personnaliser ton expérience.</li>
         <li><strong>Préférences newsletter</strong> — si tu acceptes de recevoir les bonus et nouveautés.</li>
         <li><strong>Statut abonné YouTube</strong> — déclaration volontaire, non vérifiée automatiquement.</li>
+        <li><strong>Conversation vocale avec Ramonito</strong> — uniquement si tu la démarres : audio du microphone, transcription et données techniques nécessaires à la conversation, traités par ElevenLabs.</li>
       </ul>
       <p style="margin-top:var(--space-md);">
-        Nous ne collectons <strong>aucune donnée financière</strong>, <strong>aucun mot de passe</strong> en V1, et <strong>aucune donnée sensible</strong> au sens du RGPD.
+        Nous ne collectons <strong>aucune donnée financière</strong>. La connexion par lien magique Supabase ne nécessite pas de mot de passe stocké par le Club. Le microphone n'est activé qu'après ton action et pendant la session vocale.
       </p>
     </div>
 
@@ -148,6 +149,7 @@
         <li>T'envoyer des communications liées au Club (si tu y as consenti)</li>
         <li>Améliorer le site et les contenus proposés</li>
         <li>Gérer les inscriptions et les demandes de contact ou de collaboration</li>
+        <li>Fournir la conversation vocale avec Ramonito lorsque tu choisis de la démarrer</li>
       </ul>
     </div>
 
@@ -158,6 +160,7 @@
       </p>
       <ul>
         <li><strong>Ton consentement</strong> — lors de l'inscription, tu acceptes explicitement la collecte et le traitement de tes données via la case RGPD.</li>
+        <li><strong>Ton action volontaire</strong> — lorsque tu démarres une conversation vocale et autorises l'accès au microphone.</li>
         <li><strong>Notre intérêt légitime</strong> — gérer et améliorer la communauté El Ramon Music Club.</li>
       </ul>
     </div>
@@ -183,7 +186,8 @@
       </p>
       <ul>
         <li><strong>Cloudflare</strong> — hébergement du site</li>
-        <li><strong>Supabase</strong> — base de données (à venir en V2)</li>
+        <li><strong>Supabase</strong> — authentification et base de données membres</li>
+        <li><strong>ElevenLabs</strong> — traitement de la voix et fonctionnement de Ramonito vocal, uniquement lorsqu'une session vocale est démarrée</li>
       </ul>
       <p>
         Ces prestataires sont soumis à des obligations contractuelles strictes en matière de protection des données.
@@ -200,7 +204,7 @@
         <li><strong>Cookie de consentement</strong> — pour mémoriser ton choix d'acceptation des cookies</li>
       </ul>
       <p>
-        Nous n'utilisons <strong>aucun cookie de suivi publicitaire</strong> ni de cookie tiers d'analyse en V1.
+        Nous n'utilisons <strong>aucun cookie de suivi publicitaire</strong> ni de cookie tiers d'analyse.
       </p>
     </div>
 
@@ -241,7 +245,7 @@
       <ul>
         <li>Connexion HTTPS (SSL/TLS) via Cloudflare</li>
         <li>Protection anti-bot Cloudflare Turnstile sur les formulaires</li>
-        <li>Aucune donnée sensible stockée (pas de mot de passe en V1)</li>
+        <li>Clés secrètes conservées côté serveur et sessions membres vérifiées</li>
         <li>Accès administrateur restreint</li>
       </ul>
     </div>
@@ -266,7 +270,7 @@
     </div>
 
     <p style="text-align:center; color:rgba(255,255,255,0.55); font-size:0.8rem; margin-top:var(--space-3xl);">
-      Dernière mise à jour : juillet 2026
+      Dernière mise à jour : septembre 2026
     </p>
 
   </div>

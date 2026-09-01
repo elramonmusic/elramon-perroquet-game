@@ -317,6 +317,9 @@ Après les migrations historiques, exécute aussi `supabase/security_hardening.s
 | `TURNSTILE_SECRET_KEY` | Secret Cloudflare Turnstile ; les formulaires échouent s'il manque | Oui |
 | `RESEND_API_KEY` | Clé API Resend pour les emails | V2 (optionnel) |
 | `RAMONITO_FUNCTION_URL` | URL de la fonction Supabase Ramonito | Ramonito |
+| `ELEVENLABS_API_KEY` | Clé API ElevenLabs, secrète et uniquement côté serveur | Ramonito vocal |
+| `ELEVENLABS_AGENT_ID` | Identifiant de l'agent ElevenLabs (un identifiant par défaut est prévu) | Optionnel |
+| `ELEVENLABS_BRANCH_ID` | Branche ElevenLabs à utiliser en production | Optionnel |
 
 Crée un fichier `.dev.vars` à la racine pour le développement local avec Wrangler :
 
@@ -326,7 +329,10 @@ SUPABASE_ANON_KEY=eyJhbGci...
 SUPABASE_SERVICE_KEY=eyJhbGci...
 TURNSTILE_SECRET_KEY=0x...
 RESEND_API_KEY=re_xxx...
+ELEVENLABS_API_KEY=sk_...
 ```
+
+Ne place jamais `ELEVENLABS_API_KEY` dans un fichier JavaScript envoyé au navigateur ou dans le dépôt Git.
 
 ---
 
